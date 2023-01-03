@@ -1,0 +1,48 @@
+srvinfo: dev
+
+server:
+  port: 10000
+
+#Oracle DataSource
+# spring:
+#   datasource:
+#     hikari:
+#       max-lifetime: 9000
+#       idle-timeout: 8000
+#     type: com.zaxxer.hikari.HikariDataSource
+#     driver-class-name: org.mariadb.jdbc.Driver
+#     url: jdbc:mariadb://eura-maria-db.cmjphsu1czot.ap-northeast-2.rds.amazonaws.com:3306/eura_db
+#     username: eura_user
+#     password: eura_pass
+
+#업로드 디렉토리는 협의 후 확정
+file:
+  upload-dir: classpath:/upload
+
+#개발만 디버그 로그 보이게 하기
+logging:
+  level:
+    root: debug
+    com:
+      eura: debug
+  file:
+    path: classpath:/logs
+    max-history: 7
+  register-shutdown-hook: true
+
+log4jdbc:
+  spylogdelegator:
+    name: net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
+  dump:
+    sql:
+      maxlinelength: 0
+  auto:
+    load:
+      popular:
+        drivers: false
+
+mail:
+  passwd: "1"
+
+domain: http://localhost:10000
+w3domain: http://localhost:3000

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kantar.mapper.ProjectMapper">
+    <select id="getProjectInfo">
+        SELECT * FROM KT_PROJECT
+    </select>
+
+    <insert id="savProjectInfo">
+        INSERT INTO KT_PROJECT (project_id, job_num, user_type, user_status) VALUES (#{user_id}, #{user_pw}, #{user_type}, #{user_status})
+    </insert>
+</mapper>
