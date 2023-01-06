@@ -1,24 +1,31 @@
 package com.kantar;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 
-import com.kantar.service.KafkaSender;
+import com.kantar.config.GracefulShutdown;
 
+@EnableAsync
 @SpringBootApplication
-public class KantarApplication implements CommandLineRunner {
+public class KantarApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(KantarApplication.class, args);
 	}
 
-	@Autowired
-    private KafkaSender KafkaSender;
+	@Bean
+    public GracefulShutdown gracefulShutdown() {
+        return new GracefulShutdown();
+    }
 
-    @Override
-    public void run(String... strings) throws Exception {
-        KafkaSender.send(123.123);
+    @Bean
+    public ConfigurableServletWebServerFactory webServerFactory(final GracefulShutdown gracefulShutdown) {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+        factory.addConnectorCustomizers(gracefulShutdown);
+        return factory;
     }
 }

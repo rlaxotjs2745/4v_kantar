@@ -5,5 +5,5 @@ import lombok.*;
 @Getter
 @Setter
 public class SingleResult<T> extends CommonResult {
-    private T list;
+    private T data;
 }

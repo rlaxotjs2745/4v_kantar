@@ -3,17 +3,17 @@ srvinfo: dev
 server:
   port: 10000
 
-#Oracle DataSource
-# spring:
-#   datasource:
-#     hikari:
-#       max-lifetime: 9000
-#       idle-timeout: 8000
-#     type: com.zaxxer.hikari.HikariDataSource
-#     driver-class-name: org.mariadb.jdbc.Driver
-#     url: jdbc:mariadb://eura-maria-db.cmjphsu1czot.ap-northeast-2.rds.amazonaws.com:3306/eura_db
-#     username: eura_user
-#     password: eura_pass
+#DataSource
+spring:
+  datasource:
+    hikari:
+      max-lifetime: 9000
+      idle-timeout: 8000
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://3.36.125.155:3306/kantar
+    username: kantar_user
+    password: kantar123
 
 #업로드 디렉토리는 협의 후 확정
 file:

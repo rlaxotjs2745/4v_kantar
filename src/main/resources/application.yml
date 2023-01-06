@@ -6,17 +6,30 @@ spring:
       enabled: true
       max-file-size: 5GB
       max-request-size: 5GB
+  mvc:
+    static-path-pattern: /static/**
+    async:
+      request-timeout: 86400000
+  web:
+    resources:
+      add-mappings: true
+      static-locations: classpath:/static/
+  devtools:
+    add-properties: false
+    livereload:
+      enabled: true
+  freemarker:
+    cache: false
   jwt:
     secret: cMtNfCZTjYL6w9oDKNqwEkndAyiTK5FJAMZc
   kafka:
+    bootstrap-servers: localhost:9092
     consumer:
-      bootstrap-servers: localhost:9092
       group-id: kantar
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:
-      bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
@@ -27,8 +40,8 @@ server:
 #Model Location
 mybatis:
   type-aliases-package: com.kantar.vo
-
-#Xml Location
-  mapper-locations: classpath:sqlmap/*.xml
+  check-config-location: true
   configuration:
+    default-fetch-size: 100
     jdbc-type-for-null: null
+  mapper-locations: classpath:sqlmap/*.xml

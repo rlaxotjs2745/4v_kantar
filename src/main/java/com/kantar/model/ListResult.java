@@ -6,5 +6,5 @@ import java.util.List;
 @Getter
 @Setter
 public class ListResult<T> extends CommonResult {
-    private List<T> list;
+    private List<T> data;
 }

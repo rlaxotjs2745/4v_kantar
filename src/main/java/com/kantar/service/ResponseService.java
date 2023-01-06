@@ -37,53 +37,53 @@ public class ResponseService {
         setSuccessResult(result);
         return result;
     }
-    public CommonResult getSuccessResult(String integer, String msg) {
+    public CommonResult getSuccessResult(String code, String msg) {
         CommonResult result = new CommonResult();
         result.setSuccess("1");
-        result.setCode(integer);
+        result.setCode(code);
         result.setMsg(msg);
         return result;
     }
-    public <T> CommonResult getSuccessResult(T list, String integer, String msg) {
+    public <T> CommonResult getSuccessResult(T data, String code, String msg) {
         SingleResult<T> result = new SingleResult<>();
         result.setSuccess("1");
-        result.setList(list);
-        result.setCode(integer);
+        result.setData(data);
+        result.setCode(code);
         result.setMsg(msg);
         return result;
     }
-    public <T> CommonResult getSuccessResult(List<T> list, String integer, String msg) {
+    public <T> CommonResult getSuccessResult(List<T> data, String code, String msg) {
         ListResult<T> result = new ListResult<>();
         result.setSuccess("1");
-        result.setList(list);
-        result.setCode(integer);
+        result.setData(data);
+        result.setCode(code);
         result.setMsg(msg);
         return result;
     }
-    public <T> CommonResult getSuccessResult(List<T> list) {
+    public <T> CommonResult getSuccessResult(List<T> data) {
         ListResult<T> result = new ListResult<>();
-        result.setList(list);
+        result.setData(data);
         setSuccessResult(result);
         return result;
     }
-    public <T> CommonResult getSuccessResult(ArrayList<T> list) {
+    public <T> CommonResult getSuccessResult(ArrayList<T> data) {
         ListResult<T> result = new ListResult<>();
-        result.setList(list);
+        result.setData(data);
         setSuccessResult(result);
         return result;
     }
-    public <T> CommonResult getSuccessResult(T list) {
+    public <T> CommonResult getSuccessResult(T data) {
         SingleResult<T> result = new SingleResult<>();
-        result.setList(list);
+        result.setData(data);
         setSuccessResult(result);
         return result;
     }
 
     // 실패 결과만 처리하는 메소드
-    public CommonResult getFailResult(String integer, String msg) {
+    public CommonResult getFailResult(String code, String msg) {
         CommonResult result = new CommonResult();
         result.setSuccess("0");
-        result.setCode(integer);
+        result.setCode(code);
         result.setMsg(msg);
         return result;
     }

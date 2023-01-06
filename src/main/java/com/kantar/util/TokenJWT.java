@@ -36,14 +36,14 @@ public class TokenJWT {
     }
 
     public void main(String[] args) throws UnsupportedEncodingException {
-        TokenJWT tokenJWT = new TokenJWT();
-        System.out.println(secretKey);
+        // TokenJWT tokenJWT = new TokenJWT();
+        // System.out.println(secretKey);
 
-        String jwt = tokenJWT.createToken(null, "USER");
-        System.out.println(jwt);
+        // String jwt = tokenJWT.createToken(null, "USER");
+        // System.out.println(jwt);
         
-        Map<String, Object> claimMap = tokenJWT.verifyJWT(jwt);
-        System.out.println(claimMap); // 토큰이 만료되었거나 문제가있으면 null
+        // Map<String, Object> claimMap = tokenJWT.verifyJWT(jwt);
+        // System.out.println(claimMap); // 토큰이 만료되었거나 문제가있으면 null
     }
         
     /**
@@ -62,7 +62,8 @@ public class TokenJWT {
         //payload 부분 설정
         Claims payloads = Jwts.claims();
         payloads.put("role_type", roles);
-        payloads.put("uidx", _data.get("uidx"));
+        payloads.put("user_id", _data.get("user_id"));
+        payloads.put("user_status", _data.get("user_status"));
         
         Date ext = new Date(); // 토큰 만료 시간
         ext.setTime(ext.getTime() + expiredTime);
