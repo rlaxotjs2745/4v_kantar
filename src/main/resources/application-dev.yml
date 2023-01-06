@@ -11,13 +11,17 @@ spring:
       idle-timeout: 8000
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://3.36.125.155:3306/kantar
+    url: jdbc:mariadb://3.36.125.155:3306/kantar?useUnicode=true&autoReconnect=true&characterEncoding=utf8&allowMultiQueries=true&useSSL=false&serverTimezone=UTC
     username: kantar_user
     password: kantar123
+  sql:
+    init:
+      encoding: UTF-8
 
 #업로드 디렉토리는 협의 후 확정
 file:
-  upload-dir: classpath:/upload
+  upload-dir: /Users/winmaster/DEV/KANTAR/KANTAR-Serv/upload
+  # upload-dir: /home/ec2-user/upload
 
 #개발만 디버그 로그 보이게 하기
 logging:

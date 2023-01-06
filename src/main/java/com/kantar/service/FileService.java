@@ -55,29 +55,28 @@ public class FileService {
                                 return param;
                             }
                         }
+                    // }
+
+                    String path = "/report/" + _path + "/";
+                    String fullpath = this.filepath + path;
+                    File fileDir = new File(fullpath);
+                    if (!fileDir.exists()) {
+                        fileDir.mkdirs();
                     }
-                }
+                // }
 
-                if(req.getFiles("file").get(0).getSize() != 0){
-                    fileList = req.getFiles("file");
-
-                    
-                }
-                String path = "/report/" + _path + "/";
-                String fullpath = this.filepath + path;
-                File fileDir = new File(fullpath);
-                if (!fileDir.exists()) {
-                    fileDir.mkdirs();
-                }
-
-                for(MultipartFile mf : fileList) {
-                    String originFileName = mf.getOriginalFilename();   // 원본 파일 명
-                    param.setFilename(originFileName);
+                // if(req.getFiles("file").get(0).getSize() != 0){
+                //     fileList = req.getFiles("file");
+                // }
+                // for(MultipartFile mf : fileList) {
+                    // String originFileName = mf.getOriginalFilename();   // 원본 파일 명
+                    param.setFilename(fname);
                     param.setFilepath(path);
                     try { // 파일생성
-                        mf.transferTo(new File(fullpath, originFileName));
+                        mf.transferTo(new File(fullpath, fname));
                     } catch (Exception e) {
                         e.printStackTrace();
+                    }
                     }
                 }
             }

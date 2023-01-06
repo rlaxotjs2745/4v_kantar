@@ -7,17 +7,47 @@
     </select>
 
     <select id="getProjectList" resultType="com.kantar.vo.ProjectVO">
-        SELECT A.idx_project_job_projectid, B.job_no, A.project_id, A.filename, C.user_name, D.idx_report 
+        SELECT A.idx_project_job_projectid, B.job_no, A.project_id, D.filename, C.user_name, D.idx_report, E.project_name, IF(E.project_type=1, 'RAW DATA', '병합') AS project_type_str, E.idx_project, E.create_dt
         FROM KT_PROJECT_JOB_PROJECTID A
         JOIN KT_PROJECT_JOB B ON B.idx_project_job=A.idx_project_job
+        JOIN KT_PROJECT E ON E.idx_project_job_projectid=A.idx_project_job_projectid
         JOIN KT_USER C ON C.idx_user=A.idx_user
         JOIN KT_REPORT D ON D.idx_project_job_projectid=A.idx_project_job_projectid
     </select>
 
     <select id="savProjectInfo" resultType="com.kantar.vo.ProjectVO">
     <![CDATA[
-		{call prc_savProjectInfo(#{idx_user}, #{job_no}, #{project_name}, #{summary0}, #{filepath}, #{filename})}
+		{call prc_savProjectInfo(#{idx_user}, #{job_no}, #{project_name}, #{summary})}
 	]]>
+    </select>
+
+    <select id="getProjectJobNo" resultType="com.kantar.vo.ProjectVO">
+        SELECT idx_project_job FROM KT_PROJECT_JOB WHERE job_no=#{job_no}
+    </select>
+
+    <insert id="savProjectJobNo" useGeneratedKeys="true" keyProperty="idx_project_job">
+        INSERT INTO KT_PROJECT_JOB (job_no) VALUES (#{job_no})
+    </insert>
+
+    <select id="getProjectSeq" resultType="int">
+        SELECT IFNULL(MAX(project_seq),0) FROM KT_PROJECT_JOB_PROJECTID WHERE idx_project_job=#{idx_project_job}
+    </select>
+
+    <insert id="savProjectJobProjectid" useGeneratedKeys="true" keyProperty="idx_project_job_projectid">
+        INSERT INTO KT_PROJECT_JOB_PROJECTID (idx_project_job, project_id, project_seq, idx_user) VALUES (#{idx_project_job}, #{project_id}, #{project_seq}, #{idx_user});
+    </insert>
+
+    <insert id="savProjectInfo2" useGeneratedKeys="true" keyProperty="idx_project">
+        INSERT INTO KT_PROJECT (idx_project_job_projectid, project_name, project_type, project_status, summary0, idx_user) VALUES (#{idx_project_job_projectid}, #{project_name}, 1, 1, #{summary0}, #{idx_user});
+    </insert>
+
+    <select id="getProjectView" resultType="com.kantar.vo.ProjectVO">
+        SELECT A.idx_project_job_projectid, B.project_name, B.project_type, B.project_status, C.project_id, A.create_dt, B.summary0
+        FROM KT_REPORT A
+        JOIN KT_PROJECT B ON B.idx_project_job_projectid=A.idx_project_job_projectid
+        JOIN KT_PROJECT_JOB_PROJECTID C ON C.idx_project_job_projectid=B.idx_project_job_projectid
+        JOIN KT_PROJECT_JOB D ON D.idx_project_job=C.idx_project_job
+        WHERE A.idx_report=#{idx}
     </select>
 
     <select id="getReportList" resultType="com.kantar.vo.ProjectVO">
@@ -28,15 +58,36 @@
         JOIN KT_REPORT D ON D.idx_project_job_projectid=A.idx_project_job_projectid
     </select>
 
-    <select id="getReportData" resultType="com.kantar.vo.ProjectVO">
-        SELECT A.filename, C.user_name
-        FROM KT_PROJECT_JOB_PROJECTID A
-        WHERE A.idx_project_job_projectid=#{idx_project_job_projectid}
+    <select id="getReportView" resultType="com.kantar.vo.ProjectVO">
+        SELECT B.title, B.summary0
+        FROM KT_REPORT A
+        JOIN KT_REPORT_DATA B ON B.idx_report=A.idx_report
+        WHERE A.idx_report=#{idx}
     </select>
+
+    <select id="getReportFileList" resultType="com.kantar.vo.ProjectVO">
+        SELECT filepath, `filename` FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+    </select>
+
+    <insert id="savReport">
+		INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, filepath, `filename`, idx_user) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{filepath}, #{filename}, #{idx_user})
+    </insert>
+
+    <select id="getReportIdx" resultType="com.kantar.vo.ProjectVO">
+        SELECT idx_report FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+    </select>
+
+    <insert id="savReportIdx" useGeneratedKeys="true" keyProperty="idx_report">
+        INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, idx_user) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{idx_user})
+    </insert>
+
+    <insert id="saveReportData">
+        INSERT INTO KT_REPORT_DATA (idx_report, title, summary0, idx_user) VALUES (#{idx_report}, #{title}, #{summary0}, #{idx_user})
+    </insert>
 
     <select id="savReportMake" resultType="com.kantar.vo.ProjectVO">
         <![CDATA[
-            {call prc_savReportMake(#{idx_user}, #{idx_project_job_projectid})}
+            {call prc_savReportMake(#{idx_user}, #{idx_project_job_projectid}, #{title}, #{summary0})}
         ]]>
     </select>
 
@@ -46,4 +97,8 @@
             project_status=#{project_status}
             WHERE idx_project=#{idx_project}
     </update>
+
+    <select id="getReportFilterList" resultType="com.kantar.vo.ReportFilterVO">
+        SELECT idx_report_filter, filter_title FROM KT_REPORT_FILTER
+    </select>
 </mapper>

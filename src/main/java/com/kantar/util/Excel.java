@@ -1,7 +1,11 @@
 package com.kantar.util;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +18,9 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 
 @Component
 public class Excel {
@@ -38,12 +45,36 @@ public class Excel {
 	}
 
 	// 엑셀파일의 데이터 목록 가져오기 (파라미터들은 위에서 설명함)
-	public List<Map<String, Object>> getListData(MultipartFile file, int startRowNum, int columnLength) {
+	public List<Map<String, Object>> getListData(MultipartFile file, int startRowNum, int columnLength) throws IOException, InvalidFormatException {
+		
+		OPCPackage opcPackage = OPCPackage.open(file.getInputStream());
+		return getListDataProc(opcPackage, startRowNum, columnLength);
+	}
+	public List<Map<String, Object>> getListData(String file, int startRowNum, int columnLength) throws IOException, InvalidFormatException {
+		OPCPackage opcPackage = OPCPackage.open(file);
+		return getListDataProc(opcPackage, startRowNum, columnLength);
+	}
+	public List<String[]> getCsvListData(String file) throws Exception{
+		List<String[]> allRows = null;
+		try{
+			CsvParserSettings settings = new CsvParserSettings();
+			settings.getFormat().setLineSeparator("\n");
+			settings.setMaxColumns(65535);
+			settings.setMaxCharsPerColumn(65535);
+			
+			CsvParser parser = new CsvParser(settings);
+			allRows = parser.parseAll(new FileReader(new File(file)));
+			return allRows;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return allRows;
+	}
+	public List<Map<String, Object>> getListDataProc(OPCPackage opcPackage, int startRowNum, int columnLength) throws IOException, InvalidFormatException{
 		List<Map<String, Object>> excelList = new ArrayList<Map<String,Object>>();
 		
 		try {
-			OPCPackage opcPackage = OPCPackage.open(file.getInputStream());
-
 			@SuppressWarnings("resource")
 			XSSFWorkbook workbook = new XSSFWorkbook(opcPackage);
 
@@ -72,9 +103,6 @@ public class Excel {
 					excelList.add(map);
 				}
 			}
-
-		} catch (InvalidFormatException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
