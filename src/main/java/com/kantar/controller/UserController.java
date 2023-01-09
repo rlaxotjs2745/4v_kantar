@@ -3,6 +3,7 @@ package com.kantar.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,6 @@ public class UserController extends BaseController {
     private final ResponseService responseService;
     private final UserMapper userMapper;
     private final TokenJWT tokenJWT;
-    private final KafkaSender kafkaSender;
 
     /**
      * 로그인
@@ -61,15 +61,31 @@ public class UserController extends BaseController {
         return responseService.getFailResult("login","오류가 발생하였습니다.");
     }
 
+    /**
+     * 회원가입
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
     @PostMapping("/register")
     public CommonResult register(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
+            if(StringUtils.isEmpty(paramVo.getUser_id())){
+                return responseService.getFailResult("register","회원 아이디를 입력해주세요.");
+            }
+            if(StringUtils.isEmpty(paramVo.getUser_pw())){
+                return responseService.getFailResult("register","비밀번호를 입력해주세요.");
+            }
+            if(StringUtils.isEmpty(paramVo.getUser_name())){
+                return responseService.getFailResult("register","이름을 입력해주세요.");
+            }
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String hashedPassword = passwordEncoder.encode(paramVo.getUser_pw());
             paramVo.setUser_pw(hashedPassword);
             Integer rs = userMapper.savUserInfo(paramVo);
             if(rs==1){
-                return responseService.getSuccessResult();
+                return responseService.getSuccessResult("register","회원 가입이 완료되었습니다.");
             }else{
                 return responseService.getFailResult("register","회원 가입 후에 이용해주세요.");
             }
@@ -79,6 +95,13 @@ public class UserController extends BaseController {
         return responseService.getFailResult("register","오류가 발생하였습니다.");
     }
 
+    /**
+     * 회원정보 수정
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
     @PostMapping("/modify")
     public CommonResult modify(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
@@ -94,9 +117,19 @@ public class UserController extends BaseController {
         return responseService.getFailResult("modify","오류가 발생하였습니다.");
     }
 
+    /**
+     * 회원탈퇴
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
     @PostMapping("/dropout")
     public CommonResult dropout(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
+            if(StringUtils.isEmpty(paramVo.getUser_pw())){
+                return responseService.getFailResult("register","비밀번호를 입력해주세요.");
+            }
             Integer rs = userMapper.delUserInfo(paramVo);
             if(rs==1){
                 return responseService.getSuccessResult("dropout","회원 탈퇴가 완료되었습니다.");

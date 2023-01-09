@@ -33,8 +33,6 @@ public class FileService {
                     if(mf.getSize()>0){
                         String fname = mf.getOriginalFilename();
                         String ext = FilenameUtils.getExtension(fname);
-                        // Path savePath = Paths.get(this.filepath + fname);
-                        // Files.probeContentType(savePath).startsWith("image");
 
                         String contentType = mf.getContentType();
 
@@ -55,33 +53,26 @@ public class FileService {
                                 return param;
                             }
                         }
-                    // }
 
-                    String path = "/report/" + _path + "/";
-                    String fullpath = this.filepath + path;
-                    File fileDir = new File(fullpath);
-                    if (!fileDir.exists()) {
-                        fileDir.mkdirs();
-                    }
-                // }
+                        String path = "/report/" + _path + "/";
+                        String fullpath = this.filepath + path;
+                        File fileDir = new File(fullpath);
+                        if (!fileDir.exists()) {
+                            fileDir.mkdirs();
+                        }
 
-                // if(req.getFiles("file").get(0).getSize() != 0){
-                //     fileList = req.getFiles("file");
-                // }
-                // for(MultipartFile mf : fileList) {
-                    // String originFileName = mf.getOriginalFilename();   // 원본 파일 명
-                    param.setFilename(fname);
-                    param.setFilepath(path);
-                    try { // 파일생성
-                        mf.transferTo(new File(fullpath, fname));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                        param.setFilename(fname);
+                        param.setFilepath(path);
+                        try { // 파일생성
+                            mf.transferTo(new File(fullpath, fname));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
 
         return param;

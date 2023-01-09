@@ -39,21 +39,20 @@ public class ProjectService {
     @Value("${spring.smr.token}")
     public String smrtoken;
 
+    /**
+     * 비동기 리포트 결과 만들기
+     * @param prs
+     * @param paramVo
+     * @throws Exception
+     */
     @Async
     @Transactional
     public void create_report(List<ProjectVO> prs, ProjectVO paramVo) throws Exception{
         try {
             System.out.println("create_report START");
 
-            // System.out.println(paramVo.getIdx_project_job_projectid());
-
-            // List<ProjectVO> prs = projectMapper.getReportFileList(paramVo);
-
             for(ProjectVO prs0 : prs){
                 String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
-                System.out.println(_fpath);
-                // FileInputStream fis = new FileInputStream(_fpath);
-                // List<Map<String, Object>> ers = excel.getListData(_fpath, 1, 4);
 
                 SumtextVO _elist = new SumtextVO();
                 List<SumtextVO> _data = new ArrayList<SumtextVO>();
@@ -78,13 +77,6 @@ public class ProjectService {
                     _data.add(_elist);
                 }
 
-
-                // for(Map<String, Object> ers0 : ers){
-                //     _elist.setSpeaker(ers0.get("3").toString());
-                //     _elist.setText(ers0.get("2").toString());
-                //     _data.add(_elist);
-                // }
-
                 params.setText(_data);
 
                 _nlp0.put("enable",true);
@@ -101,17 +93,12 @@ public class ProjectService {
                 // _nlp.put("sentimentAnalysis",_nlp0);
                 params.setNlpConfig(_nlp);
                 String pp = new Gson().toJson(params);
-                System.out.println("summ: START");
-                System.out.println(pp);
                 String _rs = BaseController.transferHttpPost("https://apis.daglo.ai/nlp/v1/sync/summaries", pp, smrtoken);
-                System.out.println("summ:" + _rs);
-                // List<Map<String, String>> _rss = BaseController.getListFromJson(_rs);
                 Map<String, String[]> _rss = new Gson().fromJson(_rs, new TypeToken<Map<String, String[]>>() {
                 }.getType());
                 String[] _rsss = _rss.get("summaries");
                 int ii = 0;
                 for(String rss : _rsss){
-                    System.out.println("summ2:" + rss.toString());
                     paramVo.setTitle("");
                     paramVo.setSummary0(rss);
                     ProjectVO ridx = projectMapper.getReportIdx(paramVo);
@@ -125,7 +112,6 @@ public class ProjectService {
                     if(ridx0==1){
                         projectMapper.saveReportData(paramVo);
                     }
-                    // projectMapper.savReportMake(paramVo);
                     ii++;
                 }
             }
@@ -134,6 +120,12 @@ public class ProjectService {
         }
     }
 
+    /**
+     * 리포트 필터 적용해서 만들기
+     * @param req
+     * @param paramVo
+     * @throws Exception
+     */
     public void list_reportfilter(HttpServletRequest req, ProjectVO paramVo) throws Exception{
         try {
             projectMapper.getReportFilterList(paramVo);

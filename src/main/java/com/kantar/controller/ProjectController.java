@@ -97,16 +97,7 @@ public class ProjectController extends BaseController {
                 for(MultipartFile mf : fileList) {
                     String originFileName = mf.getOriginalFilename();   // 원본 파일 명
                     mf.transferTo(new File(fullpath, originFileName));
-                    // ProjectVO finfo = fileService.fileSave(req, paramVo.getJob_no(), "csv");
-                    // paramVo.setFilename(originFileName);
-                    // paramVo.setFilepath(path);
-                    // try {
-                    //     Integer rrrr = projectMapper.savProjectInfo2(paramVo);
-                    //     System.out.println(rrrr);
-                    //     return responseService.getFailResult("project_create","test");
-                    // } catch (Exception e) {
-                    //     e.printStackTrace();
-                    // }
+
                     Integer Jobno2 = 0;
                     ProjectVO Jobno = projectMapper.getProjectJobNo(paramVo);
                     if(Jobno==null){
@@ -223,7 +214,6 @@ public class ProjectController extends BaseController {
             }
             List<ProjectVO> prs = projectMapper.getReportFileList(paramVo);
             projectService.create_report(prs, paramVo);
-            // projectService.create_report(req, paramVo);
             return responseService.getSuccessResult("create_report", "리포트 생성 시작.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -265,6 +255,13 @@ public class ProjectController extends BaseController {
         }
     }
 
+    /**
+     * 리포트 상세보기
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
     @PostMapping("/report_view")
     public CommonResult getReportView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {

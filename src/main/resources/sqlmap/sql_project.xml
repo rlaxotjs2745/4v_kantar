@@ -15,12 +15,6 @@
         JOIN KT_REPORT D ON D.idx_project_job_projectid=A.idx_project_job_projectid
     </select>
 
-    <select id="savProjectInfo" resultType="com.kantar.vo.ProjectVO">
-    <![CDATA[
-		{call prc_savProjectInfo(#{idx_user}, #{job_no}, #{project_name}, #{summary})}
-	]]>
-    </select>
-
     <select id="getProjectJobNo" resultType="com.kantar.vo.ProjectVO">
         SELECT idx_project_job FROM KT_PROJECT_JOB WHERE job_no=#{job_no}
     </select>
@@ -84,12 +78,6 @@
     <insert id="saveReportData">
         INSERT INTO KT_REPORT_DATA (idx_report, title, summary0, idx_user) VALUES (#{idx_report}, #{title}, #{summary0}, #{idx_user})
     </insert>
-
-    <select id="savReportMake" resultType="com.kantar.vo.ProjectVO">
-        <![CDATA[
-            {call prc_savReportMake(#{idx_user}, #{idx_project_job_projectid}, #{title}, #{summary0})}
-        ]]>
-    </select>
 
     <update id="comProject">
         UPDATE KT_PROJECT

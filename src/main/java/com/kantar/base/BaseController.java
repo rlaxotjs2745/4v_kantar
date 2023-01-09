@@ -91,14 +91,13 @@ public class BaseController {
 	 *
 	 * @param bean
 	 * @param map
-	 * @param prefixOverrides
-	 *            제거할 prefix 문자열 (ex. sch_)
+	 * @param prefixOverrides 제거할 prefix 문자열 (ex. sch_)
 	 * @param keyUpperCase
 	 * @param camelCase
 	 * @return
 	 */
 	private static void putValues(Object bean, Map<String, Object> map,
-			String prefixOverrides, boolean keyUpperCase, boolean camelCase, boolean isAllowNull) {
+		String prefixOverrides, boolean keyUpperCase, boolean camelCase, boolean isAllowNull) {
 
 		Class<?> cls = bean.getClass();
 
@@ -235,25 +234,15 @@ public class BaseController {
 		wr.close();
 
 		Charset charset = Charset.forName("UTF-8");
-		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), charset));
-		
-		String inputLine;			
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), charset));
+		String output;
 		StringBuffer response = new StringBuffer();
-		while ((inputLine = br.readLine()) != null) {
-			response.append(inputLine);
+
+		while ((output = in.readLine()) != null) {
+			response.append(output);
 		}
-		br.close();
+		in.close();
 		con.disconnect();
-
-		// BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		// String output;
-		// StringBuffer response = new StringBuffer();
-
-		// while ((output = in.readLine()) != null) {
-		// 	response.append(output);
-		// }
-		// in.close();
-		// con.disconnect();
 		return response.toString();
 	}
 
@@ -266,50 +255,8 @@ public class BaseController {
 		return new Gson().fromJson(jsonStr, new TypeToken<List<Map<String, String>>>() {
         }.getType());
 	}
-
-	public static void ignoreSsl() throws Exception{
-		HostnameVerifier hv = new HostnameVerifier() {
-		        public boolean verify(String urlHostName, SSLSession session) { 
-		                return true;
-		            }
-		        };
-		        trustAllHttpsCertificates();
-		        HttpsURLConnection.setDefaultHostnameVerifier(hv);
-		    }
-		    public static void trustAllHttpsCertificates() throws Exception {
-		        TrustManager[] trustAllCerts = new TrustManager[1];
-		        TrustManager tm = new miTM();
-		        trustAllCerts[0] = tm;
-		        SSLContext sc = SSLContext.getInstance("SSL");
-		        sc.init(null, trustAllCerts, null);
-		        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-		    }
-		     
-		    static class miTM implements TrustManager,X509TrustManager {
-		        public X509Certificate[] getAcceptedIssuers() {
-		            return null;
-		        }
-		     
-		        public boolean isServerTrusted(X509Certificate[] certs) {
-		            return true;
-		        }
-		     
-		        public boolean isClientTrusted(X509Certificate[] certs) {
-		            return true;
-		        }
-		     
-		        public void checkServerTrusted(X509Certificate[] certs, String authType)
-		                throws CertificateException {
-		            return;
-		        }
-		     
-		        public void checkClientTrusted(X509Certificate[] certs, String authType)
-		                throws CertificateException {
-		            return;
-		        }
-		    }
 	
-			// ssl security Exception 방지
+	// ssl security Exception 방지
 	public static void disableSslVerification(){
 		// TODO Auto-generated method stub
 		try
