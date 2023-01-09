@@ -23,7 +23,6 @@ import com.kantar.model.CommonResult;
 import com.kantar.service.FileService;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
-import com.kantar.util.Excel;
 import com.kantar.vo.ProjectVO;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,13 +39,7 @@ public class ProjectController extends BaseController {
     private ProjectMapper projectMapper;
 
     @Autowired
-    private FileService fileService;
-
-    @Autowired
     private ProjectService projectService;
-
-    @Autowired
-    private Excel excel;
 
     @Value("${file.upload-dir}")
     public String filepath;

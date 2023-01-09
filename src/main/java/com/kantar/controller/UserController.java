@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kantar.base.BaseController;
 import com.kantar.mapper.UserMapper;
 import com.kantar.model.CommonResult;
-import com.kantar.service.KafkaSender;
 import com.kantar.service.ResponseService;
 import com.kantar.util.TokenJWT;
 import com.kantar.vo.UserVO;

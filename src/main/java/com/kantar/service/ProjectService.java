@@ -1,6 +1,5 @@
 package com.kantar.service;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +53,7 @@ public class ProjectService {
             for(ProjectVO prs0 : prs){
                 String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
 
-                SumtextVO _elist = new SumtextVO();
+                
                 List<SumtextVO> _data = new ArrayList<SumtextVO>();
 
                 Map<String, Object> _nlp = new HashMap<String, Object>();
@@ -63,18 +62,23 @@ public class ProjectService {
                 Map<String, Object> _nlp2 = new HashMap<String, Object>();
                 SummaryVO params = new SummaryVO();
                 List<String[]> ers = excel.getCsvListData(_fpath);
+                int j = 0;
                 for(String[] _ers0 : ers){
-                    int i = 0;
-                    for(String _ers00 : _ers0){
-                        if(i==3){
-                            _elist.setSpeaker(_ers00.toString());
+                    if(j>0){
+                        int i = 0;
+                        SumtextVO _elist = new SumtextVO();
+                        for(String _ers00 : _ers0){
+                            if(i==3){
+                                _elist.setSpeaker(_ers00.toString());
+                            }
+                            if(i==2){
+                                _elist.setText(_ers00.toString());
+                            }
+                            i++;
                         }
-                        if(i==2){
-                            _elist.setText(_ers00.toString());
-                        }
-                        i++;
+                        _data.add(_elist);
                     }
-                    _data.add(_elist);
+                    j++;
                 }
 
                 params.setText(_data);
@@ -93,9 +97,9 @@ public class ProjectService {
                 // _nlp.put("sentimentAnalysis",_nlp0);
                 params.setNlpConfig(_nlp);
                 String pp = new Gson().toJson(params);
+                System.out.println("JSON : " + pp);
                 String _rs = BaseController.transferHttpPost("https://apis.daglo.ai/nlp/v1/sync/summaries", pp, smrtoken);
-                Map<String, String[]> _rss = new Gson().fromJson(_rs, new TypeToken<Map<String, String[]>>() {
-                }.getType());
+                Map<String, String[]> _rss = new Gson().fromJson(_rs, new TypeToken<Map<String, String[]>>(){}.getType());
                 String[] _rsss = _rss.get("summaries");
                 int ii = 0;
                 for(String rss : _rsss){
