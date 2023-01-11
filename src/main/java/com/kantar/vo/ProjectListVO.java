@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class ProjectVO extends BaseVO {
+public class ProjectListVO {
     private Integer idx_project;
     private Integer idx_project_job;
     private Integer idx_project_job_projectid;
@@ -21,13 +21,9 @@ public class ProjectVO extends BaseVO {
     private Integer project_status;
     private String project_type_str;
     private String title;
-    private String summary0;
-    private String summary;
-    private String filepath;
     private String filename;
     private String user_name;
-    private Integer project_seq;
-    private Integer report_seq;
-    private String report_id;
-    List<ReportVO> reportList;
+    private String create_dt;
+    private String doc_version;
+    List<ReportListVO> reportList;
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +21,10 @@ import org.apache.commons.io.FilenameUtils;
 import com.kantar.base.BaseController;
 import com.kantar.mapper.ProjectMapper;
 import com.kantar.model.CommonResult;
-import com.kantar.service.FileService;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
 import com.kantar.vo.ProjectVO;
+import com.kantar.vo.ProjectViewVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,8 @@ public class ProjectController extends BaseController {
      * @return CommonResult
      * @throws Exception
      */
-     @PostMapping("/create")
+    @PostMapping("/create")
+    @Transactional
     public CommonResult create(MultipartHttpServletRequest req, ProjectVO paramVo) throws Exception {
         try {
             if(StringUtils.isEmpty(paramVo.getJob_no())){
@@ -102,8 +104,11 @@ public class ProjectController extends BaseController {
                     if(Jobno2==1){
                         Integer prseq = projectMapper.getProjectSeq(paramVo);
                         prseq = prseq+1;
-                        String a1 = ("0000"+prseq);
-                        String PRID = "P" + a1.substring(a1.length()-5,a1.length());
+                        if(prseq > 9999){
+                            return responseService.getFailResult("project_create","더이상 프로젝트를 생성할 수 없습니다.");
+                        }
+                        String a1 = ("000"+prseq);
+                        String PRID = "P" + a1.substring(a1.length()-4,a1.length());
                         paramVo.setProject_seq(prseq);
                         paramVo.setProject_id(PRID);
                         Integer pridrs = projectMapper.savProjectJobProjectid(paramVo);
@@ -116,7 +121,13 @@ public class ProjectController extends BaseController {
                                     return responseService.getFailResult("project_create","저장에 실패하였습니다.");
                                 }else{
                                     // 요청 사항 : 2023.01.06 회의때 프로젝트 저장 시 리포트 생성까지 같이 되도록 요청
+                                    Integer _seq = projectMapper.getReportSeq();
+                                    _seq = _seq+1;
+                                    String b1 = ("000"+_seq);
+                                    String RPID = "R" + b1.substring(b1.length()-4,b1.length());
                                     ProjectVO param = new ProjectVO();
+                                    param.setReport_seq(_seq);
+                                    param.setReport_id(RPID);
                                     param.setIdx_user(paramVo.getIdx_user());
                                     param.setIdx_project(paramVo.getIdx_project());
                                     param.setIdx_project_job_projectid(paramVo.getIdx_project_job_projectid());
@@ -124,17 +135,10 @@ public class ProjectController extends BaseController {
                                     param.setFilepath(path);
                                     Integer _rs0 = projectMapper.savReport(param);
                                     if(_rs0==1){
-                                        List<ProjectVO> prs = projectMapper.getReportFileList(param);
-                                        projectService.create_report(prs, param);
+                                        projectService.create_report(req, param);
                                     }
                                     _rdata.put("idx_project",paramVo.getIdx_project());
                                     _rdata.put("idx_project_job_projectid",paramVo.getIdx_project_job_projectid());
-
-                                    // List<Map<String, Object>> excelList = excel.getListData(mf, 1, 4);
-                                    // Map<String, Object> _edata = new HashMap<String, Object>();
-                                    // _edata.put("filename",originFileName);
-                                    // _edata.put("datalist",excelList);
-                                    // _elist.add(_edata);
                                 }
                             }
                         }else{
@@ -176,16 +180,49 @@ public class ProjectController extends BaseController {
                 paramVo.setRecordCountPerPage(10);
                 paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
             }
-
+            Integer tcnt = projectMapper.getProjectListCount(paramVo);
             List<ProjectVO> rs = projectMapper.getProjectList(paramVo);
+            Map<String, Object> _data = new HashMap<String, Object>();
+            _data.put("tcnt",tcnt);
+            _data.put("list",rs);
             if(rs!=null){
-                return responseService.getSuccessResult(rs, "list_project", "프로젝트 리스팅 성공");
+                return responseService.getSuccessResult(_data, "list_project", "프로젝트 리스팅 성공");
             }else{
                 return responseService.getFailResult("list_project","프로젝트 리스트가 없습니다.");
             }
         } catch (Exception e) {
             e.printStackTrace();
             return responseService.getFailResult("list_project","오류가 발생하였습니다.");
+        }
+    }
+
+    /**
+     * 프로젝트 상세보기
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/project_view")
+    public CommonResult getProjectView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
+        try {
+            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
+                return responseService.getFailResult("report_view","프로젝트 INDEX가 없습니다.");
+            }
+
+            List<ProjectVO> rs = projectMapper.getReportFileList(paramVo);
+            ArrayList<ProjectViewVO> rlist = new ArrayList<ProjectViewVO>();
+            for(ProjectVO prs0 : rs){
+                rlist = projectService.get_projectListView(rlist, prs0);
+            }
+            if(rlist!=null){
+                return responseService.getSuccessResult(rlist, "report_view", "프로젝트 정보 성공");
+            }else{
+                return responseService.getFailResult("report_view","프로젝트 정보가 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("report_view","오류가 발생하였습니다.");
         }
     }
 
@@ -205,8 +242,7 @@ public class ProjectController extends BaseController {
             if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
                 return responseService.getFailResult("create_report","프로젝트 INDEX가 없습니다.");
             }
-            List<ProjectVO> prs = projectMapper.getReportFileList(paramVo);
-            projectService.create_report(prs, paramVo);
+            projectService.create_report(req, paramVo);
             return responseService.getSuccessResult("create_report", "리포트 생성 시작.");
         } catch (Exception e) {
             e.printStackTrace();

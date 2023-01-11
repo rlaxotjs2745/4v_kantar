@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -16,7 +17,9 @@ import com.google.gson.reflect.TypeToken;
 import com.kantar.base.BaseController;
 import com.kantar.mapper.ProjectMapper;
 import com.kantar.util.Excel;
+import com.kantar.util.TokenJWT;
 import com.kantar.vo.ProjectVO;
+import com.kantar.vo.ProjectViewVO;
 import com.kantar.vo.SummaryVO;
 import com.kantar.vo.SumtextVO;
 
@@ -31,6 +34,12 @@ public class ProjectService {
 
     @Autowired
     private Excel excel;
+
+    @Autowired
+    private KafkaSender kafkaSender;
+
+    @Autowired
+    private TokenJWT tokenJWT;
     
     @Value("${file.upload-dir}")
     public String filepath;
@@ -46,13 +55,14 @@ public class ProjectService {
      */
     @Async
     @Transactional
-    public void create_report(List<ProjectVO> prs, ProjectVO paramVo) throws Exception{
+    public void create_report(HttpServletRequest req, ProjectVO paramVo) throws Exception{
         try {
-            System.out.println("create_report START");
+            String _token = tokenJWT.resolveToken(req);
+            // System.out.println("create_report START");
+            List<ProjectVO> prs = projectMapper.getReportFileList(paramVo);
 
             for(ProjectVO prs0 : prs){
                 String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
-
                 
                 List<SumtextVO> _data = new ArrayList<SumtextVO>();
 
@@ -71,7 +81,7 @@ public class ProjectService {
                             if(i==3){
                                 _elist.setSpeaker(_ers00.toString());
                             }
-                            if(i==2){
+                            if(i==4){
                                 _elist.setText(_ers00.toString());
                             }
                             i++;
@@ -93,35 +103,93 @@ public class ProjectService {
                 _nlp2.put("enable",true);
 
                 _nlp.put("summary",_nlp0);
-                // _nlp.put("keywordExtraction",_nlp0);
-                // _nlp.put("sentimentAnalysis",_nlp0);
+                // _nlp.put("keywordExtraction",_nlp1);
+                // _nlp.put("sentimentAnalysis",_nlp2);
                 params.setNlpConfig(_nlp);
                 String pp = new Gson().toJson(params);
-                System.out.println("JSON : " + pp);
+                // System.out.println("JSON : " + pp);
                 String _rs = BaseController.transferHttpPost("https://apis.daglo.ai/nlp/v1/sync/summaries", pp, smrtoken);
-                Map<String, String[]> _rss = new Gson().fromJson(_rs, new TypeToken<Map<String, String[]>>(){}.getType());
-                String[] _rsss = _rss.get("summaries");
-                int ii = 0;
-                for(String rss : _rsss){
-                    paramVo.setTitle("");
-                    paramVo.setSummary0(rss);
-                    ProjectVO ridx = projectMapper.getReportIdx(paramVo);
-                    Integer ridx0 = 0;
-                    if(ridx==null){
-                        ridx0 = projectMapper.savReportIdx(paramVo);
-                    }else{
-                        paramVo.setIdx_report(ridx.getIdx_report());
-                        ridx0 = 1;
+                // System.out.println(_rs);
+                if(!_rs.equals("error")){
+                    Map<String, String[]> _rss = new Gson().fromJson(_rs, new TypeToken<Map<String, String[]>>(){}.getType());
+                    String[] _rsss = _rss.get("summaries");
+                    int ii = 0;
+                    for(String rss : _rsss){
+                        paramVo.setTitle("");
+                        paramVo.setSummary0(rss);
+                        ProjectVO ridx = projectMapper.getReportIdx(paramVo);
+                        Integer ridx0 = 0;
+                        if(ridx==null){
+                            Integer _seq = projectMapper.getReportSeq();
+                            _seq = _seq+1;
+                            String b1 = ("000"+_seq);
+                            String RPID = "R" + b1.substring(b1.length()-4,b1.length());
+                            paramVo.setReport_seq(_seq);
+                            paramVo.setReport_id(RPID);
+                            ridx0 = projectMapper.savReport(paramVo);
+                        }else{
+                            paramVo.setIdx_report(ridx.getIdx_report());
+                            ridx0 = 1;
+                        }
+                        if(ridx0==1){
+                            projectMapper.saveReportData(paramVo);
+                        }
+                        ii++;
                     }
-                    if(ridx0==1){
-                        projectMapper.saveReportData(paramVo);
+                    if(StringUtils.isNotEmpty(_token)){
+                        kafkaSender.send(tokenJWT.resolveToken(req), "리포트가 생성되었습니다.");
                     }
-                    ii++;
+                }else{
+                    if(StringUtils.isNotEmpty(_token)){
+                        kafkaSender.send(tokenJWT.resolveToken(req), "리포트 생성을 실패하였습니다.");
+                    }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 프로젝트 상세보기 리스트 만들기
+     * @param rlist
+     * @param prs0
+     * @return ArrayList<ProjectViewVO>
+     * @throws Exception
+     */
+    public ArrayList<ProjectViewVO> get_projectListView(ArrayList<ProjectViewVO> rlist, ProjectVO prs0) throws Exception {
+        String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
+        List<String[]> ers = excel.getCsvListData(_fpath);
+        if(ers.size() > 0){
+            int j = 0;
+            for(String[] _ers0 : ers){
+                if(j > 0){
+                    int i = 0;
+                    ProjectViewVO _elist = new ProjectViewVO();
+                    for(String _ers00 : _ers0){
+                        if(i==0){
+                            _elist.setChaptor(_ers00.toString());
+                        }
+                        if(i==1){
+                            _elist.setSubchaptor(_ers00.toString());
+                        }
+                        if(i==2){
+                            _elist.setQuestion(_ers00.toString());
+                        }
+                        if(i==3){
+                            _elist.setSpeaker(_ers00.toString());
+                        }
+                        if(i==4){
+                            _elist.setAnswer(_ers00.toString());
+                        }
+                        i++;
+                    }
+                    rlist.add(_elist);
+                }
+                j++;
+            }
+        }
+        return rlist;
     }
 
     /**

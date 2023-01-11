@@ -12,6 +12,8 @@ public interface ProjectMapper {
 
     public List<ProjectVO> getProjectList(ProjectVO paramVo) throws Exception;
 
+    public Integer getProjectListCount(ProjectVO paramVo) throws Exception;
+
     public ProjectVO savProjectInfo(ProjectVO paramVo) throws Exception;
 
     public ProjectVO getProjectJobNo(ProjectVO paramVo) throws Exception;
@@ -30,11 +32,11 @@ public interface ProjectMapper {
 
     public List<ProjectVO> getReportFileList(ProjectVO paramVo) throws Exception;
 
+    public Integer getReportSeq() throws Exception;
+
     public Integer savReport(ProjectVO paramVo) throws Exception;
 
     public ProjectVO getReportIdx(ProjectVO paramVo) throws Exception;
-
-    public Integer savReportIdx(ProjectVO paramVo) throws Exception;
 
     public Integer saveReportData(ProjectVO paramVo) throws Exception;
 

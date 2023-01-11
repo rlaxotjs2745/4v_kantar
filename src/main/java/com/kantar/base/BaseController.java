@@ -227,22 +227,39 @@ public class BaseController {
 		con.setConnectTimeout(10000);
 		con.setReadTimeout(10000);
 		con.setDoOutput(true);
-		BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
-		wr.write(params);
+		// BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		wr.write(params.getBytes("UTF-8"));
 		wr.flush();
 		wr.close();
+		int responseCode = con.getResponseCode();
+		String res = "";
 
-		Charset charset = Charset.forName("UTF-8");
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), charset));
-		String output;
-		StringBuffer response = new StringBuffer();
+		if(responseCode==200) { // 정상 호출
+			Charset charset;
+			BufferedReader in;
+			String headerType = con.getContentType();
+			if(headerType.toUpperCase().indexOf("UTF-8") != -1){
+				charset = Charset.forName("UTF-8");
+			}else{
+				charset = Charset.forName("EUC-KR");
+			}
+			in = new BufferedReader(new InputStreamReader(con.getInputStream(), charset));
+			String output;
+			StringBuffer response = new StringBuffer();
 
-		while ((output = in.readLine()) != null) {
-			response.append(output);
-		}
-		in.close();
-		con.disconnect();
-		return response.toString();
+			while ((output = in.readLine()) != null) {
+				response.append(output);
+			}
+			in.close();
+			con.disconnect();
+			res = response.toString();
+		} else {  // 에러 발생
+			System.err.println(con.getResponseMessage());
+            res = "error";
+        }
+		System.err.println(res);
+		return res;
 	}
 
 	/**

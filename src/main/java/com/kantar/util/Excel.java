@@ -1,8 +1,10 @@
 package com.kantar.util;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,24 @@ import com.univocity.parsers.csv.CsvParserSettings;
 
 @Component
 public class Excel {
+	public List<String[]> getCsvListData(String file) throws Exception{
+		List<String[]> allRows = null;
+		try{
+			CsvParserSettings settings = new CsvParserSettings();
+			settings.getFormat().setLineSeparator("\n");
+			settings.setMaxColumns(65535);
+			settings.setMaxCharsPerColumn(65535);
+			
+			CsvParser parser = new CsvParser(settings);
+			Reader inputReader = new InputStreamReader(new FileInputStream(new File(file)), "UTF-8");
+			allRows = parser.parseAll(inputReader);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return allRows;
+	}
+
 	public String getCellValue(XSSFCell cell) {
 		String value = "";
 		
@@ -52,23 +72,7 @@ public class Excel {
 		OPCPackage opcPackage = OPCPackage.open(file);
 		return getListDataProc(opcPackage, startRowNum, columnLength);
 	}
-	public List<String[]> getCsvListData(String file) throws Exception{
-		List<String[]> allRows = null;
-		try{
-			CsvParserSettings settings = new CsvParserSettings();
-			settings.getFormat().setLineSeparator("\n");
-			settings.setMaxColumns(65535);
-			settings.setMaxCharsPerColumn(65535);
-			
-			CsvParser parser = new CsvParser(settings);
-			allRows = parser.parseAll(new FileReader(new File(file)));
-			return allRows;
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return allRows;
-	}
+
 	public List<Map<String, Object>> getListDataProc(OPCPackage opcPackage, int startRowNum, int columnLength) throws IOException, InvalidFormatException{
 		List<Map<String, Object>> excelList = new ArrayList<Map<String,Object>>();
 		
