@@ -9,4 +9,11 @@ public class ReportListVO {
     private String keyword;
     private String keytype;
     private Integer keycount;
+    private Integer d_count;
+    private Integer d_count_total;
+    private String job_no;
+    private String report_id;
+    private String title;
+    private String create_dt;
+    private String status_str;
 }
