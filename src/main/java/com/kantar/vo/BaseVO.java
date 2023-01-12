@@ -18,4 +18,5 @@ public class BaseVO{
     private Integer recordCountPerPage;
     private Integer firstIndex;
     private String token;
+    private Integer filter;
 }

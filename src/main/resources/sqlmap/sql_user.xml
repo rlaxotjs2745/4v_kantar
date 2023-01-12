@@ -40,4 +40,13 @@
     <delete id="delUserInfo">
         DELETE FROM KT_USER WHERE idx_user=#{idx_user}
     </delete>
+
+    <select id="getUserList" resultType="com.kantar.vo.UserVO">
+        SELECT user_id, user_name, create_dt, update_dt FROM KT_USER
+            WHERE user_type <![CDATA[<>]]> 99
+            <if test="filter eq 11">
+                AND user_type <![CDATA[<>]]> 11
+            </if>
+        LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
 </mapper>

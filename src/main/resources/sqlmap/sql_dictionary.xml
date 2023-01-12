@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kantar.mapper.DictionaryMapper">
+    <select id="getDictionaryList" resultType="com.kantar.vo.DictionaryVO">
+        SELECT * FROM KT_DICTIONARY
+        <if test="filter eq 11">
+            WHERE dic_type = 0
+        </if>
+        <if test="filter eq 1">
+            WHERE (dic_type = 0
+            OR idx_user = #{idx_user})
+        </if>
+        <if test="filter eq 99">
+            WHERE (dic_type = 0
+            OR dic_type = 1)
+        </if>
+        <if test="title ne null">
+            AND title LIKE CONCAT('%', #{title}, '%')
+        </if>
+        LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="getDictionary" resultType="com.kantar.vo.DictionaryVO">
+        SELECT * FROM KT_DICTIONARY WHERE idx_dictionary = #{idx_dictionary}
+    </select>
+
+    <delete id="deleteDictionary">
+        DELETE FROM KT_DICTIONARY WHERE idx_dictionary = #{idx_dictionary}
+    </delete>
+
+    <insert id="insertDictionary" useGeneratedKeys="true" keyProperty="idx_dictionary">
+        INSERT INTO KT_DICTIONARY (
+            title,
+            filepath,
+            filename,
+            dic_type,
+            dic_count,
+            idx_user
+        ) VALUES (
+            #{title},
+            #{filepath},
+            #{filename},
+            #{dic_type},
+            #{dic_count},
+            #{idx_user}
+        )
+    </insert>
+
+    <insert id="insertDictionaryData" useGeneratedKeys="true" keyProperty="idx_dictionary">
+        INSERT INTO KT_DICTIONARY_DATA (
+            idx_dictionary,
+            keyword,
+            keyword01,
+            keyword02,
+            keyword03,
+            keyword04,
+            keyword05,
+            keyword06,
+            keyword07,
+            keyword08,
+            keyword09,
+            keyword10,
+            idx_user
+        ) VALUES (
+            #{idx_dictionary},
+            #{keyword},
+            #{keyword01},
+            #{keyword02},
+            #{keyword03},
+            #{keyword04},
+            #{keyword05},
+            #{keyword06},
+            #{keyword07},
+            #{keyword08},
+            #{keyword09},
+            #{keyword10},
+            #{idx_user}
+        )
+
+    </insert>
+
+    <select id="getDictionaryDataList" resultType="com.kantar.vo.DictionaryDataVO">
+        SELECT * FROM KT_DICTIONARY_DATA WHERE idx_dictionary = #{idx_dictionary}
+    </select>
+
+    <select id="getDictionaryData" resultType="com.kantar.vo.DictionaryDataVO">
+        SELECT * FROM KT_DICTIONARY_DATA WHERE idx_dictionary_data = #{idx_dictionary_data}
+    </select>
+
+    <delete id="deleteDictionaryData">
+        DELETE FROM KT_DICTIONARY_DATA WHERE idx_dictionary_data = #{idx_dictionary_data}
+    </delete>
+
+    <update id="updateDictionaryData">
+        UPDATE KT_DICTIONARY_DATA SET
+                keyword=#{keyword},
+            <if test="keyword01 ne null">
+                keyword01=#{keyword01},
+            </if>
+            <if test="keyword02 ne null">
+                keyword02=#{keyword02},
+            </if>
+            <if test="keyword03 ne null">
+                keyword03=#{keyword03},
+            </if>
+            <if test="keyword04 ne null">
+                keyword04=#{keyword04},
+            </if>
+            <if test="keyword05 ne null">
+                keyword05=#{keyword05},
+            </if>
+            <if test="keyword06 ne null">
+                keyword06=#{keyword06},
+            </if>
+            <if test="keyword07 ne null">
+                keyword07=#{keyword07},
+            </if>
+            <if test="keyword08 ne null">
+                keyword08=#{keyword08},
+            </if>
+            <if test="keyword09 ne null">
+                keyword09=#{keyword09},
+            </if>
+            <if test="keyword10 ne null">
+                keyword10=#{keyword10}
+            </if>
+            WHERE idx_dictionary_data = #{idx_dictionary_data}
+    </update>
+</mapper>

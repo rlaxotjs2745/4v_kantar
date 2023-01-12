@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.kantar.vo.UserVO;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
     public UserVO getUserInfo(UserVO paramVo) throws Exception;
@@ -13,4 +15,6 @@ public interface UserMapper {
     public Integer modUserInfo(UserVO paramVo) throws Exception;
 
     public Integer delUserInfo(UserVO paramVo) throws Exception;
+
+    public List<UserVO> getUserList(UserVO paramVo) throws Exception;
 }

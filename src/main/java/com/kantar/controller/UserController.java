@@ -1,6 +1,7 @@
 package com.kantar.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -140,4 +141,86 @@ public class UserController extends BaseController {
         }
         return responseService.getFailResult("dropout","오류가 발생하였습니다.");
     }
+
+    /**
+     * 멤버관리(리스팅)
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/list_member")
+    public CommonResult getMemberList(HttpServletRequest req, UserVO paramVo) throws Exception {
+        try {
+            UserVO userInfo = userMapper.getUserInfo(paramVo);
+            if(userInfo.getUser_type() == 1){
+                return responseService.getFailResult("list_member","관리자만 조회 가능한 기능힙니다.");
+            }
+            if(paramVo.getRecordCountPerPage() == 0){
+                paramVo.setRecordCountPerPage(10);
+            }
+            if(paramVo.getCurrentPage() == 0){
+                paramVo.setCurrentPage(1);
+            }
+            paramVo.setFilter(userInfo.getUser_type());
+            paramVo.setFirstIndex(paramVo.getCurrentPage() * paramVo.getRecordCountPerPage() - (paramVo.getRecordCountPerPage() - 1));
+            List<UserVO> rs = userMapper.getUserList(paramVo);
+            if(rs != null){
+                return responseService.getSuccessResult(rs, "list_member", "멤버 리스팅 성공");
+            } else {
+                return responseService.getFailResult("list_member","멤버 리스트가 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("list_member","오류가 발생하였습니다.");
+        }
+
+    }
+
+    /**
+     * 멤버관리(상세보기)
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/member_detail")
+    public CommonResult getMemberDetail(HttpServletRequest req, UserVO paramVo) throws Exception {
+        try {
+            UserVO rs = userMapper.getUserInfo(paramVo);
+
+            if(rs != null){
+                return responseService.getSuccessResult(rs, "member_detail", "회원 불러오기 성공");
+            } else {
+                return responseService.getFailResult("member_detail","회원이 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("member_detail","오류가 발생하였습니다.");
+        }
+    }
+
+    /**
+     * 멤버관리(회원 삭제)
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/member_delete")
+    public CommonResult deleteMember(HttpServletRequest req, UserVO paramVo) throws Exception {
+        try {
+            Integer rs = userMapper.delUserInfo(paramVo);
+            if(rs==1){
+                return responseService.getSuccessResult("member_delete","회원 삭제가 완료되었습니다.");
+            }else{
+                return responseService.getFailResult("member_delete","없는 회원입니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseService.getFailResult("member_delete","오류가 발생하였습니다.");
+    }
+
+
 }
