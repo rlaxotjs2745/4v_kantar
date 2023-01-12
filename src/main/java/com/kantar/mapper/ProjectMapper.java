@@ -14,8 +14,6 @@ public interface ProjectMapper {
 
     public Integer getProjectListCount(ProjectVO paramVo) throws Exception;
 
-    public ProjectVO savProjectInfo(ProjectVO paramVo) throws Exception;
-
     public ProjectVO getProjectJobNo(ProjectVO paramVo) throws Exception;
 
     public Integer savProjectJobNo(ProjectVO paramVo) throws Exception;
@@ -24,7 +22,9 @@ public interface ProjectMapper {
 
     public Integer savProjectJobProjectid(ProjectVO paramVo) throws Exception;
 
-    public Integer savProjectInfo2(ProjectVO paramVo) throws Exception;
+    public Integer savProjectInfo(ProjectVO paramVo) throws Exception;
+
+    public Integer modiProjectInfo(ProjectVO paramVo) throws Exception;
 
     public ProjectVO getProjectView(ProjectVO paramVo) throws Exception;
 
@@ -39,6 +39,8 @@ public interface ProjectMapper {
     public ProjectVO getReportIdx(ProjectVO paramVo) throws Exception;
 
     public Integer saveReportData(ProjectVO paramVo) throws Exception;
+
+    public Integer modiReportData(ProjectVO paramVo) throws Exception;
 
     public ProjectVO savReportMake(ProjectVO paramVo) throws Exception;
 

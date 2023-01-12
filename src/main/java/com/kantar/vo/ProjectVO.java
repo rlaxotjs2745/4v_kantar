@@ -14,6 +14,7 @@ public class ProjectVO extends BaseVO {
     private Integer idx_project_job;
     private Integer idx_project_job_projectid;
     private Integer idx_report;
+    private Integer idx_report_data;
     private String job_no;      // VARCHAR(10)
     private String project_id;  // VARCHAR(10)
     private String project_name;

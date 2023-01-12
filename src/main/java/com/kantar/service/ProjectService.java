@@ -126,6 +126,7 @@ public class ProjectService {
                             String RPID = "R" + b1.substring(b1.length()-4,b1.length());
                             paramVo.setReport_seq(_seq);
                             paramVo.setReport_id(RPID);
+                            paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
                             ridx0 = projectMapper.savReport(paramVo);
                         }else{
                             paramVo.setIdx_report(ridx.getIdx_report());

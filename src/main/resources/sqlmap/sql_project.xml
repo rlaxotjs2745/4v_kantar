@@ -65,9 +65,16 @@
         INSERT INTO KT_PROJECT_JOB_PROJECTID (idx_project_job, project_id, project_seq, idx_user) VALUES (#{idx_project_job}, #{project_id}, #{project_seq}, #{idx_user});
     </insert>
 
-    <insert id="savProjectInfo2" useGeneratedKeys="true" keyProperty="idx_project">
+    <insert id="savProjectInfo" useGeneratedKeys="true" keyProperty="idx_project">
         INSERT INTO KT_PROJECT (idx_project_job_projectid, project_name, project_type, project_status, summary0, idx_user) VALUES (#{idx_project_job_projectid}, #{project_name}, 1, 1, #{summary0}, #{idx_user});
     </insert>
+
+    <update id="modiProjectInfo">
+        UPDATE KT_PROJECT
+            SET idx_user=#{idx_user}
+
+            WHERE idx_project=#{idx_project}
+    </update>
 
     <select id="getProjectView" resultType="com.kantar.vo.ProjectVO">
         SELECT A.idx_project_job_projectid, B.project_name, B.project_type, B.project_status, C.project_id, A.create_dt, B.summary0
@@ -88,7 +95,7 @@
     </select>
 
     <select id="getReportView" resultType="com.kantar.vo.ProjectVO">
-        SELECT B.title, B.summary0
+        SELECT B.title, B.summary0, LEFT(REPLACE(B.create_dt,'-','.'),16) AS create_dt, B.idx_report_data
         FROM KT_REPORT A
         JOIN KT_REPORT_DATA B ON B.idx_report=A.idx_report
         WHERE A.idx_report=#{idx}
@@ -117,6 +124,18 @@
     <insert id="saveReportData">
         INSERT INTO KT_REPORT_DATA (idx_report, title, summary0, idx_user) VALUES (#{idx_report}, #{title}, #{summary0}, #{idx_user})
     </insert>
+
+    <update id="modiReportData">
+        UPDATE KT_REPORT
+            SET idx=#{idx_user}
+            <if test="title != null">
+            , title=#{title}
+            </if>
+            <if test="summary0 != null">
+            , summary0=#{summary0}
+            </if>
+            WHERE idx_report_data=#{idx_report_data}
+    </update>
 
     <update id="comProject">
         UPDATE KT_PROJECT

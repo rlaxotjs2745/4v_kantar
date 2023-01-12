@@ -113,7 +113,7 @@ public class ProjectController extends BaseController {
                         paramVo.setProject_id(PRID);
                         Integer pridrs = projectMapper.savProjectJobProjectid(paramVo);
                         if(pridrs>0){
-                            Integer rs = projectMapper.savProjectInfo2(paramVo);
+                            Integer rs = projectMapper.savProjectInfo(paramVo);
                             if(rs == 0){
                                 return responseService.getFailResult("project_create","저장을 할 수 없습니다.");
                             }else{
@@ -133,6 +133,8 @@ public class ProjectController extends BaseController {
                                     param.setIdx_project_job_projectid(paramVo.getIdx_project_job_projectid());
                                     param.setFilename(originFileName);
                                     param.setFilepath(path);
+                                    param.setProject_name(paramVo.getProject_name());
+                                    param.setTitle(paramVo.getProject_name() + "_기본리포트");
                                     Integer _rs0 = projectMapper.savReport(param);
                                     if(_rs0==1){
                                         projectService.create_report(req, param);
@@ -300,6 +302,29 @@ public class ProjectController extends BaseController {
 
             ProjectVO rs0 = projectMapper.getProjectView(paramVo);
             ProjectVO rs1 = projectMapper.getReportView(paramVo);
+            Map<String, Object> _data = new HashMap<String, Object>();
+            _data.put("project",rs0);
+            _data.put("report",rs1);
+            if(rs1!=null){
+                return responseService.getSuccessResult(_data, "report_view", "리포트 정보 성공");
+            }else{
+                return responseService.getFailResult("report_view","리포트 정보가 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("report_view","오류가 발생하였습니다.");
+        }
+    }
+
+    @PostMapping("/report_modify")
+    public CommonResult modiReportView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
+        try {
+            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
+                return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
+            }
+
+            Integer rs0 = projectMapper.modiProjectInfo(paramVo);
+            Integer rs1 = projectMapper.modiReportData(paramVo);
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("project",rs0);
             _data.put("report",rs1);
