@@ -73,11 +73,11 @@ public class ProjectService {
                 SummaryVO params = new SummaryVO();
                 List<String[]> ers = excel.getCsvListData(_fpath);
                 int j = 0;
-                for(String[] _ers0 : ers){
+                for(String[] _ers0 : ers){  // 줄
                     if(j>0){
                         int i = 0;
                         SumtextVO _elist = new SumtextVO();
-                        for(String _ers00 : _ers0){
+                        for(String _ers00 : _ers0){ // 컬럼
                             if(i==3){
                                 _elist.setSpeaker(_ers00.toString());
                             }
