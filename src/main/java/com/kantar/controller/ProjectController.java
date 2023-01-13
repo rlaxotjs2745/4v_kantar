@@ -55,6 +55,128 @@ public class ProjectController extends BaseController {
     @Transactional
     public CommonResult create(MultipartHttpServletRequest req, ProjectVO paramVo) throws Exception {
         try {
+            List<MultipartFile> fileList = req.getFiles("file");
+            if(req.getFiles("file").get(0).getSize() != 0){
+                fileList = req.getFiles("file");
+            }
+            if(fileList.size()>0){
+                for(MultipartFile mf : fileList) {
+                    if(mf.getSize()>0){
+                        String fname = mf.getOriginalFilename();
+                        String ext = FilenameUtils.getExtension(fname);
+                        String contentType = mf.getContentType();
+                        if (!ext.equals("csv")) {
+                            return responseService.getFailResult("project_create",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                        }
+                        if(!contentType.equals("text/csv")) {
+                            return responseService.getFailResult("project_create",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                        }
+                    }
+                }
+
+                String path = "/report/" + paramVo.getJob_no() + "/";
+                String fullpath = this.filepath + path;
+                File fileDir = new File(fullpath);
+                if (!fileDir.exists()) {
+                    fileDir.mkdirs();
+                }
+
+                ArrayList<Object> _elist = new ArrayList<Object>();
+                Map<String, Object> _rdata = new HashMap<String, Object>();
+                for(MultipartFile mf : fileList) {
+                    String originFileName = mf.getOriginalFilename();   // 원본 파일 명
+                    mf.transferTo(new File(fullpath, originFileName));
+                    // List<String[]> ers = excel.getCsvListData(fullpath + originFileName);
+                }
+                _rdata.put("xlsdata",_elist);
+                return responseService.getSuccessResult(_rdata, "project_create", "프로젝트 설정이 저장되었습니다.");
+            }else{
+                return responseService.getFailResult("project_create",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("project_create","오류가 발생하였습니다.");
+        }
+    }
+
+    /**
+     * 프로젝트 리스팅
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/list_project")
+    public CommonResult getProjectList(HttpServletRequest req, ProjectVO paramVo) throws Exception {
+        try {
+            if(StringUtils.isEmpty(paramVo.getIdx_project()+"")){
+                return responseService.getFailResult("list_project","프로젝트 INDEX가 없습니다.");
+            }
+            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
+                return responseService.getFailResult("list_project","프로젝트 INDEX가 없습니다.");
+            }
+
+            if(paramVo.getCurrentPage() != null){
+                paramVo.setRecordCountPerPage(10);
+                paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
+            }
+            Integer tcnt = projectMapper.getProjectListCount(paramVo);
+            List<ProjectVO> rs = projectMapper.getProjectList(paramVo);
+            Map<String, Object> _data = new HashMap<String, Object>();
+            _data.put("tcnt",tcnt);
+            _data.put("list",rs);
+            if(rs!=null){
+                return responseService.getSuccessResult(_data, "list_project", "프로젝트 리스팅 성공");
+            }else{
+                return responseService.getFailResult("list_project","프로젝트 리스트가 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("list_project","오류가 발생하였습니다.");
+        }
+    }
+
+    /**
+     * 프로젝트 상세보기
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/project_view")
+    public CommonResult getProjectView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
+        try {
+            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
+                return responseService.getFailResult("report_view","프로젝트 INDEX가 없습니다.");
+            }
+
+            List<ProjectVO> rs = projectMapper.getReportFileList(paramVo);
+            ArrayList<ProjectViewVO> rlist = new ArrayList<ProjectViewVO>();
+            for(ProjectVO prs0 : rs){
+                rlist = projectService.get_projectListView(rlist, prs0);
+            }
+            if(rlist!=null){
+                return responseService.getSuccessResult(rlist, "report_view", "프로젝트 정보 성공");
+            }else{
+                return responseService.getFailResult("report_view","프로젝트 정보가 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("report_view","오류가 발생하였습니다.");
+        }
+    }
+
+    /**
+     * 리포트 생성
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/create_report")
+    @Transactional
+    public CommonResult create_report(MultipartHttpServletRequest req, ProjectVO paramVo) throws Exception {
+        try {
             if(StringUtils.isEmpty(paramVo.getJob_no())){
                 return responseService.getFailResult("project_create","JOB No를 입력해주세요.");
             }
@@ -158,97 +280,6 @@ public class ProjectController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             return responseService.getFailResult("project_create","오류가 발생하였습니다.");
-        }
-    }
-
-    /**
-     * 프로젝트 리스팅
-     * @param req
-     * @param paramVo
-     * @return CommonResult
-     * @throws Exception
-     */
-    @PostMapping("/list_project")
-    public CommonResult getProjectList(HttpServletRequest req, ProjectVO paramVo) throws Exception {
-        try {
-            if(StringUtils.isEmpty(paramVo.getIdx_project()+"")){
-                return responseService.getFailResult("list_project","프로젝트 INDEX가 없습니다.");
-            }
-            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
-                return responseService.getFailResult("list_project","프로젝트 INDEX가 없습니다.");
-            }
-
-            if(paramVo.getCurrentPage() != null){
-                paramVo.setRecordCountPerPage(10);
-                paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
-            }
-            Integer tcnt = projectMapper.getProjectListCount(paramVo);
-            List<ProjectVO> rs = projectMapper.getProjectList(paramVo);
-            Map<String, Object> _data = new HashMap<String, Object>();
-            _data.put("tcnt",tcnt);
-            _data.put("list",rs);
-            if(rs!=null){
-                return responseService.getSuccessResult(_data, "list_project", "프로젝트 리스팅 성공");
-            }else{
-                return responseService.getFailResult("list_project","프로젝트 리스트가 없습니다.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return responseService.getFailResult("list_project","오류가 발생하였습니다.");
-        }
-    }
-
-    /**
-     * 프로젝트 상세보기
-     * @param req
-     * @param paramVo
-     * @return CommonResult
-     * @throws Exception
-     */
-    @PostMapping("/project_view")
-    public CommonResult getProjectView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
-        try {
-            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
-                return responseService.getFailResult("report_view","프로젝트 INDEX가 없습니다.");
-            }
-
-            List<ProjectVO> rs = projectMapper.getReportFileList(paramVo);
-            ArrayList<ProjectViewVO> rlist = new ArrayList<ProjectViewVO>();
-            for(ProjectVO prs0 : rs){
-                rlist = projectService.get_projectListView(rlist, prs0);
-            }
-            if(rlist!=null){
-                return responseService.getSuccessResult(rlist, "report_view", "프로젝트 정보 성공");
-            }else{
-                return responseService.getFailResult("report_view","프로젝트 정보가 없습니다.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return responseService.getFailResult("report_view","오류가 발생하였습니다.");
-        }
-    }
-
-    /**
-     * 리포트 생성
-     * @param req
-     * @param paramVo
-     * @return CommonResult
-     * @throws Exception
-     */
-    @PostMapping("/create_report")
-    public CommonResult create_report(HttpServletRequest req, ProjectVO paramVo) throws Exception {
-        try {
-            if(StringUtils.isEmpty(paramVo.getIdx_project()+"")){
-                return responseService.getFailResult("create_report","프로젝트 INDEX가 없습니다.");
-            }
-            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
-                return responseService.getFailResult("create_report","프로젝트 INDEX가 없습니다.");
-            }
-            projectService.create_report(req, paramVo);
-            return responseService.getSuccessResult("create_report", "리포트 생성 시작.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return responseService.getFailResult("create_report","오류가 발생하였습니다.");
         }
     }
 
