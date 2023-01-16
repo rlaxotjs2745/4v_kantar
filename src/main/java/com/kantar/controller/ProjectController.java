@@ -205,7 +205,7 @@ public class ProjectController extends BaseController {
     @PostMapping("/project_view")
     public CommonResult getProjectView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
-            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
+            if(StringUtils.isEmpty(paramVo.getIdx_project()+"")){
                 return responseService.getFailResult("project_view","프로젝트 INDEX가 없습니다.");
             }
 
