@@ -102,7 +102,7 @@
     </select>
 
     <insert id="savReport" useGeneratedKeys="true" keyProperty="idx_report">
-		INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, report_seq, report_id, filepath, `filename`, idx_user) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{report_seq}, #{report_id}, #{filepath}, #{filename}, #{idx_user})
+		INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, report_seq, report_id, title, filepath, `filename`, idx_user) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{report_seq}, #{report_id}, #{title}, #{filepath}, #{filename}, #{idx_user})
     </insert>
 
     <select id="getReportIdx" resultType="com.kantar.vo.ProjectVO">
@@ -114,7 +114,7 @@
     </insert>
 
     <insert id="saveReportData">
-        INSERT INTO KT_REPORT_DATA (idx_report, title, summary0, idx_user) VALUES (#{idx_report}, #{title}, #{summary0}, #{idx_user})
+        INSERT INTO KT_REPORT_DATA (idx_report, summary0, idx_user) VALUES (#{idx_report}, #{summary0}, #{idx_user})
     </insert>
 
     <update id="modiReportData">
