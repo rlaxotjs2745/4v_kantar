@@ -352,27 +352,22 @@ public class ProjectController extends BaseController {
     @PostMapping("/list_report")
     public CommonResult getReportList(HttpServletRequest req, ProjectVO paramVo) throws Exception {
         try {
-            if(StringUtils.isEmpty(paramVo.getIdx_project()+"")){
-                return responseService.getFailResult("create_report","프로젝트 INDEX가 없습니다.");
-            }
-            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
-                return responseService.getFailResult("create_report","프로젝트 INDEX가 없습니다.");
-            }
-
             if(paramVo.getCurrentPage() != null){
                 paramVo.setRecordCountPerPage(10);
                 paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
+            }else{
+                paramVo.setCurrentPage(1);
             }
 
             List<ProjectVO> rs = projectMapper.getReportList(paramVo);
             if(rs!=null){
-                return responseService.getSuccessResult(rs, "create_report", "리포트 리스팅 성공");
+                return responseService.getSuccessResult(rs, "list_report", "리포트 리스팅 성공");
             }else{
-                return responseService.getFailResult("create_report","리포트 리스트가 없습니다.");
+                return responseService.getFailResult("list_report","리포트 리스트가 없습니다.");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("create_report","오류가 발생하였습니다.");
+            return responseService.getFailResult("list_report","오류가 발생하였습니다.");
         }
     }
 
@@ -386,7 +381,7 @@ public class ProjectController extends BaseController {
     @PostMapping("/report_view")
     public CommonResult getReportView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
-            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
+            if(StringUtils.isEmpty(paramVo.getIdx()+"")){
                 return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
             }
 
