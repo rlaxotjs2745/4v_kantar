@@ -158,13 +158,13 @@ public class ProjectService {
      * @return ArrayList<ProjectViewVO>
      * @throws Exception
      */
-    public ArrayList<ProjectViewVO> get_projectListView(ArrayList<ProjectViewVO> rlist, ProjectVO prs0) throws Exception {
+    public List<ProjectViewVO> get_projectListView(List<ProjectViewVO> rlist, ProjectVO prs0) throws Exception {
         String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
         rlist = getCsvParse(rlist, _fpath);
         return rlist;
     }
 
-    public ArrayList<ProjectViewVO> getCsvParse(ArrayList<ProjectViewVO> rlist, String _fPath) throws Exception {
+    public List<ProjectViewVO> getCsvParse(List<ProjectViewVO> rlist, String _fPath) throws Exception {
         List<String[]> ers = excel.getCsvListData(_fPath);
         int j = 0;
         for(String[] _ers0 : ers){  // 줄

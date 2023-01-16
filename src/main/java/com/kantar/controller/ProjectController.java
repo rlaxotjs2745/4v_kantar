@@ -2,9 +2,13 @@ package com.kantar.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +91,7 @@ public class ProjectController extends BaseController {
                     fileDir.mkdirs();
                 }
 
-                ArrayList<Object> _elist = new ArrayList<Object>();
+                List<Object> _elist = new ArrayList<Object>();
                 Map<String, Object> _rdata = new HashMap<String, Object>();
                 for(MultipartFile mf : fileList) {
                     String originFileName = mf.getOriginalFilename();   // 원본 파일 명
@@ -112,7 +116,6 @@ public class ProjectController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/csv_view")
-    @Transactional
     public CommonResult viewCsv(MultipartHttpServletRequest req, ProjectVO paramVo) throws Exception {
         try {
             List<MultipartFile> fileList = req.getFiles("file");
@@ -141,8 +144,7 @@ public class ProjectController extends BaseController {
                     fileDir.mkdirs();
                 }
 
-                ArrayList<ProjectViewVO> _elist = new ArrayList<ProjectViewVO>();
-                Map<String, Object> _rdata = new HashMap<String, Object>();
+                List<ProjectViewVO> _elist = new ArrayList<ProjectViewVO>();
                 for(MultipartFile mf : fileList) {
                     String originFileName = mf.getOriginalFilename();   // 원본 파일 명
                     mf.transferTo(new File(fullpath, originFileName));
@@ -152,8 +154,28 @@ public class ProjectController extends BaseController {
                         file.delete();
                     }
                 }
-                _rdata.put("xlsdata",_elist);
-                return responseService.getSuccessResult(_rdata, "csv_view", "프로젝트 설정이 저장되었습니다.");
+                Map<String, Map<String, Map<String, Map<String, Set<String>>>>> _ers = new HashMap<String, Map<String, Map<String, Map<String, Set<String>>>>>();
+                if(_elist.size() > 0){
+                    _ers = _elist.stream()
+                    .sorted(
+                        Comparator.comparing(ProjectViewVO::getChapter)
+                            .thenComparing(ProjectViewVO::getSubchapter)
+                            .thenComparing(ProjectViewVO::getQuestion)
+                            .thenComparing(ProjectViewVO::getPerson)
+                        )
+                    .collect(
+                        Collectors.groupingBy(ProjectViewVO::getChapter
+                            , Collectors.groupingBy(ProjectViewVO::getSubchapter
+                                , Collectors.groupingBy(ProjectViewVO::getQuestion
+                                    , Collectors.groupingBy(ProjectViewVO::getPerson
+                                        , Collectors.mapping(ProjectViewVO::getAnswer, Collectors.toSet())
+                                    )
+                                )
+                            )
+                        )
+                    );
+                }
+                return responseService.getSuccessResult(_ers, "csv_view", "csv 파일 정보를 가져왔습니다.");
             }else{
                 return responseService.getFailResult("csv_view",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
             }
@@ -210,7 +232,7 @@ public class ProjectController extends BaseController {
             }
 
             List<ProjectVO> rs = projectMapper.getReportFileList(paramVo);
-            ArrayList<ProjectViewVO> rlist = new ArrayList<ProjectViewVO>();
+            List<ProjectViewVO> rlist = new ArrayList<ProjectViewVO>();
             for(ProjectVO prs0 : rs){
                 rlist = projectService.get_projectListView(rlist, prs0);
             }
