@@ -171,7 +171,7 @@ public class ProjectController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/list_project")
-    public CommonResult getProjectList(HttpServletRequest req, ProjectVO paramVo) throws Exception {
+    public CommonResult getProjectList(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
             if(paramVo.getCurrentPage() != null){
                 paramVo.setRecordCountPerPage(10);
@@ -350,7 +350,7 @@ public class ProjectController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/list_report")
-    public CommonResult getReportList(HttpServletRequest req, ProjectVO paramVo) throws Exception {
+    public CommonResult getReportList(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
             if(paramVo.getCurrentPage() != null){
                 paramVo.setRecordCountPerPage(10);

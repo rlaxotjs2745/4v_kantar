@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +36,7 @@ public class UserController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/login")
-    public CommonResult login(HttpServletRequest req, UserVO paramVo) throws Exception {
+    public CommonResult login(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
             UserVO rs = userMapper.getUserInfo(paramVo);
             if(rs!=null){
