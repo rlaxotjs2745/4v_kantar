@@ -160,35 +160,38 @@ public class ProjectService {
      */
     public ArrayList<ProjectViewVO> get_projectListView(ArrayList<ProjectViewVO> rlist, ProjectVO prs0) throws Exception {
         String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
-        List<String[]> ers = excel.getCsvListData(_fpath);
-        if(ers.size() > 0){
-            int j = 0;
-            for(String[] _ers0 : ers){
-                if(j > 0){
-                    int i = 0;
-                    ProjectViewVO _elist = new ProjectViewVO();
-                    for(String _ers00 : _ers0){
-                        if(i==0){
-                            _elist.setChaptor(_ers00.toString());
-                        }
-                        if(i==1){
-                            _elist.setSubchaptor(_ers00.toString());
-                        }
-                        if(i==2){
-                            _elist.setQuestion(_ers00.toString());
-                        }
-                        if(i==3){
-                            _elist.setSpeaker(_ers00.toString());
-                        }
-                        if(i==4){
-                            _elist.setAnswer(_ers00.toString());
-                        }
-                        i++;
+        rlist = getCsvParse(rlist, _fpath);
+        return rlist;
+    }
+
+    public ArrayList<ProjectViewVO> getCsvParse(ArrayList<ProjectViewVO> rlist, String _fPath) throws Exception {
+        List<String[]> ers = excel.getCsvListData(_fPath);
+        int j = 0;
+        for(String[] _ers0 : ers){  // 줄
+            if(j>0){
+                int i = 0;
+                ProjectViewVO _e = new ProjectViewVO();
+                for(String _ers00 : _ers0){ // 컬럼
+                    if(i==0){
+                        _e.setChapter(_ers00.toString());
                     }
-                    rlist.add(_elist);
+                    if(i==1){
+                        _e.setSubchapter(_ers00.toString());
+                    }
+                    if(i==2){
+                        _e.setQuestion(_ers00.toString());
+                    }
+                    if(i==3){
+                        _e.setPerson(_ers00.toString());
+                    }
+                    if(i==4){
+                        _e.setAnswer(_ers00.toString());
+                    }
+                    i++;
                 }
-                j++;
+                rlist.add(_e);
             }
+            j++;
         }
         return rlist;
     }

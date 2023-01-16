@@ -5,9 +5,9 @@ import lombok.*;
 @Getter
 @Setter
 public class ProjectViewVO {
-    String speaker;
-    String chaptor;
-    String subchaptor;
+    String person;
+    String chapter;
+    String subchapter;
     String question;
     String answer;
 }
