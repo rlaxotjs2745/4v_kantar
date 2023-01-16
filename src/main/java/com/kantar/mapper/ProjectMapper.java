@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.kantar.vo.ProjectListVO;
 import com.kantar.vo.ProjectVO;
 
 @Mapper
 public interface ProjectMapper {
     public ProjectVO getProjectInfo(ProjectVO paramVo) throws Exception;
 
-    public List<ProjectVO> getProjectList(ProjectVO paramVo) throws Exception;
+    public List<ProjectListVO> getProjectList(ProjectVO paramVo) throws Exception;
 
     public Integer getProjectListCount(ProjectVO paramVo) throws Exception;
 

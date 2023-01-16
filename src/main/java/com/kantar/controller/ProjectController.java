@@ -24,6 +24,7 @@ import com.kantar.model.CommonResult;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
 import com.kantar.util.Excel;
+import com.kantar.vo.ProjectListVO;
 import com.kantar.vo.ProjectVO;
 import com.kantar.vo.ProjectViewVO;
 
@@ -179,7 +180,7 @@ public class ProjectController extends BaseController {
                 paramVo.setCurrentPage(1);
             }
             Integer tcnt = projectMapper.getProjectListCount(paramVo);
-            List<ProjectVO> rs = projectMapper.getProjectList(paramVo);
+            List<ProjectListVO> rs = projectMapper.getProjectList(paramVo);
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("tcnt",tcnt);
             _data.put("list",rs);
