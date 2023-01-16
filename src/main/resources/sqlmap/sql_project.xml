@@ -94,7 +94,7 @@
     </select>
 
     <select id="getReportFileList" resultType="com.kantar.vo.ProjectVO">
-        SELECT filepath, `filename` FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+        SELECT filepath, `filename` FROM KT_REPORT WHERE idx_project=#{idx_project}
     </select>
 
     <select id="getReportSeq" resultType="Integer">
