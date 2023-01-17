@@ -15,7 +15,7 @@
             WHERE (dic_type = 0
             OR dic_type = 1)
         </if>
-        <if test="title ne null">
+        <if test="title neq null">
             AND title LIKE CONCAT('%', #{title}, '%')
         </if>
         LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
@@ -92,39 +92,51 @@
         DELETE FROM KT_DICTIONARY_DATA WHERE idx_dictionary_data = #{idx_dictionary_data}
     </delete>
 
+    <delete id="deleteDictionaryDataToDictionaryIdx">
+        DELETE FROM KT_DICTIONARY_DATA WHERE idx_dictionary = #{idx_dictionary}
+    </delete>
+
     <update id="updateDictionaryData">
         UPDATE KT_DICTIONARY_DATA SET
-                keyword=#{keyword},
-            <if test="keyword01 ne null">
-                keyword01=#{keyword01},
+                keyword=#{keyword}
+            <if test="keyword01 neq null">
+                ,keyword01=#{keyword01}
             </if>
-            <if test="keyword02 ne null">
-                keyword02=#{keyword02},
+            <if test="keyword02 neq null">
+                ,keyword02=#{keyword02}
             </if>
-            <if test="keyword03 ne null">
-                keyword03=#{keyword03},
+            <if test="keyword03 neq null">
+                ,keyword03=#{keyword03}
             </if>
-            <if test="keyword04 ne null">
-                keyword04=#{keyword04},
+            <if test="keyword04 neq null">
+                ,keyword04=#{keyword04}
             </if>
-            <if test="keyword05 ne null">
-                keyword05=#{keyword05},
+            <if test="keyword05 neq null">
+                ,keyword05=#{keyword05}
             </if>
-            <if test="keyword06 ne null">
-                keyword06=#{keyword06},
+            <if test="keyword06 neq null">
+                ,keyword06=#{keyword06}
             </if>
-            <if test="keyword07 ne null">
-                keyword07=#{keyword07},
+            <if test="keyword07 neq null">
+                ,keyword07=#{keyword07}
             </if>
-            <if test="keyword08 ne null">
-                keyword08=#{keyword08},
+            <if test="keyword08 neq null">
+                ,keyword08=#{keyword08}
             </if>
-            <if test="keyword09 ne null">
-                keyword09=#{keyword09},
+            <if test="keyword09 neq null">
+                ,keyword09=#{keyword09}
             </if>
-            <if test="keyword10 ne null">
-                keyword10=#{keyword10}
+            <if test="keyword10 neq null">
+                ,keyword10=#{keyword10}
             </if>
             WHERE idx_dictionary_data = #{idx_dictionary_data}
     </update>
+
+    <select id="getDictionaryDataByKeyword" resultType="com.kantar.vo.DictionaryDataVO">
+        SELECT * FROM KT_DICTIONARY_DATA WHERE keyword = #{keyword} AND idx_dictionary = #{idx_dictionary}
+    </select>
+
+    <select id="getDictionaryByTitle" resultType="com.kantar.vo.DictionaryVO">
+        SELECT * FROM KT_DICTIONARY WHERE title = #{title}
+    </select>
 </mapper>
