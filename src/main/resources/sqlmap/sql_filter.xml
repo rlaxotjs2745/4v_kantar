@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kantar.mapper.FilterMapper">
+    <resultMap id="getFilter" type="com.kantar.vo.FilterVO">
+        <id property="idx_filter" column="idx_filter" />
+        <result property="idx_filter" column="idx_filter" />
+        <result property="filter_title" column="filter_title" />
+        <result property="create_dt" column="create_dt" />
+        <collection property="filterDataList" resultMap="filterDataList"/>
+    </resultMap>
+
+    <resultMap id="filterDataList" type="com.kantar.vo.FilterDataVO">
+        <id column="idx_filter_data" property="idx_filter_data"/>
+        <result property="idx_filter" column="idx_filter2" />
+        <result property="filter_type" column="filter_type"/>
+        <result property="filter_data" column="filter_data"/>
+    </resultMap>
+
+    <select id="getFilter" resultMap="getFilter">
+        SELECT A.idx_filter, A.filter_title, LEFT(REPLACE(A.create_dt,'-','.'),16) AS create_dt 
+            , B.idx_filter_data, B.idx_filter AS idx_filter2, B.filter_type, B.filter_data
+            FROM KT_REPORT_FILTER A
+            JOIN KT_REPORT_FILTER_DATA B ON B.idx_filter=A.idx_filter
+            WHERE 1=1
+            <if test="idx_project != null">
+                AND A.idx_project=#{idx_project}
+            </if>
+            <if test="idx_filter != null">
+                AND A.idx_filter=#{idx_filter}
+            </if>
+    </select>
+
+    <insert id="createFilter" useGeneratedKeys="true" keyColumn="idx_filter" keyProperty="idx_filter">
+        INSERT INTO KT_REPORT_FILTER (idx_project, filter_title) VALUES (#{idx_project}, #{filter_title})
+    </insert>
+
+    <delete id="delFilter">
+        DELETE FROM KT_REPORT_FILTER WHERE idx_filter=#{idx_filter}
+    </delete>
+
+    <insert id="createFilterData" parameterType="java.util.Map">
+        INSERT INTO KT_REPORT_FILTER_DATA (idx_filter, filter_type, filter_data) VALUES 
+        <foreach item="item" collection="list" separator=",">
+            (#{item.idx_filter}, #{item.filter_type}, #{item.filter_data})
+        </foreach>
+    </insert>
+
+    <delete id="delFilterData">
+        DELETE FROM KT_REPORT_FILTER_DATA WHERE idx_filter_data=#{idx_filter_data}
+    </delete>
+</mapper>

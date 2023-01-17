@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +26,6 @@ import com.kantar.mapper.ProjectMapper;
 import com.kantar.model.CommonResult;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
-import com.kantar.util.Excel;
 import com.kantar.vo.ProjectListVO;
 import com.kantar.vo.ProjectVO;
 import com.kantar.vo.ProjectViewVO;
@@ -47,9 +45,6 @@ public class ProjectController extends BaseController {
 
     @Autowired
     private ProjectService projectService;
-
-    @Autowired
-    private Excel excel;
 
     @Value("${file.upload-dir}")
     public String filepath;
