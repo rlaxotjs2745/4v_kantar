@@ -70,7 +70,7 @@ public class UserController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/register")
-    public CommonResult register(HttpServletRequest req, UserVO paramVo) throws Exception {
+    public CommonResult register(HttpServletRequest req,@RequestBody UserVO paramVo) throws Exception {
         try {
             if(StringUtils.isEmpty(paramVo.getUser_id())){
                 return responseService.getFailResult("register","회원 아이디를 입력해주세요.");

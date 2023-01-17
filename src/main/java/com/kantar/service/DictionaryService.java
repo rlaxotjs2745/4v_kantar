@@ -7,6 +7,7 @@ import com.kantar.vo.DictionaryVO;
 import com.kantar.vo.ProjectVO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -41,7 +42,7 @@ public class DictionaryService {
     @Transactional
     public void createDictionary(HttpServletRequest req, DictionaryVO paramVo) throws Exception{
         try{
-            String _fpath = this.filepath + paramVo.getFile_path() + paramVo.getFilename();
+            String _fpath = this.filepath + paramVo.getFilepath() + paramVo.getFilename();
 
             List<String[]> ers = excel.getCsvListData(_fpath);
             paramVo.setDic_count(ers.size());
@@ -54,6 +55,12 @@ public class DictionaryService {
                 dictionaryDataVO.setIdx_user(paramVo.getIdx_user());
                 int keywordNum = 0;
                 for(String _rss: _erss){
+                    if(keywordNum == 0){
+                        List<DictionaryDataVO> findKeyword = dictionaryMapper.getDictionaryDataByKeyword(_rss, dictIdx);
+                        if(!findKeyword.isEmpty()){
+                            throw new Exception();
+                        }
+                    }
                     switch (keywordNum){
                         case 0 : dictionaryDataVO.setKeyword(_rss); break;
                         case 1 : dictionaryDataVO.setKeyword01(_rss); break;

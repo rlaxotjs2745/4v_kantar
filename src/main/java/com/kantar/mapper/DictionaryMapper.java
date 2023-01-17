@@ -16,6 +16,8 @@ public interface DictionaryMapper {
 
     public void deleteDictionary(DictionaryVO paramVo) throws Exception;
 
+    public void deleteDictionaryDataToDictionaryIdx(DictionaryVO paramVo) throws Exception;
+
     public Integer insertDictionary(DictionaryVO paramVo) throws Exception;
 
     public Integer insertDictionaryData(DictionaryDataVO paramVo) throws Exception;
@@ -25,4 +27,8 @@ public interface DictionaryMapper {
     public void updateDictionaryData(DictionaryDataVO paramVo) throws Exception;
 
     public void deleteDictionaryData(DictionaryDataVO paramVo) throws Exception;
+
+    public List<DictionaryDataVO> getDictionaryDataByKeyword(String keyword, Integer idx_dictionary) throws Exception;
+
+    public List<DictionaryVO> getDictionaryByTitle(String title) throws Exception;
 }

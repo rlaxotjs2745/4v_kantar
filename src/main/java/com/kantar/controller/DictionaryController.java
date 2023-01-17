@@ -18,10 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -56,6 +53,7 @@ public class DictionaryController extends BaseController {
      * @throws Exception
      */
     @GetMapping("/list_dictionary")
+    @Transactional
     public CommonResult getDictionaryList(HttpServletRequest req, DictionaryVO paramVo) throws Exception {
         try{
             if(paramVo.getIdx_user() == null){
@@ -64,14 +62,14 @@ public class DictionaryController extends BaseController {
             UserVO userVO = new UserVO();
             userVO.setIdx_user(paramVo.getIdx_user());
             UserVO userInfo = userMapper.getUserInfo(userVO);
-            if(paramVo.getRecordCountPerPage() == 0){
+            if( paramVo.getRecordCountPerPage() == null || paramVo.getRecordCountPerPage() == 0){
                 paramVo.setRecordCountPerPage(10);
             }
-            if(paramVo.getCurrentPage() == 0){
-                paramVo.setCurrentPage(1);
+            if(paramVo.getCurrentPage() == null || paramVo.getCurrentPage() == 0){
+                paramVo.setCurrentPage(0);
             }
             paramVo.setFilter(userInfo.getUser_type());
-            paramVo.setFirstIndex(paramVo.getCurrentPage() * paramVo.getRecordCountPerPage() - (paramVo.getRecordCountPerPage() - 1));
+            paramVo.setFirstIndex(paramVo.getCurrentPage() * paramVo.getRecordCountPerPage());
             List<DictionaryVO> rs = dictionaryMapper.getDictionaryList(paramVo);
             if(rs != null){
                 return responseService.getSuccessResult(rs, "list_dictionary", "사전 리스팅 성공");
@@ -85,13 +83,15 @@ public class DictionaryController extends BaseController {
     }
 
     @PostMapping("/delete_dictionary")
-    public CommonResult deleteDictionary(HttpServletRequest req, DictionaryVO paramVo) throws Exception {
+    @Transactional
+    public CommonResult deleteDictionary(HttpServletRequest req, @RequestBody DictionaryVO paramVo) throws Exception {
         try {
-            if(paramVo.getIdx_dictionary() == 0){
+            if(paramVo.getIdx_dictionary() == null || paramVo.getIdx_dictionary() == 0){
                 return responseService.getFailResult("delete_dictionary","사전 인덱스 값이 없습니다.");
             }
             if(dictionaryMapper.getDictionary(paramVo) != null){
                 dictionaryMapper.deleteDictionary(paramVo);
+                dictionaryMapper.deleteDictionaryDataToDictionaryIdx(paramVo);
                 return responseService.getSuccessResult("delete_dictionary", "사전 삭제 성공");
             } else {
                 return responseService.getFailResult("delete_dictionary","이미 삭제된 사전이거나, 없는 사전입니다.");
@@ -103,12 +103,18 @@ public class DictionaryController extends BaseController {
     }
 
     @PostMapping("/create")
+    @Transactional
     public CommonResult create(MultipartHttpServletRequest req, DictionaryVO paramVo) throws Exception {
-
         try{
             if(StringUtils.isEmpty(paramVo.getTitle())){
                 return responseService.getFailResult("dictionary_create","사전 이름을 입력해주세요.");
             }
+
+            List<DictionaryVO> findTitle = dictionaryMapper.getDictionaryByTitle(paramVo.getTitle());
+            if(findTitle != null && findTitle.size() != 0){
+                return responseService.getFailResult("dictionary_create","이미 존재하는 사전 이름입니다. 확인 후 다시 시도해주세요.");
+            }
+
             UserVO userVO = new UserVO();
             userVO.setIdx_user(paramVo.getIdx_user());
             UserVO userInfo = userMapper.getUserInfo(userVO);
@@ -138,11 +144,12 @@ public class DictionaryController extends BaseController {
                 String originFileName = mf.getOriginalFilename();
                 mf.transferTo(new File(fullpath, originFileName));
 
+
                 DictionaryVO param = new DictionaryVO();
                 param.setTitle(paramVo.getTitle());
                 param.setDic_type(userInfo.getUser_type() == 1 ? 1 : 0);
                 param.setFilename(originFileName);
-                param.setFile_path(path);
+                param.setFilepath(path);
                 param.setIdx_user(userInfo.getIdx_user());
 
                 dictionaryService.createDictionary(req, param);
@@ -153,7 +160,7 @@ public class DictionaryController extends BaseController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("dictionary_create","오류가 발생하였습니다.");
+            return responseService.getFailResult("dictionary_create","사전 파일 내 중복되는 키워드가 있습니다. 확인 후 다시 시도해주세요.");
         }
     }
 
@@ -185,7 +192,7 @@ public class DictionaryController extends BaseController {
     }
 
     @PostMapping("/delete_dictionary_data")
-    public CommonResult deleteDictionaryData(HttpServletRequest req, DictionaryDataVO paramVo) throws Exception {
+    public CommonResult deleteDictionaryData(HttpServletRequest req, @RequestBody DictionaryDataVO paramVo) throws Exception {
         try {
             if(paramVo.getIdx_dictionary_data() == 0){
                 return responseService.getFailResult("delete_dictionary_data","표제어 인덱스를 받지 못했습니다.");
@@ -203,17 +210,29 @@ public class DictionaryController extends BaseController {
     }
 
     @PostMapping("/update_dictionary_data")
-    public CommonResult updateDictionaryData(HttpServletRequest req, DictionaryDataVO paramVo) throws Exception {
+    public CommonResult updateDictionaryData(HttpServletRequest req, @RequestBody List<DictionaryDataVO> paramVo) throws Exception {
         try {
-            if(paramVo.getIdx_dictionary_data() == 0){
-                return responseService.getFailResult("update_dictionary_data","표제어 인덱스를 받지 못했습니다.");
+            for(DictionaryDataVO param: paramVo){
+                if(param.getIdx_dictionary_data() == null || param.getIdx_dictionary_data() == 0){
+                    if(param.getKeyword() == null){
+                        return responseService.getFailResult("update_dictionary_data","대표 키워드는 필수 입력값입니다. 확인 후 다시 저장해 주세요.");
+                    }
+                    List<DictionaryDataVO> findKeyword = dictionaryMapper.getDictionaryDataByKeyword(param.getKeyword(), param.getIdx_dictionary());
+                    if(!findKeyword.isEmpty()){
+                        return responseService.getFailResult("update_dictionary_data","이미 존재하는 키워드입니다.");
+                    }
+                    dictionaryMapper.insertDictionaryData(param);
+                } else {
+                    if(param.getFilter() != null && param.getFilter() == 1){
+                        DictionaryDataVO dictionaryDataVO = dictionaryMapper.getDictionaryData(param);
+                        if(dictionaryDataVO == null){
+                            return responseService.getFailResult("update_dictionary_data","삭제된 표제어 이거나 없는 표제어입니다.");
+                        }
+                        dictionaryMapper.updateDictionaryData(param);
+                    }
+                }
             }
-            DictionaryDataVO dictionaryDataVO = dictionaryMapper.getDictionaryData(paramVo);
-            if(dictionaryDataVO == null){
-                return responseService.getFailResult("update_dictionary_data","삭제된 표제어 이거나 없는 표제어입니다.");
-            }
-            dictionaryMapper.updateDictionaryData(paramVo);
-            return responseService.getSuccessResult("update_dictionary_data", "표제어 삭제 성공");
+            return responseService.getSuccessResult("update_dictionary_data", "표제어 업데이트 성공");
         } catch (Exception e) {
             e.printStackTrace();
             return responseService.getFailResult("update_dictionary_data","오류가 발생하였습니다.");
