@@ -154,7 +154,7 @@ public class ProjectController extends BaseController {
                         file.delete();
                     }
                 }
-                Map<String, Map<String, Map<String, Map<String, String>>>> _ers = new HashMap<String, Map<String, Map<String, Map<String, String>>>>();
+                Map<String, Map<String, Map<String, Map<String, Set<String>>>>> _ers = new HashMap<String, Map<String, Map<String, Map<String, Set<String>>>>>();
                 if(_elist.size() > 0){
                     _ers = _elist.stream()
                     .sorted(
@@ -168,7 +168,7 @@ public class ProjectController extends BaseController {
                             , Collectors.groupingBy(ProjectViewVO::getSubchapter
                                 , Collectors.groupingBy(ProjectViewVO::getQuestion
                                     , Collectors.groupingBy(ProjectViewVO::getPerson
-                                        , Collectors.mapping(ProjectViewVO::getAnswer, Collectors.joining(",", "\"", "\""))
+                                        , Collectors.mapping(ProjectViewVO::getAnswer, Collectors.toSet())
                                     )
                                 )
                             )
