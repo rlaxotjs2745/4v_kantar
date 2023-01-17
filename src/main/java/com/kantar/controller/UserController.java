@@ -43,6 +43,7 @@ public class UserController extends BaseController {
                 BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                 if (passwordEncoder.matches(paramVo.getUser_pw(), rs.getUser_pw())) {
                     Map<String, Object> param = new HashMap<String, Object>();
+                    param.put("idx_user",rs.getIdx_user());
                     param.put("user_id",rs.getUser_id());
                     param.put("user_status", rs.getUser_status());
                     String _token = tokenJWT.createToken(param, rs.getUser_type()+"");

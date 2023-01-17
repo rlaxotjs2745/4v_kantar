@@ -62,6 +62,7 @@ public class TokenJWT {
         //payload 부분 설정
         Claims payloads = Jwts.claims();
         payloads.put("role_type", roles);
+        payloads.put("idx_user", _data.get("idx_user"));
         payloads.put("user_id", _data.get("user_id"));
         payloads.put("user_status", _data.get("user_status"));
         

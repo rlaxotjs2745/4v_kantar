@@ -31,14 +31,34 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.kantar.util.TokenJWT;
 import com.kantar.vo.SummaryVO;
+import com.kantar.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 public class BaseController {
+	@Autowired
+	private TokenJWT tokenJWT;
+
+	public UserVO getChkUserLogin(HttpServletRequest req) throws Exception{
+		UserVO paramVo = new UserVO();
+        String token = tokenJWT.resolveToken(req);
+		if("".equals(token) || token == null){
+			return paramVo;
+		}else{
+			Map<String, Object> jwt = tokenJWT.verifyJWT(token);
+			if (jwt != null) {
+				paramVo = tokenJWT.getRoles(token);
+			}
+			return paramVo;
+		}
+    }
+
     /**
 	 * Client IP 조회
 	 * @param request

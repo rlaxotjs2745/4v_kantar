@@ -113,7 +113,6 @@ public class ProjectService {
                 if(!_rs.equals("error")){
                     Map<String, String[]> _rss = new Gson().fromJson(_rs, new TypeToken<Map<String, String[]>>(){}.getType());
                     String[] _rsss = _rss.get("summaries");
-                    int ii = 0;
                     for(String rss : _rsss){
                         paramVo.setTitle("");
                         paramVo.setSummary0(rss);
@@ -135,7 +134,6 @@ public class ProjectService {
                         if(ridx0==1){
                             projectMapper.saveReportData(paramVo);
                         }
-                        ii++;
                     }
                     if(StringUtils.isNotEmpty(_token)){
                         kafkaSender.send(tokenJWT.resolveToken(req), "리포트가 생성되었습니다.");

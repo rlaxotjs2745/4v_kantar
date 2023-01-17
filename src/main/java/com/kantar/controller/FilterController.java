@@ -19,6 +19,7 @@ import com.kantar.model.CommonResult;
 import com.kantar.service.ResponseService;
 import com.kantar.vo.FilterDataVO;
 import com.kantar.vo.FilterVO;
+import com.kantar.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +34,21 @@ public class FilterController extends BaseController {
     @Autowired
     private FilterMapper filterMapper;
 
+    /**
+     * 필터 리스트 & 정보
+     * 사용방법 : {"idx_project":1,"idx_filter":1}
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
     @PostMapping("/get")
-    @Transactional
     public CommonResult getFilter(HttpServletRequest req, @RequestBody FilterVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
             if(paramVo.getIdx_project() == null){
                 return responseService.getFailResult("filter_create","프로젝트 값이 없습니다.");
             }
