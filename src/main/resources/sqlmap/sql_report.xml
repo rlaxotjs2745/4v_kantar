@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kantar.mapper.ProjectMapper">
+<mapper namespace="com.kantar.mapper.ReportMapper">
     <select id="getReportList" resultType="com.kantar.vo.ReportListVO">
         SELECT A.idx_report, B.job_no, A.report_id, A.title, LEFT(REPLACE(A.create_dt,'-','.'),16) AS create_dt, IF((A.d_count_total-A.d_count)=0,'생성완료','생성중') AS status_str
         FROM KT_REPORT A
