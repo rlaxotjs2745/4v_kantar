@@ -16,7 +16,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kantar.base.BaseController;
 import com.kantar.mapper.ProjectMapper;
+import com.kantar.mapper.ReportMapper;
 import com.kantar.util.Excel;
+import com.kantar.util.Summary;
 import com.kantar.util.TokenJWT;
 import com.kantar.vo.ProjectVO;
 import com.kantar.vo.ProjectViewVO;
@@ -33,7 +35,13 @@ public class ProjectService {
     private ProjectMapper projectMapper;
 
     @Autowired
+    private ReportMapper reportMapper;
+
+    @Autowired
     private Excel excel;
+
+    @Autowired
+    private Summary summary;
 
     @Autowired
     private KafkaSender kafkaSender;
@@ -56,10 +64,10 @@ public class ProjectService {
     @Async
     @Transactional
     public void create_report(HttpServletRequest req, ProjectVO paramVo) throws Exception{
+        String _token = tokenJWT.resolveToken(req);
+        String _msg = "";
         try {
-            String _token = tokenJWT.resolveToken(req);
-            // System.out.println("create_report START");
-            List<ProjectVO> prs = projectMapper.getReportFileList(paramVo);
+            List<ProjectVO> prs = reportMapper.getReportFileList(paramVo);
 
             for(ProjectVO prs0 : prs){
                 String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
@@ -107,45 +115,44 @@ public class ProjectService {
                 // _nlp.put("sentimentAnalysis",_nlp2);
                 params.setNlpConfig(_nlp);
                 String pp = new Gson().toJson(params);
-                // System.out.println("JSON : " + pp);
-                String _rs = BaseController.transferHttpPost("https://apis.daglo.ai/nlp/v1/sync/summaries", pp, smrtoken);
-                // System.out.println(_rs);
-                if(!_rs.equals("error")){
-                    Map<String, String[]> _rss = new Gson().fromJson(_rs, new TypeToken<Map<String, String[]>>(){}.getType());
-                    String[] _rsss = _rss.get("summaries");
-                    for(String rss : _rsss){
-                        paramVo.setTitle("");
-                        paramVo.setSummary0(rss);
-                        ProjectVO ridx = projectMapper.getReportIdx(paramVo);
-                        Integer ridx0 = 0;
-                        if(ridx==null){
-                            Integer _seq = projectMapper.getReportSeq();
-                            _seq = _seq+1;
-                            String b1 = ("000"+_seq);
-                            String RPID = "R" + b1.substring(b1.length()-4,b1.length());
-                            paramVo.setReport_seq(_seq);
-                            paramVo.setReport_id(RPID);
-                            paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
-                            ridx0 = projectMapper.savReport(paramVo);
-                        }else{
-                            paramVo.setIdx_report(ridx.getIdx_report());
-                            ridx0 = 1;
-                        }
-                        if(ridx0==1){
-                            projectMapper.saveReportData(paramVo);
-                        }
+                ProjectVO param = summary.getSummary(pp);
+                if(StringUtils.isNotEmpty(param.getTitle())){
+                    paramVo.setTitle(param.getTitle());
+                    paramVo.setSummary0(param.getSummary0());
+
+                    ProjectVO ridx = reportMapper.getReportIdx(paramVo);
+                    Integer ridx0 = 0;
+                    if(ridx==null){
+                        Integer _seq = reportMapper.getReportSeq();
+                        _seq = _seq+1;
+                        String b1 = ("000"+_seq);
+                        String RPID = "R" + b1.substring(b1.length()-4,b1.length());
+                        paramVo.setReport_seq(_seq);
+                        paramVo.setReport_id(RPID);
+                        paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
+                        ridx0 = reportMapper.savReport(paramVo);
+                    }else{
+                        paramVo.setIdx_report(ridx.getIdx_report());
+                        ridx0 = 1;
                     }
-                    if(StringUtils.isNotEmpty(_token)){
-                        kafkaSender.send(tokenJWT.resolveToken(req), "리포트가 생성되었습니다.");
+                    if(ridx0==1){
+                        reportMapper.saveReportData(paramVo);
+                        if(StringUtils.isNotEmpty(_token)){
+                            _msg = "리포트가 생성되었습니다.";
+                        }
+                    }else{
+                        _msg = "리포트 생성을 실패하였습니다.";
                     }
                 }else{
-                    if(StringUtils.isNotEmpty(_token)){
-                        kafkaSender.send(tokenJWT.resolveToken(req), "리포트 생성을 실패하였습니다.");
-                    }
+                    _msg = "리포트 생성을 실패하였습니다.";
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            _msg = "리포트 생성을 실패하였습니다.";
+        }
+        if(StringUtils.isNotEmpty(_token)){
+            kafkaSender.send(tokenJWT.resolveToken(req), _msg);
         }
     }
 
@@ -202,7 +209,7 @@ public class ProjectService {
      */
     public void list_reportfilter(HttpServletRequest req, ProjectVO paramVo) throws Exception{
         try {
-            projectMapper.getReportFilterList(paramVo);
+            reportMapper.getReportFilterList(paramVo);
         } catch (Exception e) {
             e.printStackTrace();
         }

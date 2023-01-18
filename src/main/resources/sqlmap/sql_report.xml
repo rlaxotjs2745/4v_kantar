@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kantar.mapper.ProjectMapper">
+    <select id="getReportList" resultType="com.kantar.vo.ReportListVO">
+        SELECT A.idx_report, B.job_no, A.report_id, A.title, LEFT(REPLACE(A.create_dt,'-','.'),16) AS create_dt, IF((A.d_count_total-A.d_count)=0,'생성완료','생성중') AS status_str
+        FROM KT_REPORT A
+        JOIN KT_PROJECT_JOB_PROJECTID D ON D.idx_project_job_projectid=A.idx_project_job_projectid
+        JOIN KT_PROJECT_JOB B ON B.idx_project_job=D.idx_project_job
+        ORDER BY A.idx_report DESC
+    </select>
+
+    <select id="getReportView" resultType="com.kantar.vo.ProjectVO">
+        SELECT A.title, B.summary0, LEFT(REPLACE(B.create_dt,'-','.'),16) AS create_dt, B.idx_report_data, A.idx_report
+        FROM KT_REPORT A
+        JOIN KT_REPORT_DATA B ON B.idx_report=A.idx_report
+        WHERE A.idx_report=#{idx}
+    </select>
+
+    <select id="getReportFileList" resultType="com.kantar.vo.ProjectVO">
+        SELECT filepath, `filename` FROM KT_REPORT WHERE idx_project=#{idx_project}
+    </select>
+
+    <select id="getReportSeq" resultType="Integer">
+        SELECT MAX(report_seq) AS report_seq FROM KT_REPORT
+    </select>
+
+    <insert id="savReport" useGeneratedKeys="true" keyColumn="idx_report" keyProperty="idx_report">
+		INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, report_seq, report_id, title, filepath, `filename`, idx_user) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{report_seq}, #{report_id}, #{title}, #{filepath}, #{filename}, #{idx_user})
+    </insert>
+
+    <select id="getReportIdx" resultType="com.kantar.vo.ProjectVO">
+        SELECT idx_report FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+    </select>
+
+    <insert id="savReportIdx" useGeneratedKeys="true" keyColumn="idx_report" keyProperty="idx_report">
+        INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, idx_user) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{idx_user})
+    </insert>
+
+    <insert id="saveReportData">
+        INSERT INTO KT_REPORT_DATA (idx_report, summary0, idx_user) VALUES (#{idx_report}, #{summary0}, #{idx_user})
+    </insert>
+
+    <update id="modiReportData">
+        UPDATE KT_REPORT
+            SET idx=#{idx_user}
+            <if test="title != null">
+            , title=#{title}
+            </if>
+            <if test="summary0 != null">
+            , summary0=#{summary0}
+            </if>
+            WHERE idx_report_data=#{idx_report_data}
+    </update>
+
+    <update id="comProject">
+        UPDATE KT_PROJECT
+            SET project_type=#{project_type},
+            project_status=#{project_status}
+            WHERE idx_project=#{idx_project}
+    </update>
+
+    <select id="getReportFilterList" resultType="com.kantar.vo.ReportFilterVO">
+        SELECT idx_report_filter, filter_title FROM KT_REPORT_FILTER
+    </select>
+</mapper>

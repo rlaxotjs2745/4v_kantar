@@ -30,24 +30,4 @@ public interface ProjectMapper {
     public ProjectVO getProjectView(ProjectVO paramVo) throws Exception;
 
     public Integer comProject(ProjectVO paramVo) throws Exception;
-
-    public List<ProjectVO> getReportFileList(ProjectVO paramVo) throws Exception;
-
-    public Integer getReportSeq() throws Exception;
-
-    public Integer savReport(ProjectVO paramVo) throws Exception;
-
-    public ProjectVO getReportIdx(ProjectVO paramVo) throws Exception;
-
-    public Integer saveReportData(ProjectVO paramVo) throws Exception;
-
-    public Integer modiReportData(ProjectVO paramVo) throws Exception;
-
-    public ProjectVO savReportMake(ProjectVO paramVo) throws Exception;
-
-    public ProjectVO getReportView(ProjectVO paramVo) throws Exception;
-
-    public List<ProjectVO> getReportList(ProjectVO paramVo) throws Exception;
-
-    public List<ProjectVO> getReportFilterList(ProjectVO paramVo) throws Exception;
 }

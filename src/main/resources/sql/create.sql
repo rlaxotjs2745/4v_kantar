@@ -102,15 +102,16 @@ ENGINE=InnoDB
 CREATE TABLE `KT_REPORT_DATA` (
 	`idx_report_data` INT(11) NOT NULL AUTO_INCREMENT,
 	`idx_report` INT(11) NOT NULL DEFAULT '0',
-	`title` VARCHAR(100) NULL DEFAULT NULL COMMENT '리포트 명/이름' COLLATE 'utf8mb4_general_ci',
-	`summary0` VARCHAR(4000) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-	`idx_user` INT(11) NOT NULL DEFAULT '0',
+	`title` VARCHAR(2000) NULL DEFAULT NULL COMMENT '요약문 주제' COLLATE 'utf8mb4_general_ci',
+	`summary0` VARCHAR(4000) NULL DEFAULT NULL COMMENT '요약문' COLLATE 'utf8mb4_general_ci',
+	`idx_user` INT(11) NULL DEFAULT '0',
 	`create_dt` DATETIME NULL DEFAULT current_timestamp(),
 	`update_dt` DATETIME NULL DEFAULT NULL ON UPDATE current_timestamp(),
 	PRIMARY KEY (`idx_report_data`) USING BTREE,
 	INDEX `FK_KT_REPORT_DATA_KT_REPORT` (`idx_report`) USING BTREE,
 	CONSTRAINT `FK_KT_REPORT_DATA_KT_REPORT` FOREIGN KEY (`idx_report`) REFERENCES `KT_REPORT` (`idx_report`) ON UPDATE NO ACTION ON DELETE CASCADE
 )
+COMMENT='요약문'
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
 ;
