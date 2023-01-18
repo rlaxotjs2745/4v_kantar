@@ -13,13 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.kantar.base.BaseController;
-import com.kantar.mapper.ProjectMapper;
 import com.kantar.mapper.ReportMapper;
 import com.kantar.util.Excel;
 import com.kantar.util.Summary;
-import com.kantar.util.TokenJWT;
 import com.kantar.vo.ProjectVO;
 import com.kantar.vo.ProjectViewVO;
 import com.kantar.vo.SummaryVO;
@@ -32,9 +28,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ProjectService {
     @Autowired
-    private ProjectMapper projectMapper;
-
-    @Autowired
     private ReportMapper reportMapper;
 
     @Autowired
@@ -45,9 +38,6 @@ public class ProjectService {
 
     @Autowired
     private KafkaSender kafkaSender;
-
-    @Autowired
-    private TokenJWT tokenJWT;
     
     @Value("${file.upload-dir}")
     public String filepath;
@@ -63,8 +53,7 @@ public class ProjectService {
      */
     @Async
     @Transactional
-    public void create_report(HttpServletRequest req, ProjectVO paramVo) throws Exception{
-        String _token = tokenJWT.resolveToken(req);
+    public void create_report(String _token, ProjectVO paramVo, Integer _tp) throws Exception{
         String _msg = "";
         try {
             List<ProjectVO> prs = reportMapper.getReportFileList(paramVo);
@@ -152,7 +141,7 @@ public class ProjectService {
             _msg = "리포트 생성을 실패하였습니다.";
         }
         if(StringUtils.isNotEmpty(_token)){
-            kafkaSender.send(tokenJWT.resolveToken(req), _msg);
+            kafkaSender.send(_token, _msg);
         }
     }
 
