@@ -163,5 +163,40 @@ public class StatisticsService {
         }
     }
 
+    /**
+     * API 사용량 (키워드 입력)
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    public void getAPIUsage(Integer idx_report, Integer type, String word) throws Exception {
+        if(idx_report!=null && idx_report>0){
 
+            StatisticsVO statisticsVO = new StatisticsVO();
+            statisticsVO.setIdx_report(idx_report);
+            statisticsVO.setApi_type(type);
+            int ori_date = statisticsMapper.getReportAPIUsage(idx_report);
+            int word_length = word.length();
+
+            if(ori_date==0){
+                if(type==1){
+                    statisticsVO.setSummaryUsage(word_length);
+                    statisticsMapper.setSummaryAPIUsage(statisticsVO);
+                }
+                if(type==2){
+                    statisticsVO.setKeywordUsage(word_length);
+                    statisticsMapper.setKeywordAPIUsage(statisticsVO);
+                }
+            } else{
+                if(type==1){
+                    statisticsVO.setSummaryUsage(word_length);
+                    statisticsMapper.updateSummaryAPIUsage(statisticsVO);
+                }
+                if(type==2){
+                    statisticsVO.setKeywordUsage(word_length);
+                    statisticsMapper.updateKeywordAPIUsage(statisticsVO);
+                }
+            }
+        }
+    }
 }
