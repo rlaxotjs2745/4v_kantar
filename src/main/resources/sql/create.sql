@@ -214,3 +214,23 @@ CREATE TABLE `KT_REPORT_FILTER_DATA` (
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB
 ;
+
+
+
+
+CREATE TABLE `KT_FILE_STATISTICS` (
+    `idx_file_statistics` INT(11) NOT NULL AUTO_INCREMENT,
+    `idx_project` INT(11) NOT NULL,
+    `file_status` TINYINT(4) NULL DEFAULT '1' COMMENT '1:사용, 99:삭제',
+    `file_cnt` INT(11) NOT NULL,
+    `file_size` DECIMAL(10,3) NOT NULL,
+    `word_length` BIGINT(20) NOT NULL,
+    `report_cnt` INT(11) NOT NULL,
+    `create_dt` DATETIME NULL DEFAULT current_timestamp(),
+    `update_dt` DATETIME NULL DEFAULT NULL ON UPDATE current_timestamp(),
+    PRIMARY KEY (`idx_file_statistics`) USING BTREE
+)
+    COMMENT='시스템 사용 현황'
+    COLLATE='utf8mb4_general_ci'
+    ENGINE=InnoDB
+;
