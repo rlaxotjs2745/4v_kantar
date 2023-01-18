@@ -23,4 +23,14 @@ public interface StatisticsMapper {
     long getAllFileWordCnt() throws Exception;
 
     Double getAllFileSize() throws Exception;
+
+    int getReportAPIUsage(Integer idx_report) throws Exception;
+
+    void setSummaryAPIUsage(StatisticsVO statisticsVO) throws Exception;
+
+    void setKeywordAPIUsage(StatisticsVO statisticsVO) throws Exception;
+
+    void updateSummaryAPIUsage(StatisticsVO statisticsVO) throws Exception;
+
+    void updateKeywordAPIUsage(StatisticsVO statisticsVO) throws Exception;
 }

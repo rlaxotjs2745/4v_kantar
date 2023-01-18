@@ -3,19 +3,19 @@
 
 <mapper namespace="com.kantar.mapper.StatisticsMapper">
     <select id="getFileCount" resultType="long">
-        SELECT count(1) FROM KT_FILE_STATISTICS WHERE file_status = 1
+        SELECT count(1) FROM KT_FILE_STATISTICS
     </select>
 
     <select id="getAllFileWordCnt" resultType="long">
-        SELECT sum(word_length) FROM KT_FILE_STATISTICS WHERE file_status = 1
+        SELECT sum(word_length) FROM KT_FILE_STATISTICS
     </select>
 
     <select id="getAllFileSize" resultType="Double">
-        SELECT sum(file_size) FROM KT_FILE_STATISTICS WHERE file_status = 1
+        SELECT sum(file_size) FROM KT_FILE_STATISTICS
     </select>
 
     <select id="getReportCount" resultType="long">
-        SELECT sum(report_cnt) FROM KT_FILE_STATISTICS WHERE file_status = 1
+        SELECT sum(report_cnt) FROM KT_FILE_STATISTICS
     </select>
 
     <insert id="setProjectStatistics" parameterType="com.kantar.vo.StatisticsVO">
@@ -24,7 +24,7 @@
 
     <update id="updateProjectReporteCnt" parameterType="com.kantar.vo.ProjectVO">
         UPDATE KT_FILE_STATISTICS
-        SET report_cnt = (SELECT COUNT(1) FROM KT_REPORT WHERE idx_project=#{idx_project}),
+        SET report_cnt = report_cnt + 1,
             update_dt = now()
         WHERE idx_project = #{idx_project}
     </update>
@@ -35,4 +35,33 @@
             update_dt = now()
         WHERE idx_project = #{idx_project}
     </update>
+
+    <select id="getReportAPIUsage" resultType="Integer">
+        SELECT count(1) FROM KT_API_STATISTICS WHERE idx_report = #{idx_report}
+    </select>
+
+    <insert id="setSummaryAPIUsage" parameterType="com.kantar.vo.StatisticsVO">
+        INSERT INTO KT_API_STATISTICS (report_status, idx_report, summaryUsage, keywordUsage)  VALUES (1, #{idx_report}, #{summaryUsage}, #{keywordUsage});
+    </insert>
+
+    <insert id="setKeywordAPIUsage" parameterType="com.kantar.vo.StatisticsVO">
+        INSERT INTO KT_API_STATISTICS (report_status, idx_report, summaryUsage, keywordUsage) VALUES (1, #{idx_report}, #{summaryUsage}, #{keywordUsage});
+    </insert>
+
+    <update id="updateSummaryAPIUsage" parameterType="com.kantar.vo.ProjectVO">
+        UPDATE KT_API_STATISTICS
+        SET summaryUsage = summaryUsage + #{summaryUsage},
+            update_dt = now()
+        WHERE idx_report = #{idx_report}
+    </update>
+
+    <update id="updateKeywordAPIUsage" parameterType="com.kantar.vo.ProjectVO">
+        UPDATE KT_API_STATISTICS
+        SET keywordUsage = keywordUsage + #{keywordUsage},
+            update_dt = now()
+        WHERE idx_report = #{idx_report}
+    </update>
+
+
+
 </mapper>
