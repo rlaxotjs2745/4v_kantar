@@ -36,8 +36,8 @@ public class ProjectService {
     @Autowired
     private Summary summary;
 
-    @Autowired
-    private KafkaSender kafkaSender;
+    // @Autowired
+    // private KafkaSender kafkaSender;
     
     @Value("${file.upload-dir}")
     public String filepath;
@@ -136,13 +136,13 @@ public class ProjectService {
                 }
             }
             if(StringUtils.isNotEmpty(_token)){
-                kafkaSender.send(_token, _msg);
+                // kafkaSender.send(_token, _msg);
             }
         } catch (Exception e) {
             e.printStackTrace();
             _msg = "리포트 생성을 실패하였습니다.";
             if(StringUtils.isNotEmpty(_token)){
-                kafkaSender.send(_token, _msg);
+                // kafkaSender.send(_token, _msg);
             }
         }
     }
