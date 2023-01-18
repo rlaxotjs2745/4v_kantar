@@ -106,9 +106,6 @@ public class ProjectService {
                 String pp = new Gson().toJson(params);
                 ProjectVO param = summary.getSummary(pp);
                 if(StringUtils.isNotEmpty(param.getTitle())){
-                    paramVo.setTitle(param.getTitle());
-                    paramVo.setSummary0(param.getSummary0());
-
                     ProjectVO ridx = reportMapper.getReportIdx(paramVo);
                     Integer ridx0 = 0;
                     if(ridx==null){
@@ -125,6 +122,8 @@ public class ProjectService {
                         ridx0 = 1;
                     }
                     if(ridx0==1){
+                        paramVo.setTitle(param.getTitle());
+                        paramVo.setSummary0(param.getSummary0());
                         reportMapper.saveReportData(paramVo);
                         if(StringUtils.isNotEmpty(_token)){
                             _msg = "리포트가 생성되었습니다.";
