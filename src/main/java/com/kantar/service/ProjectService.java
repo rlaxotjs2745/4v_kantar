@@ -136,12 +136,15 @@ public class ProjectService {
                     _msg = "리포트 생성을 실패하였습니다.";
                 }
             }
+            if(StringUtils.isNotEmpty(_token)){
+                kafkaSender.send(_token, _msg);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             _msg = "리포트 생성을 실패하였습니다.";
-        }
-        if(StringUtils.isNotEmpty(_token)){
-            kafkaSender.send(_token, _msg);
+            if(StringUtils.isNotEmpty(_token)){
+                kafkaSender.send(_token, _msg);
+            }
         }
     }
 
