@@ -1,10 +1,7 @@
 package com.kantar.controller;
 
 import com.kantar.base.BaseController;
-import com.kantar.mapper.DictionaryMapper;
-import com.kantar.mapper.ProjectMapper;
-import com.kantar.mapper.StatisticsMapper;
-import com.kantar.mapper.UserMapper;
+import com.kantar.mapper.*;
 import com.kantar.model.CommonResult;
 import com.kantar.service.DictionaryService;
 import com.kantar.service.ResponseService;
@@ -39,7 +36,7 @@ public class StatisticsController extends BaseController {
     private final UserMapper userMapper;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ReportMapper reportMapper;
 
     @Autowired
     private final StatisticsMapper statisticsMapper;
@@ -94,7 +91,7 @@ public class StatisticsController extends BaseController {
         StatisticsVO statisticsVO = new StatisticsVO();
 
         if(paramVo.getIdx_project()>0){
-            List<ProjectVO> prs = projectMapper.getReportFileList(paramVo);
+            List<ProjectVO> prs = reportMapper.getReportFileList(paramVo);
 
             double sizeSum = 0;
             long lengthSum = 0;
