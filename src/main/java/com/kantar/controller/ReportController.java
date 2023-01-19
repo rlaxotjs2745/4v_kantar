@@ -100,6 +100,11 @@ public class ReportController extends BaseController {
     public CommonResult create_report(MultipartHttpServletRequest req, ProjectVO paramVo) throws Exception {
         String _token = tokenJWT.resolveToken(req);
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
             if(StringUtils.isEmpty(paramVo.getJob_no())){
                 return responseService.getFailResult("create_report","JOB No를 입력해주세요.");
             }
@@ -216,12 +221,16 @@ public class ReportController extends BaseController {
     @PostMapping("/list_report")
     public CommonResult getReportList(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
-            if(paramVo.getCurrentPage() != null){
-                paramVo.setRecordCountPerPage(10);
-                paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
-            }else{
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
+            if(paramVo.getCurrentPage() == null){
                 paramVo.setCurrentPage(1);
             }
+            paramVo.setRecordCountPerPage(10);
+            paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
 
             List<ProjectVO> rs = reportMapper.getReportList(paramVo);
             if(rs!=null){
@@ -245,6 +254,11 @@ public class ReportController extends BaseController {
     @PostMapping("/report_view")
     public CommonResult getReportView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
             if(StringUtils.isEmpty(paramVo.getIdx()+"")){
                 return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
             }
@@ -268,6 +282,11 @@ public class ReportController extends BaseController {
     @PostMapping("/report_modify")
     public CommonResult modiReportView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
             if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
                 return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
             }

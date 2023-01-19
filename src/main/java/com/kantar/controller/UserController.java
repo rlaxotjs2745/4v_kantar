@@ -107,6 +107,11 @@ public class UserController extends BaseController {
     @PostMapping("/modify")
     public CommonResult modify(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
             Integer rs = userMapper.modUserInfo(paramVo);
             if(rs==1){
                 return responseService.getSuccessResult("modify","회원 정보를 수정하였습니다.");
@@ -129,6 +134,11 @@ public class UserController extends BaseController {
     @PostMapping("/dropout")
     public CommonResult dropout(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
             if(StringUtils.isEmpty(paramVo.getUser_pw())){
                 return responseService.getFailResult("register","비밀번호를 입력해주세요.");
             }

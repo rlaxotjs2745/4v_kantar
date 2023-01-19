@@ -29,6 +29,7 @@ import com.kantar.service.ResponseService;
 import com.kantar.vo.ProjectListVO;
 import com.kantar.vo.ProjectVO;
 import com.kantar.vo.ProjectViewVO;
+import com.kantar.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,11 @@ public class ProjectController extends BaseController {
     @PostMapping("/csv_view")
     public CommonResult viewCsv(MultipartHttpServletRequest req, ProjectVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
             List<MultipartFile> fileList = req.getFiles("file");
             if(req.getFiles("file").get(0).getSize() != 0){
                 fileList = req.getFiles("file");
@@ -138,12 +144,16 @@ public class ProjectController extends BaseController {
     @PostMapping("/list_project")
     public CommonResult getProjectList(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
-            if(paramVo.getCurrentPage() != null){
-                paramVo.setRecordCountPerPage(10);
-                paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
-            }else{
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
+            if(paramVo.getCurrentPage() == null){
                 paramVo.setCurrentPage(1);
             }
+            paramVo.setRecordCountPerPage(10);
+            paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
             Integer tcnt = projectMapper.getProjectListCount(paramVo);
             List<ProjectListVO> rs = projectMapper.getProjectList(paramVo);
             Map<String, Object> _data = new HashMap<String, Object>();
@@ -170,6 +180,11 @@ public class ProjectController extends BaseController {
     @PostMapping("/project_view")
     public CommonResult getProjectView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
             if(StringUtils.isEmpty(paramVo.getIdx_project()+"")){
                 return responseService.getFailResult("project_view","프로젝트 INDEX가 없습니다.");
             }
