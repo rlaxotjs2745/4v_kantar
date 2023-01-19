@@ -65,7 +65,7 @@ public class StatisticsController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("list_dictionary","오류가 발생하였습니다.");
+            return responseService.getFailResult("system_statistics","오류가 발생하였습니다.");
         }
     }
 

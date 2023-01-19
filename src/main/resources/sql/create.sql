@@ -239,7 +239,7 @@ CREATE TABLE `KT_FILE_STATISTICS` (
 CREATE TABLE `KT_API_STATISTICS` (
      `idx_api_statistics` INT(11) NOT NULL AUTO_INCREMENT,
      `idx_report` INT(11) NOT NULL,
-     `report_status` TINYINT(4) NULL DEFAULT '1' COMMENT '1:사용, 99:삭제',
+     `report_status` TINYINT(4) NULL DEFAULT '1' COMMENT '1:기본리포트, 2:추가리포트, 99:삭제',
      `summaryUsage` BIGINT(20) NOT NULL,
      `keywordUsage` BIGINT(20) NOT NULL,
      `create_dt` DATETIME NULL DEFAULT current_timestamp(),

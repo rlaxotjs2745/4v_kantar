@@ -1,9 +1,6 @@
 package com.kantar.mapper;
 
-import com.kantar.vo.DictionaryDataVO;
-import com.kantar.vo.DictionaryVO;
-import com.kantar.vo.ProjectVO;
-import com.kantar.vo.StatisticsVO;
+import com.kantar.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -33,4 +30,10 @@ public interface StatisticsMapper {
     void updateSummaryAPIUsage(StatisticsVO statisticsVO) throws Exception;
 
     void updateKeywordAPIUsage(StatisticsVO statisticsVO) throws Exception;
+
+    ProjectVO getProjectIdxToReport(Integer idx_report) throws Exception;
+
+    void setSummaryAPIUsageAdd(StatisticsVO statisticsVO) throws Exception;
+
+    void setKeywordAPIUsageAdd(StatisticsVO statisticsVO) throws Exception;
 }
