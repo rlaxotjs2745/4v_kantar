@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.kantar.service.MailService;
 //import jakarta.mail.internet.MimeMessage;
 
 import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
