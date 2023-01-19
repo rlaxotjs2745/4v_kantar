@@ -22,18 +22,15 @@
         <if test="user_pw != null">
             , user_pw=#{user_pw}
         </if>
-        <if test="user_name != null">
-            , user_name=#{user_name}
-        </if>
         <if test="user_phone != null">
             , user_phone=#{user_phone}
         </if>
-        <if test="user_type != null">
-            , user_type=#{user_type}
-        </if>
-        <if test="user_status != null">
-            , user_status=#{user_status}
-        </if>
+<!--        <if test="user_type != null">-->
+<!--            , user_type=#{user_type}-->
+<!--        </if>-->
+<!--        <if test="user_status != null">-->
+<!--            , user_status=#{user_status}-->
+<!--        </if>-->
             WHERE idx_user=#{idx_user}
     </update>
 
@@ -42,10 +39,16 @@
     </delete>
 
     <select id="getUserList" resultType="com.kantar.vo.UserVO">
-        SELECT user_id, user_name, create_dt, update_dt FROM KT_USER
-            WHERE user_type <![CDATA[<>]]> 99
-            <if test="filter eq 11">
-                AND user_type <![CDATA[<>]]> 11
+        SELECT idx_user, user_id, user_name, create_dt, update_dt FROM KT_USER
+        <if test="filter eq 11">
+            WHERE user_type = 1
+        </if>
+            <if test="filter eq 99">
+            WHERE (user_type = 1
+                OR user_type = 11)
+            </if>
+            <if test="user_name neq null">
+                AND user_name LIKE '%${user_name}%'
             </if>
         LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
     </select>

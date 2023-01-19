@@ -3,13 +3,19 @@ package com.kantar.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import com.kantar.service.MailService;
+//import jakarta.mail.internet.MimeMessage;
+
+import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import com.kantar.base.BaseController;
 import com.kantar.mapper.UserMapper;
@@ -28,6 +34,8 @@ public class UserController extends BaseController {
     private final ResponseService responseService;
     private final UserMapper userMapper;
     private final TokenJWT tokenJWT;
+
+    private final JavaMailSender mailSender;
 
     /**
      * 로그인
@@ -97,6 +105,60 @@ public class UserController extends BaseController {
         return responseService.getFailResult("register","오류가 발생하였습니다.");
     }
 
+
+    /**
+     * 멤버 관리 - 멤버 등록하기
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/create")
+    @Transactional
+    public CommonResult create(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
+        try {
+            if(StringUtils.isEmpty(paramVo.getUser_id())){
+                return responseService.getFailResult("create","회원 아이디를 입력해주세요.");
+            }
+            if(StringUtils.isEmpty(paramVo.getUser_name())){
+                return responseService.getFailResult("create","이름을 입력해주세요.");
+            }
+            Random rd = new Random();//랜덤 객체 생성
+            String newPw = "";
+            for(int i=0;i<6;i++) {
+                newPw = newPw + rd.nextInt(9); //로또번호 출력
+            }
+
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String hashedPassword = passwordEncoder.encode(newPw);
+            paramVo.setUser_pw(hashedPassword);
+            paramVo.setUser_status(0);
+            paramVo.setUser_phone("00000000000");
+            Integer rs = userMapper.savUserInfo(paramVo);
+            paramVo.setUser_pw(newPw);
+            if(rs==1){
+                // 이메일 보내기
+                String FROM_ADDRESS = "kantar@kantar.co.kr";
+//                mailService.mailSend(paramVo);
+                MimeMessage mail = mailSender.createMimeMessage();
+                MimeMessageHelper mailHelper = new MimeMessageHelper(mail, true, "UTF-8");
+
+                mailHelper.setFrom(FROM_ADDRESS);
+                mailHelper.setTo(paramVo.getUser_id());
+                mailHelper.setSubject("[KANTAR] 회원가입 안내");
+                mailHelper.setText(paramVo.getUser_pw(), true);
+
+                mailSender.send(mail);
+                return responseService.getSuccessResult("create","회원 가입이 완료되었습니다.");
+            }else{
+                return responseService.getFailResult("create","회원 가입 후에 이용해주세요.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseService.getFailResult("create","오류가 발생하였습니다.");
+    }
+
     /**
      * 회원정보 수정
      * @param req
@@ -105,7 +167,7 @@ public class UserController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/modify")
-    public CommonResult modify(HttpServletRequest req, UserVO paramVo) throws Exception {
+    public CommonResult modify(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
@@ -132,16 +194,16 @@ public class UserController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/dropout")
-    public CommonResult dropout(HttpServletRequest req, UserVO paramVo) throws Exception {
+    public CommonResult dropout(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
-            if(StringUtils.isEmpty(paramVo.getUser_pw())){
-                return responseService.getFailResult("register","비밀번호를 입력해주세요.");
-            }
+//            if(StringUtils.isEmpty(paramVo.getUser_pw())){
+//                return responseService.getFailResult("dropout","비밀번호를 입력해주세요.");
+//            }
             Integer rs = userMapper.delUserInfo(paramVo);
             if(rs==1){
                 return responseService.getSuccessResult("dropout","회원 탈퇴가 완료되었습니다.");
@@ -161,21 +223,21 @@ public class UserController extends BaseController {
      * @return CommonResult
      * @throws Exception
      */
-    @PostMapping("/list_member")
+    @GetMapping("/list_member")
     public CommonResult getMemberList(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
             UserVO userInfo = userMapper.getUserInfo(paramVo);
             if(userInfo.getUser_type() == 1){
                 return responseService.getFailResult("list_member","관리자만 조회 가능한 기능힙니다.");
             }
-            if(paramVo.getRecordCountPerPage() == 0){
+            if(paramVo.getRecordCountPerPage() == null || paramVo.getRecordCountPerPage() == 0){
                 paramVo.setRecordCountPerPage(10);
             }
-            if(paramVo.getCurrentPage() == 0){
-                paramVo.setCurrentPage(1);
+            if(paramVo.getCurrentPage() == null || paramVo.getCurrentPage() == 0){
+                paramVo.setCurrentPage(0);
             }
             paramVo.setFilter(userInfo.getUser_type());
-            paramVo.setFirstIndex(paramVo.getCurrentPage() * paramVo.getRecordCountPerPage() - (paramVo.getRecordCountPerPage() - 1));
+            paramVo.setFirstIndex(paramVo.getCurrentPage() * paramVo.getRecordCountPerPage());
             List<UserVO> rs = userMapper.getUserList(paramVo);
             if(rs != null){
                 return responseService.getSuccessResult(rs, "list_member", "멤버 리스팅 성공");
@@ -196,10 +258,17 @@ public class UserController extends BaseController {
      * @return CommonResult
      * @throws Exception
      */
-    @PostMapping("/member_detail")
+    @GetMapping("/member_detail")
     public CommonResult getMemberDetail(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
-            UserVO rs = userMapper.getUserInfo(paramVo);
+            UserVO userInfo = userMapper.getUserInfo(paramVo);
+
+            UserVO rs = new UserVO();
+
+            rs.setUser_id(userInfo.getUser_id());
+            rs.setUser_name(userInfo.getUser_name());
+            rs.setUser_phone(userInfo.getUser_phone());
+            rs.setIdx_user(userInfo.getIdx_user());
 
             if(rs != null){
                 return responseService.getSuccessResult(rs, "member_detail", "회원 불러오기 성공");
