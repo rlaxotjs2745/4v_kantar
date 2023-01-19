@@ -55,13 +55,13 @@ public class ReportController extends BaseController {
     public String filepath;
 
     /**
-     * 리포트 생성 - 필터 적용하기
+     * 리포트 생성 : 필터 적용하기
      * @param paramVo
      * @return CommonResult
      * @throws Exception
      */
     @PostMapping("/create")
-    public CommonResult createReportWithFilter(MultipartHttpServletRequest req, ReportVO paramVo) throws Exception {
+    public CommonResult createReportWithFilter(HttpServletRequest req, ReportVO paramVo) throws Exception {
         String _token = tokenJWT.resolveToken(req);
         try {
             UserVO uinfo = getChkUserLogin(req);
@@ -89,7 +89,7 @@ public class ReportController extends BaseController {
     }
 
     /**
-     * 리포트 생성
+     * 리포트 생성 : CSV 파일 업로드
      * @param req
      * @param paramVo
      * @return CommonResult
