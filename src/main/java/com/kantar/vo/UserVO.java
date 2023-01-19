@@ -1,9 +1,11 @@
 package com.kantar.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.*;
 
-@Getter
-@Setter
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserVO extends BaseVO {
     private String user_id;
     private String user_pw;

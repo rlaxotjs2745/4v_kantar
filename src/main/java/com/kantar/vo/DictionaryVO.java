@@ -1,10 +1,11 @@
 package com.kantar.vo;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-@Getter
-@Setter
+import lombok.*;
+
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DictionaryVO extends BaseVO{
     private Integer idx_dictionary;
     private String title; //사전 이름

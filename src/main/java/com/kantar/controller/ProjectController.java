@@ -32,9 +32,9 @@ import com.kantar.vo.ProjectViewVO;
 import com.kantar.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+// import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+// @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/project")
 public class ProjectController extends BaseController {

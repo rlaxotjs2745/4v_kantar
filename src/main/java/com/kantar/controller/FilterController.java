@@ -21,6 +21,7 @@ import com.kantar.vo.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/filter")
 public class FilterController extends BaseController {
@@ -49,7 +50,7 @@ public class FilterController extends BaseController {
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
-            if(paramVo.getIdx_project() == null){
+            if(paramVo.getIdx_project_job_projectid() == null){
                 return responseService.getFailResult("filter_create","프로젝트 값이 없습니다.");
             }
 

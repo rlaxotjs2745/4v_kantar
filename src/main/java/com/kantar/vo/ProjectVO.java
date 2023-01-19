@@ -2,13 +2,12 @@ package com.kantar.vo;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-@Getter
-@Setter
-@RequiredArgsConstructor
+import lombok.*;
+
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProjectVO extends BaseVO {
     private Integer idx_project;
     private Integer idx_project_job;
