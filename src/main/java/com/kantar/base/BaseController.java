@@ -55,8 +55,8 @@ public class BaseController {
 			if (jwt != null) {
 				paramVo = tokenJWT.getRoles(token);
 			}
-			return paramVo;
 		}
+		return paramVo;
     }
 
     /**

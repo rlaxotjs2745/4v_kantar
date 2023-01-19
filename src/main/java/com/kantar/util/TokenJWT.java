@@ -1,50 +1,25 @@
 package com.kantar.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kantar.vo.UserVO;
 
-import javax.annotation.PostConstruct;
-
-import java.util.Base64;
 import java.util.Date;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-@RequiredArgsConstructor
 @Component
 public class TokenJWT {
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
     final Long expiredTime = 1000 * 60L * 60L * 2L; // 토큰 유효 시간 (2시간)
-
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-    }
-
-    public void main(String[] args) throws UnsupportedEncodingException {
-        // TokenJWT tokenJWT = new TokenJWT();
-        // System.out.println(secretKey);
-
-        // String jwt = tokenJWT.createToken(null, "USER");
-        // System.out.println(jwt);
-        
-        // Map<String, Object> claimMap = tokenJWT.verifyJWT(jwt);
-        // System.out.println(claimMap); // 토큰이 만료되었거나 문제가있으면 null
-    }
         
     /**
      * 토큰 생성
@@ -73,8 +48,9 @@ public class TokenJWT {
         String jwt = Jwts.builder()
             .setHeader(headers) // Headers 설정
             .setClaims(payloads) // Claims 설정
+            .setSubject("user-auth")
             .setExpiration(ext) // 토큰 만료 시간 설정
-            .signWith(SignatureAlgorithm.HS256, secretKey) // HS256과 Key로 Sign
+            .signWith(SignatureAlgorithm.HS256, secretKey.getBytes()) // HS256과 Key로 Sign
             .compact(); // 토큰 생성
 
         return jwt;
@@ -94,13 +70,10 @@ public class TokenJWT {
                     .getBody();
 
             claimMap = claims;
-
-            //Date expiration = claims.get("exp", Date.class);
-            //String data = claims.get("data", String.class);
-            
         } catch (ExpiredJwtException e) { // 토큰이 만료되었을 경우
             System.out.println("token expired");
         } catch (Exception e) { // 그외 에러났을 경우
+            System.err.println(e);
             System.out.println("token verify error");
         }
         return claimMap;
@@ -135,7 +108,7 @@ public class TokenJWT {
     public UserVO getRoles(String token) {
         Claims claims = Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token).getBody();
         ObjectMapper a = new ObjectMapper();
-        UserVO b = a.convertValue(claims.get("data"), UserVO.class);
+        UserVO b = a.convertValue(claims, UserVO.class);
         return b;
     }
 
