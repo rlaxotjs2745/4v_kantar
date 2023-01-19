@@ -208,37 +208,11 @@
 			<version>2.14.1</version>
 		</dependency>
 
-
-<!--		&lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail &ndash;&gt;-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-starter-mail</artifactId>-->
-<!--			<version>2.7.1</version>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4.7</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api -->
-<!--		<dependency>-->
-<!--			<groupId>jakarta.mail</groupId>-->
-<!--			<artifactId>jakarta.mail-api</artifactId>-->
-<!--			<version>2.1.0</version>-->
-<!--		</dependency>-->
-
-<!--		<dependency>-->
-<!--			<groupId>org.eclipse.angus</groupId>-->
-<!--			<artifactId>angus-mail</artifactId>-->
-<!--		</dependency>-->
-
-		<dependency>
-			<groupId>com.sun.activation</groupId>
-			<artifactId>jakarta.activation</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-
-
 	</dependencies>
 
 	<build>

@@ -16,7 +16,7 @@
             OR dic_type = 1)
         </if>
         <if test="title neq null">
-            AND title LIKE CONCAT('%', #{title}, '%')
+            AND title LIKE '%${title}%'
         </if>
         LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
     </select>
