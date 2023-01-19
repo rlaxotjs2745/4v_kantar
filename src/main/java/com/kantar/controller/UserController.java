@@ -95,7 +95,7 @@ public class UserController extends BaseController {
             paramVo.setUser_pw(hashedPassword);
             Integer rs = userMapper.savUserInfo(paramVo);
             if(rs==1){
-                return responseService.getSuccessResult("register","회원 가입이 완료되었습니다.");
+                return responseService.getSuccessResult("register","이메일 발송에 성공했습니다.");
             }else{
                 return responseService.getFailResult("register","회원 가입 후에 이용해주세요.");
             }
@@ -123,10 +123,14 @@ public class UserController extends BaseController {
             if(StringUtils.isEmpty(paramVo.getUser_name())){
                 return responseService.getFailResult("create","이름을 입력해주세요.");
             }
+            if(userMapper.getUserInfo(paramVo) != null){
+                return responseService.getFailResult("create","이미 존재하는 아이디입니다.");
+            }
+
             Random rd = new Random();//랜덤 객체 생성
             String newPw = "";
             for(int i=0;i<6;i++) {
-                newPw = newPw + rd.nextInt(9); //로또번호 출력
+                newPw = newPw + rd.nextInt(9);
             }
 
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -137,9 +141,7 @@ public class UserController extends BaseController {
             Integer rs = userMapper.savUserInfo(paramVo);
             paramVo.setUser_pw(newPw);
             if(rs==1){
-                // 이메일 보내기
                 String FROM_ADDRESS = "kantar@kantar.co.kr";
-//                mailService.mailSend(paramVo);
                 MimeMessage mail = mailSender.createMimeMessage();
                 MimeMessageHelper mailHelper = new MimeMessageHelper(mail, true, "UTF-8");
 
@@ -269,6 +271,7 @@ public class UserController extends BaseController {
             rs.setUser_name(userInfo.getUser_name());
             rs.setUser_phone(userInfo.getUser_phone());
             rs.setIdx_user(userInfo.getIdx_user());
+            rs.setUser_type(userInfo.getUser_type());
 
             if(rs != null){
                 return responseService.getSuccessResult(rs, "member_detail", "회원 불러오기 성공");
