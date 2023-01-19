@@ -29,5 +29,6 @@ public class ProjectVO extends BaseVO {
     private Integer project_seq;
     private Integer report_seq;
     private String report_id;
+    private String filter_tp;
     List<ReportVO> reportList;
 }

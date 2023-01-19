@@ -1,5 +1,7 @@
 package com.kantar.vo;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.*;
@@ -11,4 +13,5 @@ public class FilterDataVO {
     private Integer idx_filter;
     private Integer filter_type;
     private String filter_data;
+    List<FilterDataArrayVO> filterDataArray;
 }

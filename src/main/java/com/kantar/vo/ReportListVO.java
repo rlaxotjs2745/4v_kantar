@@ -6,7 +6,7 @@ import lombok.*;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ReportListVO {
+public class ReportListVO extends BaseVO {
     private Integer idx_report;
     private String keyword;
     private String keytype;
@@ -16,6 +16,5 @@ public class ReportListVO {
     private String job_no;
     private String report_id;
     private String title;
-    private String create_dt;
     private String status_str;
 }

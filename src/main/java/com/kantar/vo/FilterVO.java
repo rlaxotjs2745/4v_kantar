@@ -8,7 +8,7 @@ import lombok.*;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FilterVO {
+public class FilterVO extends BaseVO {
     private Integer idx_project;
     private Integer idx_project_job_projectid;
     private Integer idx_filter;
@@ -16,8 +16,6 @@ public class FilterVO {
     private String filter_tp;
     private Integer filter_type;
     private String filter_data;
-    private String create_dt;
-    private Integer idx_user;
     private String tp1;
     private String tp2;
     private String tp3;
