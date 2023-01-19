@@ -86,16 +86,11 @@ public class FilterController extends BaseController {
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
-            if(paramVo.getIdx_project() == null){
+            if(paramVo.getIdx_project_job_projectid() == null){
                 return responseService.getFailResult("filter_create","프로젝트 값이 없습니다.");
             }
             if(paramVo.getFilter_title().equals("")){
                 return responseService.getFailResult("filter_create","필터명을 입력해주세요.");
-            }
-            if(StringUtils.isEmpty(paramVo.getFilter_tp())){
-                return responseService.getFailResult("filter_create","필터 형식이 없습니다.");
-            }else{
-                paramVo.setFilter_type(Integer.valueOf(paramVo.getFilter_tp()));
             }
 
             Integer rs0 = 0;
@@ -107,31 +102,35 @@ public class FilterController extends BaseController {
 
             if(rs0 == 1){
                 if(StringUtils.isNotEmpty(paramVo.getTp1())){
+                    paramVo.setFilter_type(1);
                     Integer rs1 = filterService.create_Filter(paramVo, paramVo.getTp1());
                     if(rs1 == 0){
                         filterMapper.delFilter(paramVo);
-                        return responseService.getFailResult("filter_create","필터 데이터를 저장하지 못했습니다.");
+                        return responseService.getFailResult("filter_create","화자 필터 데이터를 저장하지 못했습니다.");
                     }
                 }
                 if(StringUtils.isNotEmpty(paramVo.getTp2())){
+                    paramVo.setFilter_type(2);
                     Integer rs1 = filterService.create_Filter(paramVo, paramVo.getTp2());
                     if(rs1 == 0){
                         filterMapper.delFilter(paramVo);
-                        return responseService.getFailResult("filter_create","필터 데이터를 저장하지 못했습니다.");
+                        return responseService.getFailResult("filter_create","챕터 필터 데이터를 저장하지 못했습니다.");
                     }
                 }
                 if(StringUtils.isNotEmpty(paramVo.getTp3())){
+                    paramVo.setFilter_type(3);
                     Integer rs1 = filterService.create_Filter(paramVo, paramVo.getTp3());
                     if(rs1 == 0){
                         filterMapper.delFilter(paramVo);
-                        return responseService.getFailResult("filter_create","필터 데이터를 저장하지 못했습니다.");
+                        return responseService.getFailResult("filter_create","서브챕터 필터 데이터를 저장하지 못했습니다.");
                     }
                 }
                 if(StringUtils.isNotEmpty(paramVo.getTp4())){
+                    paramVo.setFilter_type(4);
                     Integer rs1 = filterService.create_Filter(paramVo, paramVo.getTp4());
                     if(rs1 == 0){
                         filterMapper.delFilter(paramVo);
-                        return responseService.getFailResult("filter_create","필터 데이터를 저장하지 못했습니다.");
+                        return responseService.getFailResult("filter_create","질문 필터 데이터를 저장하지 못했습니다.");
                     }
                 }
                 return responseService.getSuccessResult("filter_create", "필터를 저장하였습니다.");

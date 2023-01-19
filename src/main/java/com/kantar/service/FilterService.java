@@ -23,7 +23,7 @@ public class FilterService {
         for(String _data0 : _data1){
             FilterDataVO param = new FilterDataVO();
             param.setIdx_filter(paramVo.getIdx_filter());
-            param.setFilter_type(1);
+            param.setFilter_type(paramVo.getFilter_type());
             param.setFilter_data(_data0);
             _sptd0.add(param);
         }
