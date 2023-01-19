@@ -39,6 +39,11 @@ public class StatisticsService {
     @Value("${file.upload-dir}")
     public String filepath;
 
+    /**
+     * 현재 데이터 사용량 가져오기
+     * @return StatisticsVO
+     * @throws Exception
+     */
     public StatisticsVO getCurrentFileStatistic() throws Exception {
 
         StatisticsVO statisticsVO = new StatisticsVO();
@@ -59,7 +64,7 @@ public class StatisticsService {
     /**
      * 시스템 사용 현황 - 기본리포트 생성 될 때(=프로젝트 생성 될 때)
      * @param paramVo
-     * @return CommonResult
+     * @return StatisticsVO
      * @throws Exception
      */
     public StatisticsVO createProjectInfo(ProjectVO paramVo) throws Exception {
@@ -103,9 +108,9 @@ public class StatisticsService {
     }
 
     /**
+     * 사용 안함 (API 생성로직에 추가)
      * 시스템 사용 현황 - 추가리포트 생성 할 때 (리포트 수 증감. 누적 기준이기에 삭제는 반영안함)
      * @param paramVo
-     * @return CommonResult
      * @throws Exception
      */
     public void updateReportCnt(ProjectVO paramVo) throws Exception {
@@ -115,10 +120,9 @@ public class StatisticsService {
     }
 
     /**
+     * 사용 안함 (누적 기준이라 삭제 개념이 없음)
      * 시스템 사용 현황 - 프로젝트 삭제
-     * ('누적'기준이기에 사용안함. 해당 api로 삭제기록 하더라도 전체카운트에는 잡히도록 함)
      * @param paramVo
-     * @return CommonResult
      * @throws Exception
      */
     public void deleteProjectInfo(ProjectVO paramVo) throws Exception {
@@ -129,8 +133,9 @@ public class StatisticsService {
 
     /**
      * API 사용량 (키워드 수 직접 입력)
-     * @param paramVo
-     * @return CommonResult
+     * @param idx_report
+     * @param type
+     * @param word_length
      * @throws Exception
      */
     public void getAPIUsage(Integer idx_report, Integer type, Integer word_length) throws Exception {
@@ -142,6 +147,8 @@ public class StatisticsService {
             int ori_date = statisticsMapper.getReportAPIUsage(idx_report);
 
             if(ori_date==0){
+                ProjectVO param = statisticsMapper.getProjectIdxToReport(idx_report);
+                statisticsMapper.updateProjectReporteCnt(param);
                 if(type==1){
                     statisticsVO.setSummaryUsage(word_length);
                     statisticsMapper.setSummaryAPIUsage(statisticsVO);
@@ -153,11 +160,13 @@ public class StatisticsService {
             } else{
                 if(type==1){
                     statisticsVO.setSummaryUsage(word_length);
-                    statisticsMapper.updateSummaryAPIUsage(statisticsVO);
+                    //statisticsMapper.updateSummaryAPIUsage(statisticsVO);
+                    statisticsMapper.setSummaryAPIUsageAdd(statisticsVO);
                 }
                 if(type==2){
                     statisticsVO.setKeywordUsage(word_length);
-                    statisticsMapper.updateKeywordAPIUsage(statisticsVO);
+                    //statisticsMapper.updateKeywordAPIUsage(statisticsVO);
+                    statisticsMapper.setKeywordAPIUsageAdd(statisticsVO);
                 }
             }
         }
@@ -165,8 +174,9 @@ public class StatisticsService {
 
     /**
      * API 사용량 (키워드 입력)
-     * @param paramVo
-     * @return CommonResult
+     * @param idx_report
+     * @param type
+     * @param word
      * @throws Exception
      */
     public void getAPIUsage(Integer idx_report, Integer type, String word) throws Exception {
@@ -179,6 +189,8 @@ public class StatisticsService {
             int word_length = word.length();
 
             if(ori_date==0){
+                ProjectVO param = statisticsMapper.getProjectIdxToReport(idx_report);
+                statisticsMapper.updateProjectReporteCnt(param);
                 if(type==1){
                     statisticsVO.setSummaryUsage(word_length);
                     statisticsMapper.setSummaryAPIUsage(statisticsVO);
@@ -190,11 +202,11 @@ public class StatisticsService {
             } else{
                 if(type==1){
                     statisticsVO.setSummaryUsage(word_length);
-                    statisticsMapper.updateSummaryAPIUsage(statisticsVO);
+                    statisticsMapper.setSummaryAPIUsageAdd(statisticsVO);
                 }
                 if(type==2){
                     statisticsVO.setKeywordUsage(word_length);
-                    statisticsMapper.updateKeywordAPIUsage(statisticsVO);
+                    statisticsMapper.setKeywordAPIUsageAdd(statisticsVO);
                 }
             }
         }

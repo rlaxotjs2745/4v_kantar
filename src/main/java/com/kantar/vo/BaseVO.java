@@ -1,17 +1,14 @@
 package com.kantar.vo;
 
-import java.math.BigInteger;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@RequiredArgsConstructor
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseVO{
     private Integer idx;
-    private BigInteger idx_user;
+    private Integer idx_user;
     private String create_dt;
     private String update_dt;
     private Integer currentPage;
