@@ -29,18 +29,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/dict")
 public class DictionaryController extends BaseController {
     @Autowired
-    private final ResponseService responseService;
+    private ResponseService responseService;
     @Autowired
-    private final DictionaryMapper dictionaryMapper;
+    private DictionaryMapper dictionaryMapper;
     @Autowired
-    private final UserMapper userMapper;
+    private UserMapper userMapper;
     @Autowired
-    private final DictionaryService dictionaryService;
+    private DictionaryService dictionaryService;
     @Value("${file.upload-dir}")
     public String filepath;
     @Autowired

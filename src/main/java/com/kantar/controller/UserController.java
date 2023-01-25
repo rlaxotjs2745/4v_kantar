@@ -7,12 +7,8 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import jakarta.mail.internet.MimeMessage;
-
-import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -21,21 +17,26 @@ import com.kantar.base.BaseController;
 import com.kantar.mapper.UserMapper;
 import com.kantar.model.CommonResult;
 import com.kantar.service.ResponseService;
+import com.kantar.util.MailSender;
 import com.kantar.util.TokenJWT;
 import com.kantar.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
 public class UserController extends BaseController {
-    private final ResponseService responseService;
-    private final UserMapper userMapper;
-    private final TokenJWT tokenJWT;
+    @Autowired
+    private ResponseService responseService;
 
-    private final JavaMailSender mailSender;
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private TokenJWT tokenJWT;
+
+    @Autowired
+    private MailSender mailSender;
 
     /**
      * 로그인
@@ -141,16 +142,7 @@ public class UserController extends BaseController {
             Integer rs = userMapper.savUserInfo(paramVo);
             paramVo.setUser_pw(newPw);
             if(rs==1){
-                String FROM_ADDRESS = "kantar@kantar.co.kr";
-                MimeMessage mail = mailSender.createMimeMessage();
-                MimeMessageHelper mailHelper = new MimeMessageHelper(mail, true, "UTF-8");
-
-                mailHelper.setFrom(FROM_ADDRESS);
-                mailHelper.setTo(paramVo.getUser_id());
-                mailHelper.setSubject("[KANTAR] 회원가입 안내");
-                mailHelper.setText(paramVo.getUser_pw(), true);
-
-                mailSender.send(mail);
+                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", paramVo.getUser_pw());
                 return responseService.getSuccessResult("create","회원 가입이 완료되었습니다.");
             }else{
                 return responseService.getFailResult("create","회원 가입 후에 이용해주세요.");
@@ -264,16 +256,14 @@ public class UserController extends BaseController {
     public CommonResult getMemberDetail(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
             UserVO userInfo = userMapper.getUserInfo(paramVo);
+            if(userInfo != null){
+                UserVO rs = new UserVO();
 
-            UserVO rs = new UserVO();
-
-            rs.setUser_id(userInfo.getUser_id());
-            rs.setUser_name(userInfo.getUser_name());
-            rs.setUser_phone(userInfo.getUser_phone());
-            rs.setIdx_user(userInfo.getIdx_user());
-            rs.setUser_type(userInfo.getUser_type());
-
-            if(rs != null){
+                rs.setUser_id(userInfo.getUser_id());
+                rs.setUser_name(userInfo.getUser_name());
+                rs.setUser_phone(userInfo.getUser_phone());
+                rs.setIdx_user(userInfo.getIdx_user());
+                rs.setUser_type(userInfo.getUser_type());
                 return responseService.getSuccessResult(rs, "member_detail", "회원 불러오기 성공");
             } else {
                 return responseService.getFailResult("member_detail","회원이 없습니다.");
