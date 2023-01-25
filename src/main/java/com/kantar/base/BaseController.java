@@ -46,7 +46,7 @@ public class BaseController {
 	private TokenJWT tokenJWT;
 
 	public UserVO getChkUserLogin(HttpServletRequest req) throws Exception{
-		UserVO paramVo = new UserVO();
+		UserVO paramVo = null;
         String token = tokenJWT.resolveToken(req);
 		if("".equals(token) || token == null){
 			return paramVo;
