@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.kantar.vo.UserVO;
 
 import java.util.Date;
@@ -107,8 +107,7 @@ public class TokenJWT {
      */
     public UserVO getRoles(String token) {
         Claims claims = Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token).getBody();
-        ObjectMapper a = new ObjectMapper();
-        UserVO b = a.convertValue(claims, UserVO.class);
+        UserVO b = new Gson().fromJson(claims.toString(), UserVO.class);
         return b;
     }
 
