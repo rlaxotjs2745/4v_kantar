@@ -15,4 +15,6 @@ public class UserVO extends BaseVO {
     private Integer user_status;
     private Integer role_type;
     private Integer exp;
+
+    private String user_pw_origin; // 비밀번호 확인용
 }
