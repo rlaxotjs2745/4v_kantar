@@ -52,4 +52,9 @@
             </if>
         LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
     </select>
+
+    <update id="updateUserPW" parameterType="com.kantar.vo.UserVO">
+        UPDATE KT_USER SET user_pw=#{user_pw}
+        WHERE idx_user=#{idx_user}
+    </update>
 </mapper>

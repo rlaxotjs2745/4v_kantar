@@ -17,4 +17,6 @@ public interface UserMapper {
     public Integer delUserInfo(UserVO paramVo) throws Exception;
 
     public List<UserVO> getUserList(UserVO paramVo) throws Exception;
+
+    Integer updateUserPW(UserVO userInfo) throws Exception;
 }

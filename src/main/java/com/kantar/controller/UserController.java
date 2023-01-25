@@ -136,6 +136,7 @@ public class UserController extends BaseController {
 
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String hashedPassword = passwordEncoder.encode(newPw);
+            System.out.println("newPw = " + newPw);
             paramVo.setUser_pw(hashedPassword);
             paramVo.setUser_status(0);
             paramVo.setUser_phone("00000000000");
@@ -301,6 +302,13 @@ public class UserController extends BaseController {
     }
 
 
+    /**
+     * 프로필 정보 불러오기
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
     @PostMapping("/member_info")
     public CommonResult memberInfo(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
@@ -321,8 +329,15 @@ public class UserController extends BaseController {
         return responseService.getFailResult("member_info","오류가 발생하였습니다.");
     }
 
+    /**
+     * 회원 정보 수정 (비밀번호 수정 포함)
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
     @PostMapping("/member_modify")
-    public CommonResult member_modify(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
+    public CommonResult memberModify(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
             UserVO userInfo = userMapper.getUserInfo(paramVo);
 
@@ -349,10 +364,6 @@ public class UserController extends BaseController {
 
                     BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder();
 
-                    System.out.println("userInfo.getUser_pw() = " + userInfo.getUser_pw());
-                    System.out.println("paramVo.getUser_pw_origin() = " + paramVo.getUser_pw_origin());
-
-
                     if (passEncoder.matches(paramVo.getUser_pw_origin(), userInfo.getUser_pw())) {
                         String cg_pw = passEncoder.encode(paramVo.getUser_pw());
                         paramVo.setUser_pw(cg_pw);
@@ -376,6 +387,45 @@ public class UserController extends BaseController {
             e.printStackTrace();
         }
         return responseService.getFailResult("member_info","오류가 발생하였습니다.");
+    }
+
+    /**
+     * 새 비밀번호 발송
+     * @param req
+     * @param paramVo
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("find_pw")
+    public CommonResult findPw(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
+        try{
+            UserVO userInfo = userMapper.getUserInfo(paramVo);
+
+            if(userInfo!=null){
+
+                String tempPW = mailSender.getRamdomPassword();
+                BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder();
+                System.out.println("tempPW = " + tempPW);
+                String cgPw = passEncoder.encode(tempPW);
+                userInfo.setUser_pw(cgPw);
+
+                Integer rs = userMapper.updateUserPW(userInfo);
+
+                if(rs==1){
+                    mailSender.sender(userInfo.getUser_id(), "[KANTAR] 임시비밀번호 발급", tempPW);
+                    return responseService.getSuccessResult("findPw","임시 비밀번호가 발급되었습니다.");
+                }else{
+                    return responseService.getFailResult("findPw","메일 발송을 실패하였습니다.");
+                }
+
+            } else {
+                return responseService.getFailResult("findPw","존재하지 않는 회원입니다.");
+            }
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseService.getFailResult("findPw","오류가 발생하였습니다.");
     }
 
 }
