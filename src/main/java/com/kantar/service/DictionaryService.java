@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -46,8 +47,11 @@ public class DictionaryService {
 
             List<String[]> ers = excel.getCsvListData(_fpath);
             paramVo.setDic_count(ers.size());
-            Integer dictIdx = dictionaryMapper.insertDictionary(paramVo);
+            dictionaryMapper.insertDictionary(paramVo);
 
+            Integer dictIdx = dictionaryMapper.getDictionaryByTitle(paramVo.getTitle()).get(0).getIdx_dictionary();
+
+            List<DictionaryDataVO> dictionaryDataVOList = new ArrayList<>();
             for(int i = 1; i < ers.size(); i++){
                 String[] _erss = ers.get(i);
                 DictionaryDataVO dictionaryDataVO = new DictionaryDataVO();

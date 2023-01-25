@@ -47,7 +47,7 @@
         )
     </insert>
 
-    <insert id="insertDictionaryData" useGeneratedKeys="true" keyProperty="idx_dictionary">
+    <insert id="insertDictionaryData" useGeneratedKeys="true" keyColumn="idx_dictionary" keyProperty="idx_dictionary">
         INSERT INTO KT_DICTIONARY_DATA (
             idx_dictionary,
             keyword,
