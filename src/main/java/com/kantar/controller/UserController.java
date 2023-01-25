@@ -136,7 +136,6 @@ public class UserController extends BaseController {
 
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String hashedPassword = passwordEncoder.encode(newPw);
-            System.out.println("newPw = " + newPw);
             paramVo.setUser_pw(hashedPassword);
             paramVo.setUser_status(0);
             paramVo.setUser_phone("00000000000");
@@ -405,7 +404,6 @@ public class UserController extends BaseController {
 
                 String tempPW = mailSender.getRamdomPassword();
                 BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder();
-                System.out.println("tempPW = " + tempPW);
                 String cgPw = passEncoder.encode(tempPW);
                 userInfo.setUser_pw(cgPw);
 
