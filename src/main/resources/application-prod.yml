@@ -48,8 +48,5 @@ log4jdbc:
       popular:
         drivers: false
 
-mail:
-  passwd: "!"
-
 domain: https://api.kantar.com
 w3domain: https://kantar.com

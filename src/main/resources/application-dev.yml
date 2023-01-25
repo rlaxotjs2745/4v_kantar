@@ -1,14 +1,14 @@
 srvinfo: dev
 
-server:
-  port: 10000
+# server:
+#   port: 10000
 
 #DataSource
 spring:
   datasource:
     hikari:
-      max-lifetime: 9000
-      idle-timeout: 8000
+      max-lifetime: 31000
+      idle-timeout: 30000
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://3.36.125.155:3306/kantar?useUnicode=true&autoReconnect=true&characterEncoding=utf8&allowMultiQueries=true&useSSL=false&serverTimezone=UTC
@@ -18,7 +18,7 @@ spring:
     init:
       encoding: UTF-8
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 43.200.7.62:9092
     consumer:
       group-id: kantar
       auto-offset-reset: earliest
@@ -30,13 +30,13 @@ spring:
 
 #업로드 디렉토리는 협의 후 확정
 file:
-  upload-dir: /Users/winmaster/DEV/KANTAR/KANTAR-Serv/upload
-  # upload-dir: /home/ec2-user/upload
+  # upload-dir: /Users/winmaster/DEV/KANTAR/KANTAR-Serv/upload
+  upload-dir: /home/ec2-user/upload
 
 #개발만 디버그 로그 보이게 하기
 logging:
   level:
-    root: debug
+    root: warn
     com:
       eura: debug
   file:
@@ -54,9 +54,6 @@ log4jdbc:
     load:
       popular:
         drivers: false
-
-mail:
-  passwd: "1"
 
 domain: http://localhost:10000
 w3domain: http://localhost:3000

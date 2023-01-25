@@ -51,6 +51,15 @@ public class UserController extends BaseController {
             if(rs!=null){
                 BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                 if (passwordEncoder.matches(paramVo.getUser_pw(), rs.getUser_pw())) {
+                    if(rs.getUser_status() == 98){
+                        return responseService.getFailResult("login","정지된 회원입니다.");
+                    }
+                    if(rs.getUser_status() == 99){
+                        return responseService.getFailResult("login","탈퇴한 회원입니다.");
+                    }
+                    if(rs.getUser_status() == 0){
+                        return responseService.getFailResult("login","회원 인증 후 이용해주세요.");
+                    }
                     Map<String, Object> param = new HashMap<String, Object>();
                     param.put("idx_user",rs.getIdx_user());
                     param.put("user_id",rs.getUser_id());
@@ -198,7 +207,7 @@ public class UserController extends BaseController {
             if(uinfo==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
-            paramVo.setIdx_user(uinfo.getIdx_user());
+            paramVo.setIdx_user(paramVo.getIdx_user());
 //            if(StringUtils.isEmpty(paramVo.getUser_pw())){
 //                return responseService.getFailResult("dropout","비밀번호를 입력해주세요.");
 //            }
@@ -225,6 +234,9 @@ public class UserController extends BaseController {
     public CommonResult getMemberList(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
             UserVO userInfo = userMapper.getUserInfo(paramVo);
+            if(userInfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
             if(userInfo.getUser_type() == 1){
                 return responseService.getFailResult("list_member","관리자만 조회 가능한 기능힙니다.");
             }

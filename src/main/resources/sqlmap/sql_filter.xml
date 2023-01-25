@@ -7,13 +7,17 @@
         <result property="idx_filter" column="idx_filter" />
         <result property="filter_title" column="filter_title" />
         <result property="create_dt" column="create_dt" />
-        <collection property="filterDataList" resultMap="filterDataList"/>
+        <collection property="filterDataList" resultMap="filterDataList" autoMapping="true"/>
     </resultMap>
 
     <resultMap id="filterDataList" type="com.kantar.vo.FilterDataVO">
-        <id column="idx_filter_data" property="idx_filter_data"/>
+        <id property="filter_type" column="filter_type"/>
+        <result property="idx_filter_data" column="idx_filter_data"/>
         <result property="idx_filter" column="idx_filter2" />
-        <result property="filter_type" column="filter_type"/>
+        <collection property="filterDataArray" resultMap="filterDataArray"/>
+    </resultMap>
+
+    <resultMap id="filterDataArray" type="com.kantar.vo.FilterDataVO">
         <result property="filter_data" column="filter_data"/>
     </resultMap>
 
@@ -23,8 +27,8 @@
             FROM KT_REPORT_FILTER A
             JOIN KT_REPORT_FILTER_DATA B ON B.idx_filter=A.idx_filter
             WHERE 1=1
-            <if test="idx_project != null">
-                AND A.idx_project=#{idx_project}
+            <if test="idx_project_job_projectid != null">
+                AND A.idx_project_job_projectid=#{idx_project_job_projectid}
             </if>
             <if test="idx_filter != null">
                 AND A.idx_filter=#{idx_filter}
@@ -32,7 +36,7 @@
     </select>
 
     <insert id="createFilter" useGeneratedKeys="true" keyColumn="idx_filter" keyProperty="idx_filter">
-        INSERT INTO KT_REPORT_FILTER (idx_project, filter_title) VALUES (#{idx_project}, #{filter_title})
+        INSERT INTO KT_REPORT_FILTER (idx_project_job_projectid, filter_title) VALUES (#{idx_project_job_projectid}, #{filter_title})
     </insert>
 
     <delete id="delFilter">
