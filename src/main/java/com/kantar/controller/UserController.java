@@ -163,10 +163,10 @@ public class UserController extends BaseController {
     @PostMapping("/modify")
     public CommonResult modify(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
-//            UserVO thisUserInfo = getChkUserLogin(req);
-//            if(thisUserInfo==null){
-//                return responseService.getFailResult("modify","로그인이 필요합니다.");
-//            }
+            UserVO thisUserInfo = getChkUserLogin(req);
+            if(thisUserInfo==null){
+                return responseService.getFailResult("modify","로그인이 필요합니다.");
+            }
             UserVO uinfo = userMapper.getUserInfo(paramVo);
             if(uinfo == null){
                 return responseService.getFailResult("modify","회원이 없습니다.");
