@@ -3,12 +3,12 @@
 
 <mapper namespace="com.kantar.mapper.UserMapper">
     <select id="getUserInfo" resultType="com.kantar.vo.UserVO">
-        SELECT * FROM KT_USER WHERE 
+        SELECT * FROM KT_USER
         <if test="idx_user != null">
-            idx_user = #{idx_user}
+            WHERE idx_user = #{idx_user}
         </if>
-        <if test="user_id != null">
-            user_id = #{user_id}
+        <if test="idx_user == null and user_id != null">
+            WHERE user_id = #{user_id}
         </if>
     </select>
 
