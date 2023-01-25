@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/dict")
 public class DictionaryController extends BaseController {
@@ -145,8 +146,8 @@ public class DictionaryController extends BaseController {
                 String originFileName = mf.getOriginalFilename();
                 mf.transferTo(new File(fullpath, originFileName));
 
-
                 DictionaryVO param = new DictionaryVO();
+
                 param.setTitle(paramVo.getTitle());
                 param.setDic_type(userInfo.getUser_type() == 1 ? 1 : 0);
                 param.setFilename(originFileName);
