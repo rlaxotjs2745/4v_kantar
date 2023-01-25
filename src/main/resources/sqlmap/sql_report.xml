@@ -22,7 +22,7 @@
     </select>
 
     <select id="getReportSeq" resultType="Integer">
-        SELECT MAX(report_seq) AS report_seq FROM KT_REPORT
+        SELECT IFNULL(MAX(report_seq),0) AS report_seq FROM KT_REPORT
     </select>
 
     <insert id="savReport" useGeneratedKeys="true" keyColumn="idx_report" keyProperty="idx_report">
