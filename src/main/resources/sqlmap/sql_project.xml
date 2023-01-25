@@ -21,8 +21,8 @@
     </resultMap>
 
     <resultMap id="reportList" type="com.kantar.vo.ReportListVO">
-        <id column="idx_report" property="idx_report"/>
-        <result column="title" property="title"/>
+        <result property="idx_report" column="idx_report"/>
+        <result property="title" column="title"/>
     </resultMap>
 
     <select id="getProjectList" resultMap="getProjectListMap">

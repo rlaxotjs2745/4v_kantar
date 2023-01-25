@@ -46,7 +46,7 @@ public class FilterController extends BaseController {
     public CommonResult getFilter(HttpServletRequest req, @RequestBody FilterVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
-            if(uinfo==null){
+            if(uinfo.getIdx_user()==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
