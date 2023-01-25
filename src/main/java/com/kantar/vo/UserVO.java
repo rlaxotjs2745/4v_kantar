@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserVO extends BaseVO {
     private String user_id;
@@ -15,4 +16,6 @@ public class UserVO extends BaseVO {
     private Integer user_status;
     private Integer role_type;
     private Integer exp;
+
+    private String user_pw_origin; // 비밀번호 확인용
 }

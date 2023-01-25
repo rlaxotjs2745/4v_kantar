@@ -7,11 +7,11 @@ spring:
       idle-timeout: 8000
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://3.36.109.182:3306/kantar?useUnicode=true&autoReconnect=true&characterEncoding=utf8&allowMultiQueries=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mariadb://52.78.44.197:3306/kantar?useUnicode=true&autoReconnect=true&characterEncoding=utf8&allowMultiQueries=true&useSSL=false&serverTimezone=UTC
     username: kantar_user
     password: kantar123
   kafka:
-    bootstrap-servers: 13.124.84.234:9092
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: kantar
       auto-offset-reset: earliest
@@ -23,7 +23,9 @@ spring:
 
 #업로드 디렉토리는 협의 후 확정
 file:
-  upload-dir: classpath:/upload
+  # upload-dir: classpath:/upload
+  upload-dir: /home/ec2-user/upload
+
 
 #운영은 에러 로그 보이게 하기
 logging:
