@@ -30,9 +30,7 @@ import com.kantar.vo.ReportVO;
 import com.kantar.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/report")
 public class ReportController extends BaseController {

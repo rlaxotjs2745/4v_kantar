@@ -27,21 +27,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/statistics")
 public class StatisticsController extends BaseController {
     @Autowired
-    private final ResponseService responseService;
+    private ResponseService responseService;
 
     @Autowired
-    private final StatisticsService statisticsService;
+    private StatisticsService statisticsService;
 
     @Autowired
-    private final UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Autowired
-    private final StatisticsMapper statisticsMapper;
+    private StatisticsMapper statisticsMapper;
 
     @Value("${file.upload-dir}")
     public String filepath;

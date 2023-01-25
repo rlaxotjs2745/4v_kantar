@@ -19,9 +19,7 @@ import com.kantar.vo.FilterVO;
 import com.kantar.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/filter")
 public class FilterController extends BaseController {
