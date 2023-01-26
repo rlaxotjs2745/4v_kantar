@@ -105,7 +105,6 @@ public class ProjectService {
                 // _nlp.put("sentimentAnalysis",_nlp2);
                 params.setNlpConfig(_nlp);
                 String pp = new Gson().toJson(params);
-                System.out.println("pp = " + pp);
                 ProjectVO param = summary.getSummary(pp);
                 if(StringUtils.isNotEmpty(param.getTitle())){
                     ProjectVO ridx = reportMapper.getReportIdx(paramVo);
@@ -246,6 +245,8 @@ public class ProjectService {
                 String _fpath = this.filepath + pr.getFilepath() + pr.getFilename();
 
                 List<String[]> ers = excel.getCsvListData(_fpath);
+                out.write("\ufeff");
+
                 for (String[] er : ers) {
                     if(fileCnt==0 || (fileCnt>0 && lineCnt>0)) {
                         String aData = "";
