@@ -362,27 +362,26 @@ public class UserController extends BaseController {
                         return responseService.getFailResult("member_info","기존 비밀번호를 입력해주세요.");
                     }
 
-                    String regexPw = "(?=.*\\d{1,50})(?=.*[~`!@#$%\\^&*()-+=]{1,50})(?=.*[a-zA-Z]{2,50}).{10,20}$";
-
-                    Matcher matcherPw = Pattern.compile(regexPw).matcher(paramVo.getUser_pw());
-                    if (paramVo.getUser_pw().length() < 12) {
-                        return responseService.getFailResult("member_info","12자 이상의 비밀번호만 사용할 수 있습니다.");
-                    }
-
-                    if (!matcherPw.find()) {
-                        return responseService.getFailResult("member_info","영어, 숫자, 특수문자로 조합된 비밀번호만 사용가능합니다.");
-                    }
-
                     BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder();
 
                     if (passEncoder.matches(paramVo.getUser_pw_origin(), userInfo.getUser_pw())) {
+
+                        String regexPw = "(?=.*\\d{1,50})(?=.*[~`!@#$%\\^&*()-+=]{1,50})(?=.*[a-zA-Z]{2,50}).{10,20}$";
+                        Matcher matcherPw = Pattern.compile(regexPw).matcher(paramVo.getUser_pw());
+
+                        if (paramVo.getUser_pw().length() < 12) {
+                            return responseService.getFailResult("member_info","12자 이상의 비밀번호만 사용할 수 있습니다.");
+                        }
+
+                        if (!matcherPw.find()) {
+                            return responseService.getFailResult("member_info","영어, 숫자, 특수문자로 조합된 비밀번호만 사용가능합니다.");
+                        }
                         String cg_pw = passEncoder.encode(paramVo.getUser_pw());
                         paramVo.setUser_pw(cg_pw);
                     } else {
                         return responseService.getFailResult("member_info","기존 비밀번호를 다시 확인해 주세요.");
                     }
                 }
-
                 Integer rs = userMapper.modUserInfo(paramVo);
 
                 if(rs==1){
@@ -408,6 +407,7 @@ public class UserController extends BaseController {
      * @throws Exception
      */
     @PostMapping("find_pw")
+    @Transactional
     public CommonResult findPw(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try{
             UserVO userInfo = userMapper.getUserInfo(paramVo);
