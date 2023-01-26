@@ -322,13 +322,11 @@ public class ReportController extends BaseController {
     public CommonResult merge_report(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         String _token = tokenJWT.resolveToken(req);
         try {
-            /*
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
-            */
 
             if(StringUtils.isEmpty(paramVo.getJob_no())){
                 return responseService.getFailResult("create_report","JOB No를 입력해주세요.");
