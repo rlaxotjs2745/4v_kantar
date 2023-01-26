@@ -46,12 +46,11 @@ public class DictionaryService {
             String _fpath = this.filepath + paramVo.getFilepath() + paramVo.getFilename();
 
             List<String[]> ers = excel.getCsvListData(_fpath);
-            paramVo.setDic_count(ers.size());
+            paramVo.setDic_count(ers.size() - 1);
             dictionaryMapper.insertDictionary(paramVo);
 
             Integer dictIdx = dictionaryMapper.getDictionaryByTitle(paramVo.getTitle()).get(0).getIdx_dictionary();
 
-            List<DictionaryDataVO> dictionaryDataVOList = new ArrayList<>();
             for(int i = 1; i < ers.size(); i++){
                 String[] _erss = ers.get(i);
                 DictionaryDataVO dictionaryDataVO = new DictionaryDataVO();
