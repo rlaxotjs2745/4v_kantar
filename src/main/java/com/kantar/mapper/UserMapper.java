@@ -18,5 +18,7 @@ public interface UserMapper {
 
     public List<UserVO> getUserList(UserVO paramVo) throws Exception;
 
+    public UserVO getUserInfoByFCode(String fCode) throws Exception;
+
     Integer updateUserPW(UserVO userInfo) throws Exception;
 }

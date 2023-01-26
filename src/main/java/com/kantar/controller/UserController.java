@@ -1,9 +1,6 @@
 package com.kantar.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -137,6 +134,7 @@ public class UserController extends BaseController {
                 return responseService.getFailResult("create","이미 존재하는 아이디입니다.");
             }
 
+
             Random rd = new Random();//랜덤 객체 생성
             String newPw = "";
             for(int i=0;i<6;i++) {
@@ -148,16 +146,16 @@ public class UserController extends BaseController {
             }
 
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            String hashedPassword = passwordEncoder.encode(newPw);
+            String hashedPassword = passwordEncoder.encode(new Date().toString());
             paramVo.setUser_pw(hashedPassword);
             paramVo.setUser_status(0);
-            paramVo.setUser_phone("00000000000");
+            paramVo.setUser_phone(newPw);
             Integer rs = userMapper.savUserInfo(paramVo);
             paramVo.setUser_pw(newPw);
             if(rs==1){
-                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", paramVo.getUser_pw());
+                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", "<a href=\"http://localhost:3000/firstlogin/" + newPw + "\">계정 인증하기</a>");
                 return responseService.getSuccessResult("create","회원 가입이 완료되었습니다.");
-            }else{
+            } else {
                 return responseService.getFailResult("create","회원 가입 후에 이용해주세요.");
             }
         } catch (Exception e) {
@@ -332,6 +330,7 @@ public class UserController extends BaseController {
             if(userInfo!=null){
                 UserVO user = new UserVO();
                 user.setUser_id(userInfo.getUser_id());
+                user.setUser_name(userInfo.getUser_name());
                 user.setUser_phone(userInfo.getUser_phone());
 
                 return responseService.getSuccessResult(user, "member_info", "회원 정보를 전달 합니다.");
@@ -410,7 +409,7 @@ public class UserController extends BaseController {
      * @return
      * @throws Exception
      */
-    @PostMapping("find_pw")
+    @PostMapping("/find_pw")
     @Transactional
     public CommonResult findPw(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try{
@@ -442,4 +441,48 @@ public class UserController extends BaseController {
         return responseService.getFailResult("findPw","오류가 발생하였습니다.");
     }
 
+    @GetMapping("/first_login")
+    public CommonResult firstLogin(HttpServletRequest req, @RequestParam("fCode") String firstCode) throws Exception {
+        try {
+            UserVO userInfo = userMapper.getUserInfoByFCode(firstCode);
+            if(userInfo == null){
+                return responseService.getFailResult("first_login","사용자를 찾을 수 없습니다.");
+            }
+            userInfo.setUser_pw(null);
+            return responseService.getSuccessResult(userInfo, "first_login", "멤버 불러오기 성공");
+        } catch (Exception e){
+            e.printStackTrace();
+            return responseService.getFailResult("first_login","오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 첫 인증 및 휴대폰,비밀번호 설정
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/first_login_confirm")
+    public CommonResult first_login_confirm(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
+        try {
+            UserVO uinfo = userMapper.getUserInfo(paramVo);
+            if(uinfo == null){
+                return responseService.getFailResult("first_login_confirm","회원이 없습니다.");
+            }
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String hashedPassword = passwordEncoder.encode(paramVo.getUser_pw());
+            paramVo.setUser_pw(hashedPassword);
+            paramVo.setUser_status(1);
+            Integer rs = userMapper.modUserInfo(paramVo);
+            if(rs==1){
+                return responseService.getSuccessResult("first_login_confirm","회원 인증이 완료되었습니다. 로그인 후 이용해주세요.");
+            }else{
+                return responseService.getFailResult("first_login_confirm","회원 가입 후에 이용해주세요.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseService.getFailResult("first_login_confirm","오류가 발생하였습니다.");
+    }
 }
