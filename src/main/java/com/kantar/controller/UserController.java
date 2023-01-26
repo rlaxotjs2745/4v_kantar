@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private MailSender mailSender;
+
+    @Value("${w3domain}")
+    private String clientDomain;
 
     /**
      * 로그인
@@ -149,7 +153,7 @@ public class UserController extends BaseController {
             Integer rs = userMapper.savUserInfo(paramVo);
             paramVo.setUser_pw(newPw);
             if(rs==1){
-                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", "<a href=\"http://localhost:3000/firstlogin/" + newPw + "\">계정 인증하기</a>");
+                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", "<a href=\"" + clientDomain + "/" + newPw + "\">계정 인증하기</a>");
                 return responseService.getSuccessResult("create","회원 가입이 완료되었습니다.");
             } else {
                 return responseService.getFailResult("create","회원 가입 후에 이용해주세요.");
@@ -480,4 +484,17 @@ public class UserController extends BaseController {
         }
         return responseService.getFailResult("first_login_confirm","오류가 발생하였습니다.");
     }
+
+    @GetMapping("/header")
+    public CommonResult getHeaderInfo(HttpServletRequest req) throws Exception {
+        try{
+            UserVO uinfo = getChkUserLogin(req);
+            System.out.println(uinfo);
+            return responseService.getSuccessResult(uinfo,"header","헤더 정보 불러오기 완료");
+        } catch (Exception e){
+            e.printStackTrace();
+            return responseService.getFailResult("header","오류가 발생하였습니다.");
+        }
+    }
+
 }
