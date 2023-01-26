@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProjectVO extends BaseVO {
     private Integer idx_project;

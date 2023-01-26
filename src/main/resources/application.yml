@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   servlet:
     multipart:
       enabled: true
@@ -44,7 +44,7 @@ spring:
   #           protocols: TLSv1.2
 
 mail:
-  passwd: gcyqljnhdzyascpg
+  passwd: Kantardev1!
 
 server:
   tomcat:

@@ -143,6 +143,10 @@ public class UserController extends BaseController {
                 newPw = newPw + rd.nextInt(9);
             }
 
+            if(StringUtils.isEmpty(paramVo.getUser_type()+"")){
+                paramVo.setUser_type(1);
+            }
+
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String hashedPassword = passwordEncoder.encode(newPw);
             paramVo.setUser_pw(hashedPassword);

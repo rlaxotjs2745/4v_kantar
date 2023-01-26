@@ -229,10 +229,13 @@ public class ReportController extends BaseController {
             }
             paramVo.setRecordCountPerPage(10);
             paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
-
+            Integer tcnt = reportMapper.getReportListCount(paramVo);
             List<ProjectVO> rs = reportMapper.getReportList(paramVo);
+            Map<String, Object> _data = new HashMap<String, Object>();
+            _data.put("tcnt",tcnt);
+            _data.put("list",rs);
             if(rs!=null){
-                return responseService.getSuccessResult(rs, "list_report", "리포트 리스팅 성공");
+                return responseService.getSuccessResult(_data, "list_report", "리포트 리스팅 성공");
             }else{
                 return responseService.getFailResult("list_report","리포트 리스트가 없습니다.");
             }

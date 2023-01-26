@@ -15,7 +15,7 @@ public class MailSender {
 
     private String FROM = "kantar@kantar.co.kr";
     private String FROMNAME = "KANTAR";
-    private String SMTP_USERNAME = "seeshow202106@gmail.com";
+    private String SMTP_USERNAME = "kantardev01@gmail.com";
     private String HOST = "smtp.gmail.com";
     private int PORT = 587;
 

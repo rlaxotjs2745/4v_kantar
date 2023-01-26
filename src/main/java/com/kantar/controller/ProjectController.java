@@ -20,10 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 
+import com.google.gson.Gson;
 import com.kantar.base.BaseController;
 import com.kantar.mapper.ProjectMapper;
 import com.kantar.mapper.ReportMapper;
 import com.kantar.model.CommonResult;
+import com.kantar.service.KafkaSender;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
 import com.kantar.vo.ProjectListVO;
@@ -47,6 +49,9 @@ public class ProjectController extends BaseController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private KafkaSender kafkaSender;
 
     @Value("${file.upload-dir}")
     public String filepath;
@@ -157,6 +162,11 @@ public class ProjectController extends BaseController {
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("tcnt",tcnt);
             _data.put("list",rs);
+            Map<String, Object> _data2 = new HashMap<String, Object>();
+            _data2.put("link","http://naver.com");
+            _data2.put("msg","kafka");
+            // String _msg = new Gson().toJson(_data2);
+            // kafkaSender.send("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlX3R5cGUiOiI5OSIsImlkeF91c2VyIjoxLCJ1c2VyX2lkIjoidGVzdEB0ZXN0LmNvbSIsInVzZXJfc3RhdHVzIjoxLCJzdWIiOiJ1c2VyLWF1dGgiLCJleHAiOjE2NzQ3MTQzNzJ9.UR7a5EF9HIbafRVVxWaphyibSoPMCfcHVlOsPf7rQsk", _msg);
             if(rs!=null){
                 return responseService.getSuccessResult(_data, "list_project", "프로젝트 리스팅 성공");
             }else{

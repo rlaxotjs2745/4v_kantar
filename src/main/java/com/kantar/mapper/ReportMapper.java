@@ -8,6 +8,8 @@ import com.kantar.vo.ProjectVO;
 
 @Mapper
 public interface ReportMapper {
+    public Integer getReportListCount(ProjectVO paramVo) throws Exception;
+
     public List<ProjectVO> getReportFileList(ProjectVO paramVo) throws Exception;
 
     public Integer getReportSeq() throws Exception;

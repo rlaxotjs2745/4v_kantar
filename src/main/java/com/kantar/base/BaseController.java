@@ -32,6 +32,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -46,6 +47,20 @@ public class BaseController {
 	private TokenJWT tokenJWT;
 
 	public UserVO getChkUserLogin(HttpServletRequest req) throws Exception{
+		UserVO paramVo = null;
+        String token = tokenJWT.resolveToken(req);
+		if("".equals(token) || token == null){
+			return paramVo;
+		}else{
+			Map<String, Object> jwt = tokenJWT.verifyJWT(token);
+			if (jwt != null) {
+				paramVo = tokenJWT.getRoles(token);
+			}
+		}
+		return paramVo;
+    }
+
+	public UserVO getChkUserLogin(MultipartHttpServletRequest req) throws Exception{
 		UserVO paramVo = null;
         String token = tokenJWT.resolveToken(req);
 		if("".equals(token) || token == null){

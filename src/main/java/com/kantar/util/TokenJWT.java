@@ -19,7 +19,7 @@ public class TokenJWT {
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
-    final Long expiredTime = 1000 * 60L * 60L * 2L; // 토큰 유효 시간 (2시간)
+    private Long expiredTime = 1000 * 60L * 60L * 2L; // 토큰 유효 시간 (2시간)
         
     /**
      * 토큰 생성
@@ -71,6 +71,7 @@ public class TokenJWT {
 
             claimMap = claims;
         } catch (ExpiredJwtException e) { // 토큰이 만료되었을 경우
+            System.out.println(token);
             System.out.println("token expired");
         } catch (Exception e) { // 그외 에러났을 경우
             System.err.println(e);
