@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProjectVO extends BaseVO {
     private Integer idx_project;
@@ -31,4 +32,6 @@ public class ProjectVO extends BaseVO {
     private String report_id;
     private String filter_tp;
     List<ReportVO> reportList;
+
+    private String project_merge_idx;
 }

@@ -32,7 +32,11 @@
         JOIN KT_PROJECT E ON E.idx_project_job_projectid=A.idx_project_job_projectid
         JOIN KT_USER C ON C.idx_user=A.idx_user
         JOIN KT_REPORT D ON D.idx_project_job_projectid=A.idx_project_job_projectid
+        WHERE CASE WHEN (SELECT user_type FROM KT_USER WHERE idx_user=#{idx_user})=1 THEN E.idx_user=#{idx_user} ELSE 1=1 END
         ORDER BY A.project_id DESC
+        <if test="currentPage != null">
+        LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+        </if>
     </select>
 
     <select id="getProjectListCount" resultType="Integer">
@@ -40,6 +44,7 @@
         FROM KT_PROJECT_JOB_PROJECTID A
         JOIN KT_PROJECT_JOB B ON B.idx_project_job=A.idx_project_job
         JOIN KT_PROJECT E ON E.idx_project_job_projectid=A.idx_project_job_projectid
+        WHERE CASE WHEN (SELECT user_type FROM KT_USER WHERE idx_user=#{idx_user})=1 THEN E.idx_user=#{idx_user} ELSE 1=1 END
     </select>
 
     <select id="getProjectJobNo" resultType="com.kantar.vo.ProjectVO">
@@ -62,10 +67,16 @@
         INSERT INTO KT_PROJECT (idx_project_job_projectid, project_name, project_type, project_status, summary0, idx_user) VALUES (#{idx_project_job_projectid}, #{project_name}, 1, 1, #{summary0}, #{idx_user});
     </insert>
 
+    <insert id="savMergeProject" useGeneratedKeys="true" keyColumn="idx_project" keyProperty="idx_project">
+        INSERT INTO KT_PROJECT (idx_project_job_projectid, project_name, project_type, project_status, summary0, idx_user) VALUES (#{idx_project_job_projectid}, #{project_name}, 2, 1, #{summary0}, #{idx_user});
+    </insert>
+
     <update id="modiProjectInfo">
         UPDATE KT_PROJECT
             SET idx_user=#{idx_user}
-
+            <if test="summary0 != null">
+                , summary0=#{summary0}
+            </if>
             WHERE idx_project=#{idx_project}
     </update>
 

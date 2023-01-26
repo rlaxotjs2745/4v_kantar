@@ -145,6 +145,10 @@ public class UserController extends BaseController {
                 newPw = newPw + rd.nextInt(9);
             }
 
+            if(StringUtils.isEmpty(paramVo.getUser_type()+"")){
+                paramVo.setUser_type(1);
+            }
+
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String hashedPassword = passwordEncoder.encode(new Date().toString());
             paramVo.setUser_pw(hashedPassword);
@@ -330,6 +334,7 @@ public class UserController extends BaseController {
             if(userInfo!=null){
                 UserVO user = new UserVO();
                 user.setUser_id(userInfo.getUser_id());
+                user.setUser_name(userInfo.getUser_name());
                 user.setUser_phone(userInfo.getUser_phone());
 
                 return responseService.getSuccessResult(user, "member_info", "회원 정보를 전달 합니다.");
@@ -408,7 +413,7 @@ public class UserController extends BaseController {
      * @return
      * @throws Exception
      */
-    @PostMapping("find_pw")
+    @PostMapping("/find_pw")
     @Transactional
     public CommonResult findPw(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try{
