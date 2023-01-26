@@ -405,7 +405,7 @@ public class UserController extends BaseController {
      * @return
      * @throws Exception
      */
-    @PostMapping("find_pw")
+    @PostMapping("/find_pw")
     @Transactional
     public CommonResult findPw(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try{
