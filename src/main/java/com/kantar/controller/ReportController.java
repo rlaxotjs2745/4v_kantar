@@ -122,7 +122,7 @@ public class ReportController extends BaseController {
                         if (!ext.equals("csv")) {
                             return responseService.getFailResult("create_report",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
                         }
-                        if(!contentType.equals("text/csv")) {
+                        if(contentType != null && !contentType.equals("text/csv")) {
                             return responseService.getFailResult("create_report",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
                         }
                     }
