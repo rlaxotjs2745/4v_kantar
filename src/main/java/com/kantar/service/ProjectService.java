@@ -1,5 +1,6 @@
 package com.kantar.service;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,6 +105,7 @@ public class ProjectService {
                 // _nlp.put("sentimentAnalysis",_nlp2);
                 params.setNlpConfig(_nlp);
                 String pp = new Gson().toJson(params);
+                System.out.println("pp = " + pp);
                 ProjectVO param = summary.getSummary(pp);
                 if(StringUtils.isNotEmpty(param.getTitle())){
                     ProjectVO ridx = reportMapper.getReportIdx(paramVo);
@@ -117,6 +119,7 @@ public class ProjectService {
                         paramVo.setReport_id(RPID);
                         paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
                         ridx0 = reportMapper.savReport(paramVo);
+                        System.out.println("ridx0 = " + ridx0);
                     }else{
                         paramVo.setIdx_report(ridx.getIdx_report());
                         ridx0 = 1;
@@ -205,4 +208,63 @@ public class ProjectService {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * 파일 병합 생성
+     * @param paramVo
+     * @return File
+     * @throws Exception
+     */
+    public File merge_csv(ProjectVO paramVo) throws Exception{
+
+        String path = "/report/" + paramVo.getJob_no() + "/";
+        String fullpath = this.filepath + path;
+        File fileDir = new File(fullpath);
+        if (!fileDir.exists()) {
+            fileDir.mkdirs();
+        }
+
+        File mergeCsv = new File(fullpath, (paramVo.getProject_name() + ".csv"));
+        OutputStreamWriter out = null;
+        FileOutputStream fos = null;
+        fos = new FileOutputStream(mergeCsv, true);
+        out = new OutputStreamWriter(fos);
+
+        String[] _mergeIdx = paramVo.getProject_merge_idx().split(",");
+
+        int fileCnt = 0;
+        for (String mergeIdx : _mergeIdx) {
+
+            int lineCnt = 0;
+            ProjectVO m0 = new ProjectVO();
+            m0.setIdx_project(Integer.valueOf(mergeIdx));
+
+            List<ProjectVO> prs = reportMapper.getReportFileList(m0);
+
+            for (ProjectVO pr : prs) {
+                String _fpath = this.filepath + pr.getFilepath() + pr.getFilename();
+
+                List<String[]> ers = excel.getCsvListData(_fpath);
+                for (String[] er : ers) {
+                    if(fileCnt==0 || (fileCnt>0 && lineCnt>0)) {
+                        String aData = "";
+                        aData = er[0] + "," + er[1] + "," + er[2] + "," + er[3] + "," + er[4];
+                        out.write(aData);
+                        out.write("\r\n");
+                    }
+                    lineCnt++;
+                }
+            }
+            fileCnt++;
+        }
+
+        if(out!=null){
+            out.flush();
+            out.close();
+        }
+
+        return mergeCsv;
+    }
+
 }

@@ -328,6 +328,7 @@ public class UserController extends BaseController {
             if(userInfo!=null){
                 UserVO user = new UserVO();
                 user.setUser_id(userInfo.getUser_id());
+                user.setUser_name(userInfo.getUser_name());
                 user.setUser_phone(userInfo.getUser_phone());
 
                 return responseService.getSuccessResult(user, "member_info", "회원 정보를 전달 합니다.");
