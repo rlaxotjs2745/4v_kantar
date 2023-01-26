@@ -490,7 +490,7 @@ public class UserController extends BaseController {
         try{
             UserVO uinfo = getChkUserLogin(req);
             System.out.println(uinfo);
-            return responseService.getSuccessResult(uinfo,"header","헤더 정보 불러오기 완료");
+            return responseService.getSuccessResult("header","헤더 정보 불러오기 완료");
         } catch (Exception e){
             e.printStackTrace();
             return responseService.getFailResult("header","오류가 발생하였습니다.");
