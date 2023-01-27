@@ -335,7 +335,15 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("create_report","JOB No를 입력해주세요.");
             }
             if(StringUtils.isEmpty(paramVo.getProject_name())){
-                return responseService.getFailResult("create_report","프로젝트 이름을 입력해주세요.");
+                ProjectVO m0 = new ProjectVO();
+                String[] _mergeIdx = paramVo.getProject_merge_idx().split(",");
+
+                m0.setIdx_project(Integer.valueOf(String.valueOf(_mergeIdx[0])));
+                List<ProjectVO> prs = reportMapper.getReportFileList(m0);
+
+                String fileName = prs.get(0).getFilename();
+                String fileNameEx = fileName.substring(0, fileName.lastIndexOf('.'));
+                paramVo.setProject_name(fileNameEx);
             }
 
             File mergeCsv = projectService.merge_csv(paramVo);
