@@ -249,9 +249,11 @@ public class ProjectService {
 
                 for (String[] er : ers) {
                     if(fileCnt==0 || (fileCnt>0 && lineCnt>0)) {
-                        String aData = "";
-                        aData = er[0] + "," + er[1] + "," + er[2] + "," + er[3] + "," + er[4];
-                        out.write(aData);
+                        for (String str00 : er) {
+                            String aData = "";
+                            aData = str00 + ",";
+                            out.write(aData);
+                        }
                         out.write("\r\n");
                     }
                     lineCnt++;

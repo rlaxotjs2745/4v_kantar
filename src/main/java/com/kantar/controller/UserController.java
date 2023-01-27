@@ -329,18 +329,19 @@ public class UserController extends BaseController {
     @PostMapping("/member_info")
     public CommonResult memberInfo(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
-            UserVO userInfo = userMapper.getUserInfo(paramVo);
-
-            if(userInfo!=null){
-                UserVO user = new UserVO();
-                user.setUser_id(userInfo.getUser_id());
-                user.setUser_name(userInfo.getUser_name());
-                user.setUser_phone(userInfo.getUser_phone());
-
-                return responseService.getSuccessResult(user, "member_info", "회원 정보를 전달 합니다.");
-            } else {
-                return responseService.getFailResult("member_info","존재하지 않는 회원입니다.");
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
             }
+
+            UserVO user = new UserVO();
+            user.setIdx_user(uinfo.getIdx_user());
+            user.setUser_id(uinfo.getUser_id());
+            user.setUser_name(uinfo.getUser_name());
+            user.setUser_phone(uinfo.getUser_phone());
+
+            return responseService.getSuccessResult(user, "member_info", "회원 정보를 전달 합니다.");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
