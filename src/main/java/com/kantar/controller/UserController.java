@@ -338,6 +338,7 @@ public class UserController extends BaseController {
 
             UserVO user = new UserVO();
             user.setIdx_user(temp.getIdx_user());
+            user.setUser_type(temp.getUser_type());
             user.setUser_id(temp.getUser_id());
             user.setUser_name(temp.getUser_name());
             user.setUser_phone(temp.getUser_phone());
