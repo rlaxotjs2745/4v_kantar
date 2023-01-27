@@ -380,8 +380,8 @@ public class UserController extends BaseController {
                         String regexPw = "(?=.*\\d{1,50})(?=.*[~`!@#$%\\^&*()-+=]{1,50})(?=.*[a-zA-Z]{2,50}).{10,20}$";
                         Matcher matcherPw = Pattern.compile(regexPw).matcher(paramVo.getUser_pw());
 
-                        if (paramVo.getUser_pw().length() < 12) {
-                            return responseService.getFailResult("member_info","12자 이상의 비밀번호만 사용할 수 있습니다.");
+                        if (paramVo.getUser_pw().length() > 12 || paramVo.getUser_pw().length() < 8) {
+                            return responseService.getFailResult("member_info","비밀번호는 8~12자 사이로 지정해주세요.");
                         }
 
                         if (!matcherPw.find()) {
