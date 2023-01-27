@@ -34,7 +34,7 @@ public class FilterController extends BaseController {
 
     /**
      * 필터 리스트 & 정보
-     * 사용방법 : {"idx_project":1,"idx_filter":1}
+     * 사용방법 : {"idx_proejct_job_projectid":1,"idx_filter":1}
      * @param req
      * @param paramVo
      * @return CommonResult
@@ -69,7 +69,7 @@ public class FilterController extends BaseController {
      * <p>filter_tp : 1:화자, 2:챕터, 3:서브챕터, 4:질문</p>
      * <p>filter_data : 화자텍스트//화자텍스트 (구분자 //)</p>
      * <pre>
-     * 사용방법 : {"idx_project":1,"filter_title":"필터명","tp1":"화자1//화자2","tp2":"챕터1//챕터2","tp3":"서브챕터1//서브챕터2","tp4":"질문1//질문2"}
+     * 사용방법 : {"idx_proejct_job_projectid":1,"filter_title":"필터명","tp1":"화자1//화자2","tp2":"챕터1//챕터2","tp3":"서브챕터1//서브챕터2","tp4":"질문1//질문2"}
      * </pre>
      * @param paramVo
      * @return CommonResult

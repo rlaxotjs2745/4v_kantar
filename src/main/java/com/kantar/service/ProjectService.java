@@ -23,9 +23,7 @@ import com.kantar.vo.SummaryVO;
 import com.kantar.vo.SumtextVO;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Service
 public class ProjectService {
     @Autowired
