@@ -334,11 +334,13 @@ public class UserController extends BaseController {
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
 
+            UserVO temp = userMapper.getUserInfo(uinfo);
+
             UserVO user = new UserVO();
-            user.setIdx_user(uinfo.getIdx_user());
-            user.setUser_id(uinfo.getUser_id());
-            user.setUser_name(uinfo.getUser_name());
-            user.setUser_phone(uinfo.getUser_phone());
+            user.setIdx_user(temp.getIdx_user());
+            user.setUser_id(temp.getUser_id());
+            user.setUser_name(temp.getUser_name());
+            user.setUser_phone(temp.getUser_phone());
 
             return responseService.getSuccessResult(user, "member_info", "회원 정보를 전달 합니다.");
 
