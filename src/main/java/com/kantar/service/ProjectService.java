@@ -249,7 +249,7 @@ public class ProjectService {
                     if(fileCnt==0 || (fileCnt>0 && lineCnt>0)) {
                         for (String str00 : er) {
                             String aData = "";
-                            aData = str00 + ",";
+                            aData = "\""+str00+"\",";
                             out.write(aData);
                         }
                         out.write("\r\n");
