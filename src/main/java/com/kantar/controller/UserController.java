@@ -392,6 +392,8 @@ public class UserController extends BaseController {
                     } else {
                         return responseService.getFailResult("member_info","기존 비밀번호를 다시 확인해 주세요.");
                     }
+                } else {
+                    paramVo.setUser_pw(userInfo.getUser_pw());
                 }
                 Integer rs = userMapper.modUserInfo(paramVo);
 
