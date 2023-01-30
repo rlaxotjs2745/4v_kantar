@@ -365,12 +365,12 @@ public class UserController extends BaseController {
 
             if(userInfo!=null){
                 if(StringUtils.isEmpty(paramVo.getUser_name()) && StringUtils.isEmpty(paramVo.getUser_phone())){
-                    return responseService.getFailResult("member_info","필수 정보가 입력되지 않았습니다.");
+                    return responseService.getFailResult("member_modify","필수 정보가 입력되지 않았습니다.");
                 }
 
                 if (StringUtils.isNotEmpty(paramVo.getUser_pw())) {
                     if (StringUtils.isEmpty(paramVo.getUser_pw_origin())) {
-                        return responseService.getFailResult("member_info","기존 비밀번호를 입력해주세요.");
+                        return responseService.getFailResult("member_modify","기존 비밀번호를 입력해주세요.");
                     }
 
                     BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder();
@@ -381,16 +381,16 @@ public class UserController extends BaseController {
                         Matcher matcherPw = Pattern.compile(regexPw).matcher(paramVo.getUser_pw());
 
                         if (paramVo.getUser_pw().length() > 12 || paramVo.getUser_pw().length() < 8) {
-                            return responseService.getFailResult("member_info","비밀번호는 8~12자 사이로 지정해주세요.");
+                            return responseService.getFailResult("member_modify","비밀번호는 8~12자 사이로 지정해주세요.");
                         }
 
                         if (!matcherPw.find()) {
-                            return responseService.getFailResult("member_info","영어, 숫자, 특수문자로 조합된 비밀번호만 사용가능합니다.");
+                            return responseService.getFailResult("member_modify","영어, 숫자, 특수문자로 조합된 비밀번호만 사용가능합니다.");
                         }
                         String cg_pw = passEncoder.encode(paramVo.getUser_pw());
                         paramVo.setUser_pw(cg_pw);
                     } else {
-                        return responseService.getFailResult("member_info","기존 비밀번호를 다시 확인해 주세요.");
+                        return responseService.getFailResult("member_modify","기존 비밀번호를 다시 확인해 주세요.");
                     }
                 } else {
                     paramVo.setUser_pw(userInfo.getUser_pw());
@@ -398,18 +398,18 @@ public class UserController extends BaseController {
                 Integer rs = userMapper.modUserInfo(paramVo);
 
                 if(rs==1){
-                    return responseService.getSuccessResult("member_info","회원 정보를 수정하였습니다.");
+                    return responseService.getSuccessResult("member_modify","회원 정보를 수정하였습니다.");
                 }else{
-                    return responseService.getFailResult("member_info","데이터를 다시 확인해주세요");
+                    return responseService.getFailResult("member_modify","데이터를 다시 확인해주세요");
                 }
 
             } else {
-                return responseService.getFailResult("member_info","존재하지 않는 회원입니다.");
+                return responseService.getFailResult("member_modify","존재하지 않는 회원입니다.");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return responseService.getFailResult("member_info","오류가 발생하였습니다.");
+        return responseService.getFailResult("member_modify","오류가 발생하였습니다.");
     }
 
     /**

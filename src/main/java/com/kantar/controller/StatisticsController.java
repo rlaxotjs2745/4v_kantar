@@ -64,7 +64,7 @@ public class StatisticsController extends BaseController {
             UserVO uinfo = getChkUserLogin(req);
 
             if(uinfo==null){
-                return responseService.getFailResult("login","로그인이 필요합니다.");
+                return responseService.getFailResult("system_statistics","로그인이 필요합니다.");
             }
             if(uinfo.getUser_type() == 1){
                 return responseService.getFailResult("system_statistics","관리자만 조회 가능한 기능힙니다.");
@@ -93,10 +93,10 @@ public class StatisticsController extends BaseController {
             UserVO uinfo = getChkUserLogin(req);
 
             if(uinfo==null){
-                return responseService.getFailResult("login","로그인이 필요합니다.");
+                return responseService.getFailResult("api_user","로그인이 필요합니다.");
             }
             if(uinfo.getUser_type() == 1){
-                return responseService.getFailResult("system_statistics","관리자만 조회 가능한 기능힙니다.");
+                return responseService.getFailResult("api_user","관리자만 조회 가능한 기능힙니다.");
             }
 
             List<UserVO> userList = userMapper.getApiUserList(uinfo);
@@ -121,19 +121,19 @@ public class StatisticsController extends BaseController {
             UserVO uinfo = getChkUserLogin(req);
 
             if(uinfo==null){
-                return responseService.getFailResult("login","로그인이 필요합니다.");
+                return responseService.getFailResult("api_statistics","로그인이 필요합니다.");
             }
             if(uinfo.getUser_type() == 1){
-                return responseService.getFailResult("system_statistics","관리자만 조회 가능한 기능힙니다.");
+                return responseService.getFailResult("api_statistics","관리자만 조회 가능한 기능힙니다.");
             }
 
             StatisticsVO statisticsVO = statisticsMapper.getApiStatisticsByUser(paramVo);
 
-            return responseService.getSuccessResult(statisticsVO, "api_user", "API 사용량을 전달합니다");
+            return responseService.getSuccessResult(statisticsVO, "api_statistics", "API 사용량을 전달합니다");
 
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("api_user","오류가 발생하였습니다.");
+            return responseService.getFailResult("api_statistics","오류가 발생하였습니다.");
         }
     }
 

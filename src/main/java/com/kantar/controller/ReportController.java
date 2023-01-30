@@ -335,12 +335,12 @@ public class ReportController extends BaseController {
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
-                return responseService.getFailResult("login","로그인이 필요합니다.");
+                return responseService.getFailResult("merge_report","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
 
             if(StringUtils.isEmpty(paramVo.getJob_no())){
-                return responseService.getFailResult("create_report","JOB No를 입력해주세요.");
+                return responseService.getFailResult("merge_report","JOB No를 입력해주세요.");
             }
             if(StringUtils.isEmpty(paramVo.getProject_name())){
                 ProjectVO m0 = new ProjectVO();
@@ -373,7 +373,7 @@ public class ReportController extends BaseController {
                 Integer prseq = projectMapper.getProjectSeq(paramVo);
                 prseq = prseq+1;
                 if(prseq > 9999){
-                    return responseService.getFailResult("create_report","더이상 프로젝트를 생성할 수 없습니다.");
+                    return responseService.getFailResult("merge_report","더이상 프로젝트를 생성할 수 없습니다.");
                 }
                 String a1 = ("000"+prseq);
                 String PRID = "P" + a1.substring(a1.length()-4,a1.length());
@@ -383,10 +383,10 @@ public class ReportController extends BaseController {
                 if(pridrs>0){
                     Integer rs = projectMapper.savMergeProject(paramVo);
                     if(rs == 0){
-                        return responseService.getFailResult("create_report","저장을 할 수 없습니다.");
+                        return responseService.getFailResult("merge_report","저장을 할 수 없습니다.");
                     }else{
                         if(paramVo.getIdx_project()==0 || paramVo.getIdx_project() == null){
-                            return responseService.getFailResult("create_report","저장에 실패하였습니다.");
+                            return responseService.getFailResult("merge_report","저장에 실패하였습니다.");
                         }else{
                             Integer _seq = reportMapper.getReportSeq();
                             _seq = _seq+1;
@@ -411,17 +411,17 @@ public class ReportController extends BaseController {
                         }
                     }
                 }else{
-                    return responseService.getFailResult("create_report","리포트 기본 설정 저장에 실패하였습니다.");
+                    return responseService.getFailResult("merge_report","리포트 기본 설정 저장에 실패하였습니다.");
                 }
             }else{
-                return responseService.getFailResult("create_report","리포트 기본 설정 저장에 실패하였습니다.");
+                return responseService.getFailResult("merge_report","리포트 기본 설정 저장에 실패하였습니다.");
                     }
         _rdata.put("xlsdata",_elist);
-        return responseService.getSuccessResult(_rdata, "create_report", "기본 리포트 생성을 시작하였습니다.");
+        return responseService.getSuccessResult(_rdata, "merge_report", "기본 리포트 생성을 시작하였습니다.");
 
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("create_report","오류가 발생하였습니다.");
+            return responseService.getFailResult("merge_report","오류가 발생하였습니다.");
         }
     }
 
