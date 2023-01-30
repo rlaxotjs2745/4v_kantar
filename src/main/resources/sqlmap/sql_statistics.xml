@@ -19,7 +19,7 @@
     </select>
 
     <insert id="setProjectStatistics" parameterType="com.kantar.vo.StatisticsVO">
-        INSERT INTO KT_FILE_STATISTICS (file_status, idx_project, file_cnt, file_size, word_length, report_cnt) VALUES (1, #{idx_project}, #{file_cnt}, #{file_size}, #{word_length}, 1)
+        INSERT INTO KT_FILE_STATISTICS (file_status, idx_project, idx_user, file_cnt, file_size, word_length, report_cnt) VALUES (1, #{idx_project}, #{idx_user}, #{file_cnt}, #{file_size}, #{word_length}, 1)
     </insert>
 
     <update id="updateProjectReporteCnt" parameterType="com.kantar.vo.ProjectVO">
@@ -41,11 +41,11 @@
     </select>
 
     <insert id="setSummaryAPIUsage" parameterType="com.kantar.vo.StatisticsVO">
-        INSERT INTO KT_API_STATISTICS (report_status, idx_report, summaryUsage, keywordUsage)  VALUES (1, #{idx_report}, #{summaryUsage}, #{keywordUsage})
+        INSERT INTO KT_API_STATISTICS (report_status, idx_report, idx_user, summaryUsage, keywordUsage)  VALUES (1, #{idx_report}, #{idx_user}, #{summaryUsage}, #{keywordUsage})
     </insert>
 
     <insert id="setKeywordAPIUsage" parameterType="com.kantar.vo.StatisticsVO">
-        INSERT INTO KT_API_STATISTICS (report_status, idx_report, summaryUsage, keywordUsage) VALUES (1, #{idx_report}, #{summaryUsage}, #{keywordUsage})
+        INSERT INTO KT_API_STATISTICS (report_status, idx_report, idx_user, summaryUsage, keywordUsage) VALUES (1, #{idx_report}, #{idx_user}, #{summaryUsage}, #{keywordUsage})
     </insert>
 
     <update id="updateSummaryAPIUsage" parameterType="com.kantar.vo.ProjectVO">
@@ -62,18 +62,26 @@
         WHERE idx_report = #{idx_report}
     </update>
 
-    <select id="getProjectIdxToReport" resultType="com.kantar.vo.ProjectVO">
+    <select id="getPjIdxToReport" resultType="com.kantar.vo.ProjectVO">
         SELECT idx_project
         FROM KT_REPORT
         WHERE idx_report = #{idx_report}
     </select>
 
     <update id="setSummaryAPIUsageAdd" parameterType="com.kantar.vo.ProjectVO">
-        INSERT INTO KT_API_STATISTICS (report_status, idx_report, summaryUsage, keywordUsage)  VALUES (2, #{idx_report}, #{summaryUsage}, #{keywordUsage})
+        INSERT INTO KT_API_STATISTICS (report_status, idx_report, idx_user, summaryUsage, keywordUsage)  VALUES (2, #{idx_report}, #{idx_user}, #{summaryUsage}, #{keywordUsage})
     </update>
 
     <update id="setKeywordAPIUsageAdd" parameterType="com.kantar.vo.ProjectVO">
-        INSERT INTO KT_API_STATISTICS (report_status, idx_report, summaryUsage, keywordUsage) VALUES (2, #{idx_report}, #{summaryUsage}, #{keywordUsage})
+        INSERT INTO KT_API_STATISTICS (report_status, idx_report, idx_user, summaryUsage, keywordUsage) VALUES (2, #{idx_report}, #{idx_user}, #{summaryUsage}, #{keywordUsage})
     </update>
+
+    <select id="getApiStatisticsByUser" resultType="com.kantar.vo.StatisticsVO">
+        SELECT sum(summaryUsage) as summaryUsage
+        FROM KT_API_STATISTICS
+        <if test="idx_user != null">
+            WHERE idx_user = #{idx_user}
+        </if>
+    </select>
 
 </mapper>

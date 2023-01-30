@@ -72,33 +72,31 @@ public class StatisticsService {
         StatisticsVO statisticsVO = new StatisticsVO();
 
         if(paramVo.getIdx_project()!=null && paramVo.getIdx_project()>0){
-            List<ProjectVO> prs = reportMapper.getReportFileList(paramVo);
 
             double sizeSum = 0;
             long lengthSum = 0;
 
-            if(!prs.isEmpty()){
-                for(ProjectVO prs0 : prs) {
-                    String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
+            String _fpath = this.filepath + paramVo.getFilepath() + paramVo.getFilename();
 
-                    File dir = new File(_fpath);
-                    sizeSum += dir.length();
+            File dir = new File(_fpath);
+            sizeSum += dir.length();
+            List<String[]> ers = excel.getCsvListData(_fpath);
 
-                    List<String[]> ers = excel.getCsvListData(_fpath);
-
-                    int j = 0;
-                    for (String[] _ers0 : ers) {  // 열
-                        if (j > 0) {
-                            for (String _ers00 : _ers0) {
-                                lengthSum += _ers00.length();
-                            }
+            int j = 0;
+            for (String[] _ers0 : ers) {  // 열
+                if (j > 0) {
+                    for (String _ers00 : _ers0) {
+                        if(_ers00!=null){
+                            lengthSum += _ers00.length();
                         }
-                        j++;
                     }
                 }
+                j++;
             }
+
+            statisticsVO.setIdx_user(paramVo.getIdx_user());
             statisticsVO.setIdx_project(paramVo.getIdx_project());
-            statisticsVO.setFile_cnt(prs.size());
+            statisticsVO.setFile_cnt(1);
             statisticsVO.setWord_length(lengthSum);
             statisticsVO.setFile_size(sizeSum/(1024*1024));
 
@@ -133,21 +131,22 @@ public class StatisticsService {
 
     /**
      * API 사용량 (키워드 수 직접 입력)
-     * @param idx_report
+     * @param paramVo
      * @param type
      * @param word_length
      * @throws Exception
      */
-    public void getAPIUsage(Integer idx_report, Integer type, Integer word_length) throws Exception {
-        if(idx_report!=null && idx_report>0){
+    public void createAPIUsage(ProjectVO paramVo, Integer type, Integer word_length) throws Exception {
+        if(paramVo.getIdx_report()!=null && paramVo.getIdx_report()>0){
 
             StatisticsVO statisticsVO = new StatisticsVO();
-            statisticsVO.setIdx_report(idx_report);
+            statisticsVO.setIdx_report(paramVo.getIdx_report());
+            statisticsVO.setIdx_user(paramVo.getIdx_user());
             statisticsVO.setApi_type(type);
-            int ori_date = statisticsMapper.getReportAPIUsage(idx_report);
+            int ori_date = statisticsMapper.getReportAPIUsage(statisticsVO);
 
             if(ori_date==0){
-                ProjectVO param = statisticsMapper.getProjectIdxToReport(idx_report);
+                ProjectVO param = statisticsMapper.getPjIdxToReport(statisticsVO);
                 statisticsMapper.updateProjectReporteCnt(param);
                 if(type==1){
                     statisticsVO.setSummaryUsage(word_length);
@@ -174,22 +173,23 @@ public class StatisticsService {
 
     /**
      * API 사용량 (키워드 입력)
-     * @param idx_report
+     * @param paramVo
      * @param type
      * @param word
      * @throws Exception
      */
-    public void getAPIUsage(Integer idx_report, Integer type, String word) throws Exception {
-        if(idx_report!=null && idx_report>0){
+    public void createAPIUsage(ProjectVO paramVo, Integer type, String word) throws Exception {
+        if(paramVo.getIdx_report()!=null && paramVo.getIdx_report()>0){
 
             StatisticsVO statisticsVO = new StatisticsVO();
-            statisticsVO.setIdx_report(idx_report);
+            statisticsVO.setIdx_report(paramVo.getIdx_report());
+            statisticsVO.setIdx_user(paramVo.getIdx_user());
             statisticsVO.setApi_type(type);
-            int ori_date = statisticsMapper.getReportAPIUsage(idx_report);
+            int ori_date = statisticsMapper.getReportAPIUsage(statisticsVO);
             int word_length = word.length();
 
             if(ori_date==0){
-                ProjectVO param = statisticsMapper.getProjectIdxToReport(idx_report);
+                ProjectVO param = statisticsMapper.getPjIdxToReport(statisticsVO);
                 statisticsMapper.updateProjectReporteCnt(param);
                 if(type==1){
                     statisticsVO.setSummaryUsage(word_length);

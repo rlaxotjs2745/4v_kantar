@@ -1,5 +1,6 @@
 package com.kantar.mapper;
 
+import com.kantar.vo.StatisticsVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kantar.vo.UserVO;
@@ -21,4 +22,7 @@ public interface UserMapper {
     public UserVO getUserInfoByFCode(String fCode) throws Exception;
 
     Integer updateUserPW(UserVO userInfo) throws Exception;
+
+    public List<UserVO>  getApiUserList(UserVO userInfo) throws Exception;
+
 }

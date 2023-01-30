@@ -61,4 +61,17 @@
         UPDATE KT_USER SET user_pw=#{user_pw}
         WHERE idx_user=#{idx_user}
     </update>
+
+    <select id="getApiUserList" resultType="com.kantar.vo.UserVO">
+        SELECT idx_user, user_id, user_name
+        FROM KT_USER
+        <if test="user_type eq 11">
+            WHERE user_type = 1 OR idx_user = #{idx_user}
+        </if>
+        <if test="user_type eq 99">
+            WHERE (user_type = 1
+            OR user_type = 11
+            OR idx_user = #{idx_user})
+        </if>
+    </select>
 </mapper>

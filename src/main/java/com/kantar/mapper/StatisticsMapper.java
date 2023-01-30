@@ -3,8 +3,6 @@ package com.kantar.mapper;
 import com.kantar.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
 @Mapper
 public interface StatisticsMapper {
     public long getFileCount() throws Exception;
@@ -21,7 +19,7 @@ public interface StatisticsMapper {
 
     Double getAllFileSize() throws Exception;
 
-    int getReportAPIUsage(Integer idx_report) throws Exception;
+    int getReportAPIUsage(StatisticsVO satisticsVO) throws Exception;
 
     void setSummaryAPIUsage(StatisticsVO statisticsVO) throws Exception;
 
@@ -31,9 +29,11 @@ public interface StatisticsMapper {
 
     void updateKeywordAPIUsage(StatisticsVO statisticsVO) throws Exception;
 
-    ProjectVO getProjectIdxToReport(Integer idx_report) throws Exception;
+    ProjectVO getPjIdxToReport(StatisticsVO satisticsVO) throws Exception;
 
     void setSummaryAPIUsageAdd(StatisticsVO statisticsVO) throws Exception;
 
     void setKeywordAPIUsageAdd(StatisticsVO statisticsVO) throws Exception;
+
+    StatisticsVO getApiStatisticsByUser(UserVO userInfo) throws Exception;
 }
