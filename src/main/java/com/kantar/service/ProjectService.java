@@ -230,6 +230,7 @@ public class ProjectService {
         FileOutputStream fos = null;
         fos = new FileOutputStream(mergeCsv, true);
         out = new OutputStreamWriter(fos);
+        out.write("\ufeff");
 
         String[] _mergeIdx = paramVo.getProject_merge_idx().split(",");
 
@@ -246,7 +247,6 @@ public class ProjectService {
                 String _fpath = this.filepath + pr.getFilepath() + pr.getFilename();
 
                 List<String[]> ers = excel.getCsvListData(_fpath);
-                out.write("\ufeff");
 
                 for (String[] er : ers) {
                     if(fileCnt==0 || (fileCnt>0 && lineCnt>0)) {
