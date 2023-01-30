@@ -35,5 +35,11 @@ public interface StatisticsMapper {
 
     void setKeywordAPIUsageAdd(StatisticsVO statisticsVO) throws Exception;
 
-    StatisticsVO getApiStatisticsByUser(UserVO userInfo) throws Exception;
+    long getApiStatisticsByUser() throws Exception;
+
+    long getApiStatisticsByUser(UserVO userInfo) throws Exception;
+
+    double getApiDataByUser() throws Exception;
+
+    double getApiDataByUser(UserVO userInfo) throws Exception;
 }

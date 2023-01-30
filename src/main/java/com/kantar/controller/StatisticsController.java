@@ -127,9 +127,18 @@ public class StatisticsController extends BaseController {
                 return responseService.getFailResult("api_statistics","관리자만 조회 가능한 기능힙니다.");
             }
 
-            StatisticsVO statisticsVO = statisticsMapper.getApiStatisticsByUser(paramVo);
+            Map result = new HashMap();
+            double total_data = statisticsMapper.getApiDataByUser();
+            double user_data = statisticsMapper.getApiDataByUser(paramVo);
+            long total_api = statisticsMapper.getApiStatisticsByUser();
+            long user_api = statisticsMapper.getApiStatisticsByUser(paramVo);
 
-            return responseService.getSuccessResult(statisticsVO, "api_statistics", "API 사용량을 전달합니다");
+            result.put("total_data", total_data);
+            result.put("user_data", user_data);
+            result.put("total_summaryUsage", total_api);
+            result.put("user_summaryUsage", user_api);
+
+            return responseService.getSuccessResult(result, "api_statistics", "API 사용량을 전달합니다");
 
         } catch (Exception e) {
             e.printStackTrace();
