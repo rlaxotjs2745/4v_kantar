@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kantar.service.StatisticsService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,9 @@ public class ReportController extends BaseController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private StatisticsService statisticsService;
 
     @Autowired
     private TokenJWT tokenJWT;
@@ -170,6 +174,10 @@ public class ReportController extends BaseController {
                                 if(paramVo.getIdx_project()==0 || paramVo.getIdx_project() == null){
                                     return responseService.getFailResult("create_report","저장에 실패하였습니다.");
                                 }else{
+                                    paramVo.setFilepath(path);
+                                    paramVo.setFilename(originFileName);
+                                    statisticsService.createProjectInfo(paramVo);// 프로젝트 생성시 사용량 누적
+
                                     // 요청 사항 : 2023.01.06 회의때 프로젝트 저장 시 리포트 생성까지 같이 되도록 요청
                                     Integer _seq = reportMapper.getReportSeq();
                                     _seq = _seq+1;

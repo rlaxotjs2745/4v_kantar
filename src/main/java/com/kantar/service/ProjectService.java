@@ -44,6 +44,9 @@ public class ProjectService {
     @Value("${spring.smr.token}")
     public String smrtoken;
 
+    @Autowired
+    private StatisticsService statisticsService;
+
     /**
      * 비동기 리포트 결과 만들기
      * @param prs
@@ -116,7 +119,6 @@ public class ProjectService {
                         paramVo.setReport_id(RPID);
                         paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
                         ridx0 = reportMapper.savReport(paramVo);
-                        System.out.println("ridx0 = " + ridx0);
                     }else{
                         paramVo.setIdx_report(ridx.getIdx_report());
                         ridx0 = 1;
@@ -125,6 +127,7 @@ public class ProjectService {
                         paramVo.setTitle(param.getTitle());
                         paramVo.setSummary0(param.getSummary0());
                         reportMapper.saveReportData(paramVo);
+                        statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
                         if(StringUtils.isNotEmpty(_token)){
                             _msg = "리포트가 생성되었습니다.";
                         }
