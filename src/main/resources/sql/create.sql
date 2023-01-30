@@ -221,6 +221,7 @@ ENGINE=InnoDB
 CREATE TABLE `KT_FILE_STATISTICS` (
     `idx_file_statistics` INT(11) NOT NULL AUTO_INCREMENT,
     `idx_project` INT(11) NOT NULL,
+    `idx_user` INT(11) NOT NULL DEFAULT '0' COMMENT '등록자',
     `file_status` TINYINT(4) NULL DEFAULT '1' COMMENT '1:사용, 99:삭제',
     `file_cnt` INT(11) NOT NULL,
     `file_size` DECIMAL(10,3) NOT NULL,
@@ -239,6 +240,7 @@ CREATE TABLE `KT_FILE_STATISTICS` (
 CREATE TABLE `KT_API_STATISTICS` (
      `idx_api_statistics` INT(11) NOT NULL AUTO_INCREMENT,
      `idx_report` INT(11) NOT NULL,
+     `idx_user` INT(11) NOT NULL DEFAULT '0' COMMENT '등록자',
      `report_status` TINYINT(4) NULL DEFAULT '1' COMMENT '1:기본리포트, 2:추가리포트, 99:삭제',
      `summaryUsage` BIGINT(20) NOT NULL,
      `keywordUsage` BIGINT(20) NOT NULL,
