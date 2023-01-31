@@ -135,8 +135,10 @@ public class StatisticsController extends BaseController {
 
             result.put("total_data", total_data);
             result.put("user_data", user_data);
-            result.put("total_summaryUsage", total_api);
-            result.put("user_summaryUsage", user_api);
+            result.put("total_summary", total_api);
+            result.put("user_summary", user_api);
+            result.put("total_keyword", 1);
+            result.put("user_keyword", 1);
 
             return responseService.getSuccessResult(result, "api_statistics", "API 사용량을 전달합니다");
 
