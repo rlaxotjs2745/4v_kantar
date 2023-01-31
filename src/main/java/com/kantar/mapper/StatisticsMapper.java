@@ -37,9 +37,9 @@ public interface StatisticsMapper {
 
     long getApiStatisticsByUser() throws Exception;
 
-    long getApiStatisticsByUser(UserVO userInfo) throws Exception;
+    long getApiStatisticsByUser(StatisticsVO userInfo) throws Exception;
 
     double getApiDataByUser() throws Exception;
 
-    double getApiDataByUser(UserVO userInfo) throws Exception;
+    double getApiDataByUser(StatisticsVO userInfo) throws Exception;
 }

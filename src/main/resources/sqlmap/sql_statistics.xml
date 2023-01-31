@@ -79,17 +79,31 @@
     <select id="getApiStatisticsByUser" resultType="long">
         SELECT NVL(sum(summaryUsage),0) as summaryUsage
         FROM KT_API_STATISTICS
+        WHERE report_status != 99
         <if test="idx_user != null">
-            WHERE idx_user = #{idx_user}
+            AND idx_user = #{idx_user}
+        </if>
+        <if test="startDate != null">
+            AND create_dt <![CDATA[>=]]> date_format(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null">
+            AND create_dt <![CDATA[<]]> date_format(date_add(#{endDate}, INTERVAL 1 DAY), '%Y-%m-%d')
         </if>
     </select>
 
     <select id="getApiDataByUser" resultType="Double">
         SELECT NVL(ROUND(SUM(data_length + index_length) / 1024 / 1024, 3),0) AS dataUsage
-        FROM information_schema.tables A, KT_REPORT B
+        FROM information_schema.tables A, KT_REPORT B, KT_API_STATISTICS C
         WHERE (A.table_name = 'KT_REPORT' OR A.table_name = 'KT_REPORT_DATA')
+          AND C.idx_report = B.idx_report
         <if test="idx_user != null">
-          AND (B.idx_user = #{idx_user}) ;
+          AND B.idx_user = #{idx_user}
+        </if>
+        <if test="startDate != null">
+            AND C.create_dt <![CDATA[>=]]> date_format(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null">
+            AND C.create_dt <![CDATA[<]]> date_format(date_add(#{endDate}, INTERVAL 1 DAY), '%Y-%m-%d')
         </if>
     </select>
 

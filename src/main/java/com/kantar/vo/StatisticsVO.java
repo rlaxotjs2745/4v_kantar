@@ -3,6 +3,8 @@ package com.kantar.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 public class StatisticsVO extends BaseVO{
@@ -19,5 +21,6 @@ public class StatisticsVO extends BaseVO{
     private Integer api_type; // 1:요약 2:키워드
     private long summaryUsage; // 요약 사용량
     private long keywordUsage; // 키워드 사용량
-
+    private String startDate;
+    private String endDate;
 }

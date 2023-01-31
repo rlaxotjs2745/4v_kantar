@@ -23,10 +23,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/statistics")
@@ -116,7 +115,7 @@ public class StatisticsController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/api_statistics")
-    public CommonResult apiStatisticsByUser(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
+    public CommonResult apiStatisticsByUser(HttpServletRequest req, @RequestBody StatisticsVO paramVo) throws Exception {
         try{
             UserVO uinfo = getChkUserLogin(req);
 
