@@ -102,8 +102,8 @@ public class ProjectService {
                 _nlp2.put("enable",true);
 
                 _nlp.put("summary",_nlp0);
-                _nlp.put("keywordExtraction",_nlp1);
-                // _nlp.put("sentimentAnalysis",_nlp2);
+                // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
                 params.setNlpConfig(_nlp);
                 String pp = new Gson().toJson(params);
                 ProjectVO param = summary.getSummary(pp, "전체 요약문");
