@@ -232,8 +232,8 @@ public class BaseController {
 			con.setRequestProperty( "Content-Type", "application/json");
 			con.setRequestProperty( "Authorization", "Bearer " + APIKEY);
 		}
-		con.setConnectTimeout(10000);
-		con.setReadTimeout(10000);
+		con.setConnectTimeout(600000);
+		con.setReadTimeout(600000);
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 		wr.write(paramStr.getBytes(StandardCharsets.UTF_8));
@@ -259,8 +259,8 @@ public class BaseController {
 		con.setRequestMethod("POST");
 		con.setRequestProperty( "Content-Type", "application/json");
 		con.setRequestProperty( "Authorization", "Bearer " + APIKEY);
-		con.setConnectTimeout(10000);
-		con.setReadTimeout(10000);
+		con.setConnectTimeout(600000);
+		con.setReadTimeout(600000);
 		con.setDoOutput(true);
 		// BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
