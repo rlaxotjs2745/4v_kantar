@@ -128,6 +128,17 @@ public class UserController extends BaseController {
     @Transactional
     public CommonResult create(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo == null){
+                return responseService.getFailResult("create","로그인이 필요합니다.");
+            }
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo==null){
+                return responseService.getFailResult("create","로그인이 필요합니다.");
+            }
+            if(userInfo.getUser_type() == 1){
+                return responseService.getFailResult("create","생성 권한이 없습니다.");
+            }
             if(StringUtils.isEmpty(paramVo.getUser_id())){
                 return responseService.getFailResult("create","회원 아이디를 입력해주세요.");
             }
@@ -182,6 +193,13 @@ public class UserController extends BaseController {
             if(thisUserInfo==null){
                 return responseService.getFailResult("modify","로그인이 필요합니다.");
             }
+            UserVO userInfo = userMapper.getUserInfo(thisUserInfo);
+            if(userInfo==null){
+                return responseService.getFailResult("modify","로그인이 필요합니다.");
+            }
+            if(userInfo.getUser_type() == 1){
+                return responseService.getFailResult("modify","삭제 권한이 없습니다.");
+            }
             UserVO uinfo = userMapper.getUserInfo(paramVo);
             if(uinfo == null){
                 return responseService.getFailResult("modify","회원이 없습니다.");
@@ -217,6 +235,13 @@ public class UserController extends BaseController {
 //            if(StringUtils.isEmpty(paramVo.getUser_pw())){
 //                return responseService.getFailResult("dropout","비밀번호를 입력해주세요.");
 //            }
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo==null){
+                return responseService.getFailResult("dropout","이미 삭제되었거나 없는 유저입니다.");
+            }
+            if(userInfo.getUser_type() == 1){
+                return responseService.getFailResult("dropout","삭제 권한이 없습니다.");
+            }
             Integer rs = userMapper.delUserInfo(paramVo);
             if(rs==1){
                 return responseService.getSuccessResult("dropout","회원 탈퇴가 완료되었습니다.");
@@ -239,10 +264,15 @@ public class UserController extends BaseController {
     @GetMapping("/list_member")
     public CommonResult getMemberList(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
-            UserVO userInfo = userMapper.getUserInfo(paramVo);
-            if(userInfo==null){
-                return responseService.getFailResult("login","로그인이 필요합니다.");
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo == null){
+                return responseService.getFailResult("member_detail","로그인이 필요합니다.");
             }
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo==null){
+                return responseService.getFailResult("list_member","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(userInfo.getIdx_user());
             if(userInfo.getUser_type() == 1){
                 return responseService.getFailResult("list_member","관리자만 조회 가능한 기능힙니다.");
             }
@@ -254,8 +284,11 @@ public class UserController extends BaseController {
             }
             paramVo.setFilter(userInfo.getUser_type());
             paramVo.setFirstIndex(paramVo.getCurrentPage() * paramVo.getRecordCountPerPage());
-            List<UserVO> rs = userMapper.getUserList(paramVo);
-            if(rs != null){
+            Map<String, Object> rs = new HashMap<>();
+            List<UserVO> userList = userMapper.getUserList(paramVo);
+            if(userList != null){
+                rs.put("userList", userList);
+                rs.put("idx_user", userInfo.getIdx_user());
                 return responseService.getSuccessResult(rs, "list_member", "멤버 리스팅 성공");
             } else {
                 return responseService.getFailResult("list_member","멤버 리스트가 없습니다.");
@@ -277,6 +310,17 @@ public class UserController extends BaseController {
     @GetMapping("/member_detail")
     public CommonResult getMemberDetail(HttpServletRequest req, UserVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo == null){
+                return responseService.getFailResult("member_detail","로그인이 필요합니다.");
+            }
+            UserVO thisUserInfo = userMapper.getUserInfo(uinfo);
+            if(thisUserInfo==null){
+                return responseService.getFailResult("member_detail","로그인이 필요합니다.");
+            }
+            if(thisUserInfo.getUser_type() == 1 && thisUserInfo.getIdx_user() != paramVo.getIdx_user()){
+                return responseService.getFailResult("member_detail","관리자, 본인만 조회 가능한 기능힙니다.");
+            }
             UserVO userInfo = userMapper.getUserInfo(paramVo);
             if(userInfo != null){
                 UserVO rs = new UserVO();
@@ -294,28 +338,6 @@ public class UserController extends BaseController {
             e.printStackTrace();
             return responseService.getFailResult("member_detail","오류가 발생하였습니다.");
         }
-    }
-
-    /**
-     * 멤버관리(회원 삭제)
-     * @param req
-     * @param paramVo
-     * @return CommonResult
-     * @throws Exception
-     */
-    @PostMapping("/member_delete")
-    public CommonResult deleteMember(HttpServletRequest req, UserVO paramVo) throws Exception {
-        try {
-            Integer rs = userMapper.delUserInfo(paramVo);
-            if(rs==1){
-                return responseService.getSuccessResult("member_delete","회원 삭제가 완료되었습니다.");
-            }else{
-                return responseService.getFailResult("member_delete","없는 회원입니다.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return responseService.getFailResult("member_delete","오류가 발생하였습니다.");
     }
 
 
@@ -494,18 +516,6 @@ public class UserController extends BaseController {
             e.printStackTrace();
         }
         return responseService.getFailResult("first_login_confirm","오류가 발생하였습니다.");
-    }
-
-    @GetMapping("/header")
-    public CommonResult getHeaderInfo(HttpServletRequest req) throws Exception {
-        try{
-            UserVO uinfo = getChkUserLogin(req);
-            System.out.println(uinfo);
-            return responseService.getSuccessResult("header","헤더 정보 불러오기 완료");
-        } catch (Exception e){
-            e.printStackTrace();
-            return responseService.getFailResult("header","오류가 발생하였습니다.");
-        }
     }
 
 }

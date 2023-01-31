@@ -17,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,12 +57,15 @@ public class DictionaryController extends BaseController {
     @Transactional
     public CommonResult getDictionaryList(HttpServletRequest req, DictionaryVO paramVo) throws Exception {
         try{
-            if(paramVo.getIdx_user() == null){
-                return responseService.getFailResult("list_dictionary","사용자 인덱스가 입력되지 않았습니다.");
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo == null){
+                return responseService.getFailResult("list_dictionary","로그인이 필요합니다.");
             }
-            UserVO userVO = new UserVO();
-            userVO.setIdx_user(paramVo.getIdx_user());
-            UserVO userInfo = userMapper.getUserInfo(userVO);
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo == null){
+                return responseService.getFailResult("list_dictionary","유저 정보를 찾을 수 없습니다.");
+            }
+            paramVo.setIdx_user(userInfo.getIdx_user());
             if( paramVo.getRecordCountPerPage() == null || paramVo.getRecordCountPerPage() == 0){
                 paramVo.setRecordCountPerPage(10);
             }
@@ -70,8 +74,11 @@ public class DictionaryController extends BaseController {
             }
             paramVo.setFilter(userInfo.getUser_type());
             paramVo.setFirstIndex(paramVo.getCurrentPage() * paramVo.getRecordCountPerPage());
-            List<DictionaryVO> rs = dictionaryMapper.getDictionaryList(paramVo);
-            if(rs != null){
+            Map<String, Object> rs = new HashMap<>();
+            List<DictionaryVO> dictList = dictionaryMapper.getDictionaryList(paramVo);
+            if(dictList != null){
+                rs.put("dictList", dictList);
+                rs.put("idx_user", uinfo.getIdx_user());
                 return responseService.getSuccessResult(rs, "list_dictionary", "사전 리스팅 성공");
             }else{
                 return responseService.getFailResult("list_dictionary","사전 리스트가 없습니다.");
@@ -88,10 +95,29 @@ public class DictionaryController extends BaseController {
     @Transactional
     public CommonResult deleteDictionary(HttpServletRequest req, @RequestBody DictionaryVO paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo == null){
+                return responseService.getFailResult("delete_dictionary","로그인이 필요합니다.");
+            }
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo == null){
+                return responseService.getFailResult("delete_dictionary","유저 정보를 찾을 수 없습니다.");
+            }
             if(paramVo.getIdx_dictionary() == null || paramVo.getIdx_dictionary() == 0){
                 return responseService.getFailResult("delete_dictionary","사전 인덱스 값이 없습니다.");
             }
-            if(dictionaryMapper.getDictionary(paramVo) != null){
+            DictionaryVO dictionaryVO = dictionaryMapper.getDictionary(paramVo);
+            if(dictionaryVO != null){
+                if(userInfo.getUser_type() == 1){
+                    if(dictionaryVO.getIdx_user() != userInfo.getIdx_user() || dictionaryVO.getDic_type() == 0){
+                        return responseService.getFailResult("delete_dictionary","삭제 권한이 없습니다.");
+                    }
+                }
+                if(userInfo.getUser_type() == 11){
+                    if(dictionaryVO.getDic_type() == 1 && dictionaryVO.getIdx_user() != userInfo.getIdx_user()){
+                        return responseService.getFailResult("delete_dictionary","삭제 권한이 없습니다.");
+                    }
+                }
                 dictionaryMapper.deleteDictionary(paramVo);
                 dictionaryMapper.deleteDictionaryDataToDictionaryIdx(paramVo);
                 return responseService.getSuccessResult("delete_dictionary", "사전 삭제 성공");
@@ -117,9 +143,16 @@ public class DictionaryController extends BaseController {
                 return responseService.getFailResult("dictionary_create","이미 존재하는 사전 이름입니다. 확인 후 다시 시도해주세요.");
             }
 
-            UserVO userVO = new UserVO();
-            userVO.setIdx_user(paramVo.getIdx_user());
-            UserVO userInfo = userMapper.getUserInfo(userVO);
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo == null){
+                return responseService.getFailResult("dictionary_create","로그인이 필요합니다.");
+            }
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo == null){
+                return responseService.getFailResult("dictionary_create","유저 정보를 찾을 수 없습니다.");
+            }
+
+            paramVo.setIdx_user(userInfo.getIdx_user());
 
             List<MultipartFile> fileList = req.getFiles("file");
 
@@ -196,15 +229,38 @@ public class DictionaryController extends BaseController {
     @PostMapping("/delete_dictionary_data")
     public CommonResult deleteDictionaryData(HttpServletRequest req, @RequestBody DictionaryDataVO paramVo) throws Exception {
         try {
-            if(paramVo.getIdx_dictionary_data() == 0){
-                return responseService.getFailResult("delete_dictionary_data","표제어 인덱스를 받지 못했습니다.");
+            UserVO uinfo = getChkUserLogin(req);
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo == null){
+                return responseService.getFailResult("delete_dictionary_data","유저 정보를 찾을 수 없습니다.");
             }
+            if(paramVo.getIdx_dictionary_data() == 0){
+                return responseService.getFailResult("delete_dictionary_data","키워드 그룹 인덱스를 받지 못했습니다.");
+            }
+
             DictionaryDataVO dictionaryDataVO = dictionaryMapper.getDictionaryData(paramVo);
+            DictionaryVO param = new DictionaryVO();
+            param.setIdx_dictionary(dictionaryDataVO.getIdx_dictionary());
+            DictionaryVO dictionaryVO = dictionaryMapper.getDictionary(param);
+
+            if(dictionaryVO == null){
+                return responseService.getFailResult("delete_dictionary_data","이미 삭제된 사전입니다.");
+            }
             if(dictionaryDataVO == null){
-                return responseService.getFailResult("delete_dictionary_data","이미 삭제된 표제어 이거나 없는 표제어입니다.");
+                return responseService.getFailResult("delete_dictionary_data","이미 삭제된 키워드 그룹 이거나 없는 키워드 그룹입니다.");
+            }
+            if(userInfo.getUser_type() == 1){
+                if(dictionaryDataVO.getIdx_user() != userInfo.getIdx_user() || dictionaryVO.getDic_type() == 0){
+                    return responseService.getFailResult("delete_dictionary_data","삭제 권한이 없습니다.");
+                }
+            }
+            if(userInfo.getUser_type() == 11){
+                if(dictionaryVO.getDic_type() != 1 && dictionaryVO.getIdx_user() != userInfo.getIdx_user()){
+                    return responseService.getFailResult("delete_dictionary_data","삭제 권한이 없습니다.");
+                }
             }
             dictionaryMapper.deleteDictionaryData(paramVo);
-            return responseService.getSuccessResult("delete_dictionary_data", "표제어 삭제 성공");
+            return responseService.getSuccessResult("delete_dictionary_data", "키워드 그룹 삭제 성공");
         } catch (Exception e) {
             e.printStackTrace();
             return responseService.getFailResult("delete_dictionary_data","오류가 발생하였습니다.");
@@ -214,6 +270,27 @@ public class DictionaryController extends BaseController {
     @PostMapping("/update_dictionary_data")
     public CommonResult updateDictionaryData(HttpServletRequest req, @RequestBody List<DictionaryDataVO> paramVo) throws Exception {
         try {
+            UserVO uinfo = getChkUserLogin(req);
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo == null){
+                return responseService.getFailResult("update_dictionary_data","유저 정보를 찾을 수 없습니다.");
+            }
+            DictionaryVO paramDict = new DictionaryVO();
+            paramDict.setIdx_dictionary(paramVo.get(0).getIdx_dictionary());
+            DictionaryVO dictionaryVO = dictionaryMapper.getDictionary(paramDict);
+
+            if(dictionaryVO.getDic_type() == 1){
+                if(userInfo.getIdx_user() != dictionaryVO.getIdx_user()){
+                    if(userInfo.getUser_type() != 99){
+                        return responseService.getFailResult("update_dictionary_data","수정 권한이 없습니다.");
+                    }
+                }
+            } else {
+                if(userInfo.getUser_type() == 1){
+                    return responseService.getFailResult("update_dictionary_data","수정 권한이 없습니다.");
+                }
+            }
+
             for(DictionaryDataVO param: paramVo){
                 if(param.getIdx_dictionary_data() == null || param.getIdx_dictionary_data() == 0){
                     if(param.getKeyword() == null){
@@ -223,18 +300,20 @@ public class DictionaryController extends BaseController {
                     if(!findKeyword.isEmpty()){
                         return responseService.getFailResult("update_dictionary_data","이미 존재하는 키워드입니다.");
                     }
+                    param.setIdx_user(userInfo.getIdx_user());
                     dictionaryMapper.insertDictionaryData(param);
                 } else {
                     if(param.getFilter() != null && param.getFilter() == 1){
                         DictionaryDataVO dictionaryDataVO = dictionaryMapper.getDictionaryData(param);
                         if(dictionaryDataVO == null){
-                            return responseService.getFailResult("update_dictionary_data","삭제된 표제어 이거나 없는 표제어입니다.");
+                            return responseService.getFailResult("update_dictionary_data","삭제된 키워드 그룹 이거나 없는 키워드 그룹입니다.");
                         }
+                        param.setIdx_user(userInfo.getIdx_user());
                         dictionaryMapper.updateDictionaryData(param);
                     }
                 }
             }
-            return responseService.getSuccessResult("update_dictionary_data", "표제어 업데이트 성공");
+            return responseService.getSuccessResult("update_dictionary_data", "키워드 그룹 업데이트 성공");
         } catch (Exception e) {
             e.printStackTrace();
             return responseService.getFailResult("update_dictionary_data","오류가 발생하였습니다.");
