@@ -132,11 +132,7 @@ public class UserController extends BaseController {
             if(uinfo == null){
                 return responseService.getFailResult("create","로그인이 필요합니다.");
             }
-            UserVO userInfo = userMapper.getUserInfo(uinfo);
-            if(userInfo==null){
-                return responseService.getFailResult("create","로그인이 필요합니다.");
-            }
-            if(userInfo.getUser_type() == 1){
+            if(uinfo.getRole_type() == 1){
                 return responseService.getFailResult("create","생성 권한이 없습니다.");
             }
             if(StringUtils.isEmpty(paramVo.getUser_id())){
@@ -193,11 +189,7 @@ public class UserController extends BaseController {
             if(thisUserInfo==null){
                 return responseService.getFailResult("modify","로그인이 필요합니다.");
             }
-            UserVO userInfo = userMapper.getUserInfo(thisUserInfo);
-            if(userInfo==null){
-                return responseService.getFailResult("modify","로그인이 필요합니다.");
-            }
-            if(userInfo.getUser_type() == 1){
+            if(thisUserInfo.getRole_type() == 1){
                 return responseService.getFailResult("modify","삭제 권한이 없습니다.");
             }
             UserVO uinfo = userMapper.getUserInfo(paramVo);
@@ -231,15 +223,8 @@ public class UserController extends BaseController {
             if(uinfo==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
-            paramVo.setIdx_user(paramVo.getIdx_user());
-//            if(StringUtils.isEmpty(paramVo.getUser_pw())){
-//                return responseService.getFailResult("dropout","비밀번호를 입력해주세요.");
-//            }
-            UserVO userInfo = userMapper.getUserInfo(uinfo);
-            if(userInfo==null){
-                return responseService.getFailResult("dropout","이미 삭제되었거나 없는 유저입니다.");
-            }
-            if(userInfo.getUser_type() == 1){
+//            paramVo.setIdx_user(paramVo.getIdx_user());
+            if(uinfo.getRole_type() == 1){
                 return responseService.getFailResult("dropout","삭제 권한이 없습니다.");
             }
             Integer rs = userMapper.delUserInfo(paramVo);
@@ -268,12 +253,8 @@ public class UserController extends BaseController {
             if(uinfo == null){
                 return responseService.getFailResult("member_detail","로그인이 필요합니다.");
             }
-            UserVO userInfo = userMapper.getUserInfo(uinfo);
-            if(userInfo==null){
-                return responseService.getFailResult("list_member","로그인이 필요합니다.");
-            }
-            paramVo.setIdx_user(userInfo.getIdx_user());
-            if(userInfo.getUser_type() == 1){
+            paramVo.setIdx_user(uinfo.getIdx_user());
+            if(uinfo.getRole_type() == 1){
                 return responseService.getFailResult("list_member","관리자만 조회 가능한 기능힙니다.");
             }
             if(paramVo.getRecordCountPerPage() == null || paramVo.getRecordCountPerPage() == 0){
@@ -282,13 +263,13 @@ public class UserController extends BaseController {
             if(paramVo.getCurrentPage() == null || paramVo.getCurrentPage() == 0){
                 paramVo.setCurrentPage(0);
             }
-            paramVo.setFilter(userInfo.getUser_type());
+            paramVo.setFilter(uinfo.getRole_type());
             paramVo.setFirstIndex(paramVo.getCurrentPage() * paramVo.getRecordCountPerPage());
             Map<String, Object> rs = new HashMap<>();
             List<UserVO> userList = userMapper.getUserList(paramVo);
             if(userList != null){
                 rs.put("userList", userList);
-                rs.put("idx_user", userInfo.getIdx_user());
+                rs.put("idx_user", uinfo.getIdx_user());
                 return responseService.getSuccessResult(rs, "list_member", "멤버 리스팅 성공");
             } else {
                 return responseService.getFailResult("list_member","멤버 리스트가 없습니다.");
@@ -314,11 +295,7 @@ public class UserController extends BaseController {
             if(uinfo == null){
                 return responseService.getFailResult("member_detail","로그인이 필요합니다.");
             }
-            UserVO thisUserInfo = userMapper.getUserInfo(uinfo);
-            if(thisUserInfo==null){
-                return responseService.getFailResult("member_detail","로그인이 필요합니다.");
-            }
-            if(thisUserInfo.getUser_type() == 1 && thisUserInfo.getIdx_user() != paramVo.getIdx_user()){
+            if(uinfo.getRole_type() == 1 && uinfo.getIdx_user() != paramVo.getIdx_user()){
                 return responseService.getFailResult("member_detail","관리자, 본인만 조회 가능한 기능힙니다.");
             }
             UserVO userInfo = userMapper.getUserInfo(paramVo);
