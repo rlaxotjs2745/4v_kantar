@@ -20,5 +20,6 @@ public class FilterVO extends BaseVO {
     private String tp2;
     private String tp3;
     private String tp4;
+    private String tp5; // 키워드 필터
     List<FilterDataVO> filterDataList;
 }

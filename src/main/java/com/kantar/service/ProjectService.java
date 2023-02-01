@@ -213,17 +213,18 @@ public class ProjectService {
             String[] ty2;
             String[] ty3;
             String[] ty4;
-            //String[] ty5;
+            String[] ty5 = null;
 
-            if(StringUtils.isNotEmpty(filterVO.getTp1())){ ty1 = filterVO.getTp1().split("//");} else { return; }
-            if(StringUtils.isNotEmpty(filterVO.getTp2())){ ty2 = filterVO.getTp2().split("//");} else { return; }
-            if(StringUtils.isNotEmpty(filterVO.getTp3())){ ty3 = filterVO.getTp3().split("//");} else { return; }
-            if(StringUtils.isNotEmpty(filterVO.getTp2())){ ty4 = filterVO.getTp4().split("//");} else { return; }
-            //if(StringUtils.isNotEmpty(filterVO.getTp2())){ ty5 = filterVO.getTp5().split("//");} else { return; }
+            if(StringUtils.isNotEmpty(filterVO.getTp1())){ ty1 = filterVO.getTp1().split("//");} else { return; } // 화자
+            if(StringUtils.isNotEmpty(filterVO.getTp2())){ ty2 = filterVO.getTp2().split("//");} else { return; } // 챕터
+            if(StringUtils.isNotEmpty(filterVO.getTp3())){ ty3 = filterVO.getTp3().split("//");} else { return; } // 서브챕터
+            if(StringUtils.isNotEmpty(filterVO.getTp4())){ ty4 = filterVO.getTp4().split("//");} else { return; } // 질문
+            if(StringUtils.isNotEmpty(filterVO.getTp5())){ ty5 = filterVO.getTp5().split("//");} // 키워드
 
             List<ProjectVO> prs = reportMapper.getReportFileListOne(paramVo);
             int data_cnt = 0;
 
+            //화자+키워드 전체요약문
             for(ProjectVO prs0 : prs){
                 String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
 
@@ -237,23 +238,26 @@ public class ProjectService {
                 List<String[]> ers = excel.getCsvListData(_fpath);
                 int j = 0;
                 for(String[] _ers0 : ers){  // 줄
-                    if(j>0){
-                        int i = 0;
-                        SumtextVO _elist = new SumtextVO();
-                        for(String _ers00 : _ers0){ // 컬럼
-                            if(i==3){
-                                _elist.setSpeaker(_ers00.toString());
+                    for (String ty1_f : ty1) {
+                        if (j > 0) {
+                            SumtextVO _elist = new SumtextVO();
+                            if (StringUtils.isEmpty(filterVO.getTp5()) && _ers0[3].equals(ty1_f)) {
+                                _elist.setSpeaker(_ers0[3].toString());
+                                _elist.setText(_ers0[4].toString());
+                                _data.add(_elist);
+                            } else if(_ers0[3].equals(ty1_f)) {
+                                for (String keyword_f : ty5) {
+                                    if (_ers0[4].contains(keyword_f)) {
+                                        _elist.setSpeaker(_ers0[3].toString());
+                                        _elist.setText(_ers0[4].toString());
+                                        _data.add(_elist);
+                                    }
+                                }
                             }
-                            if(i==4){
-                                _elist.setText(_ers00.toString());
-                            }
-                            i++;
                         }
-                        _data.add(_elist);
                     }
                     j++;
                 }
-
                 params.setText(_data);
 
                 _nlp0.put("enable",true);
@@ -269,6 +273,7 @@ public class ProjectService {
                 // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
                 // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
                 params.setNlpConfig(_nlp);
+
                 String pp = new Gson().toJson(params);
                 ProjectVO param = summary.getSummary(pp, "전체 요약문");
 
@@ -299,7 +304,7 @@ public class ProjectService {
                     _msg = "리포트 생성을 실패하였습니다.";
                 }
 
-                for (String ty2_f : ty2) { // 챕터 요약문
+                for (String ty2_f : ty2) { // 화자+키워드+챕터 요약문
                     List<SumtextVO> chapter_data = new ArrayList<SumtextVO>();
                     SummaryVO params02 = new SummaryVO();
                     ers = excel.getCsvListData(_fpath);
@@ -307,12 +312,23 @@ public class ProjectService {
                     for(String[] _ers0 : ers){
                         for (String ty1_f : ty1) {
                             if(j>0){
-                                if(_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f)){
-                                    SumtextVO _elist = new SumtextVO();
-                                    _elist.setSpeaker(_ers0[3].toString());
-                                    _elist.setText(_ers0[4].toString());
-                                    chapter_data.add(_elist);
-                                    data_cnt++;
+                                SumtextVO _elist = new SumtextVO();
+                                if(StringUtils.isEmpty(filterVO.getTp5())){
+                                    if(_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f)){
+                                        _elist.setSpeaker(_ers0[3].toString());
+                                        _elist.setText(_ers0[4].toString());
+                                        chapter_data.add(_elist);
+                                        data_cnt++;
+                                    }
+                                } else if(_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f)){
+                                    for(String keyword_f : ty5) {
+                                        if(_ers0[4].contains(keyword_f)){
+                                            _elist.setSpeaker(_ers0[3].toString());
+                                            _elist.setText(_ers0[4].toString());
+                                            chapter_data.add(_elist);
+                                            data_cnt++;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -358,7 +374,7 @@ public class ProjectService {
 
                     }
 
-                    for (String ty3_f : ty3) { //서브챕터 요약문
+                    for (String ty3_f : ty3) { //화자+키워드+서브챕터 요약문
                         data_cnt = 0;
                         List<SumtextVO> subChap_data = new ArrayList<SumtextVO>();
                         SummaryVO params03 = new SummaryVO();
@@ -367,12 +383,23 @@ public class ProjectService {
                         for(String[] _ers0 : ers){  // 줄
                             for (String ty1_f : ty1) {
                                 if (j > 0) {
-                                    if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
-                                        SumtextVO _elist = new SumtextVO();
-                                        _elist.setSpeaker(_ers0[3].toString());
-                                        _elist.setText(_ers0[4].toString());
-                                        subChap_data.add(_elist);
-                                        data_cnt++;
+                                    SumtextVO _elist = new SumtextVO();
+                                    if(StringUtils.isEmpty(filterVO.getTp5())){
+                                        if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
+                                            _elist.setSpeaker(_ers0[3].toString());
+                                            _elist.setText(_ers0[4].toString());
+                                            subChap_data.add(_elist);
+                                            data_cnt++;
+                                        }
+                                    } else if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
+                                        for(String keyword_f : ty5) {
+                                            if(_ers0[4].contains(keyword_f)){
+                                                _elist.setSpeaker(_ers0[3].toString());
+                                                _elist.setText(_ers0[4].toString());
+                                                subChap_data.add(_elist);
+                                                data_cnt++;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -419,7 +446,7 @@ public class ProjectService {
                             }
                         }
 
-                        for (String ty4_f : ty4) { // 질문 요약문
+                        for (String ty4_f : ty4) { // 화자+키워드+질문 요약문
                             data_cnt = 0;
                             List<SumtextVO> quest_data = new ArrayList<SumtextVO>();
                             SummaryVO params04 = new SummaryVO();
@@ -428,12 +455,23 @@ public class ProjectService {
                             for (String[] _ers0 : ers) {  // 줄
                                 for (String ty1_f : ty1) {
                                     if (j > 0) {
-                                        if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
-                                            SumtextVO _elist = new SumtextVO();
-                                            _elist.setSpeaker(_ers0[3].toString());
-                                            _elist.setText(_ers0[4].toString());
-                                            quest_data.add(_elist);
-                                            data_cnt++;
+                                        SumtextVO _elist = new SumtextVO();
+                                        if(StringUtils.isEmpty(filterVO.getTp5())){
+                                            if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
+                                                _elist.setSpeaker(_ers0[3].toString());
+                                                _elist.setText(_ers0[4].toString());
+                                                quest_data.add(_elist);
+                                                data_cnt++;
+                                            }
+                                        } else if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
+                                            for(String keyword_f : ty5) {
+                                                if(_ers0[4].contains(keyword_f)){
+                                                    _elist.setSpeaker(_ers0[3].toString());
+                                                    _elist.setText(_ers0[4].toString());
+                                                    quest_data.add(_elist);
+                                                    data_cnt++;
+                                                }
+                                            }
                                         }
                                     }
                                 }
