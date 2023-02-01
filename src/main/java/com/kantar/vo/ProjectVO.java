@@ -31,6 +31,7 @@ public class ProjectVO extends BaseVO {
     private Integer report_seq;
     private String report_id;
     private String filter_tp;
+    private String keywords;
     List<ReportVO> reportList;
 
     private String project_merge_idx;

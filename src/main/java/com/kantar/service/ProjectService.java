@@ -97,16 +97,16 @@ public class ProjectService {
                 _nlp0.put("outputSizeOption","small");
 
                 _nlp1.put("enable",true);
-                _nlp1.put("maxCount","small");
+                _nlp1.put("maxCount","30");
 
                 _nlp2.put("enable",true);
 
                 _nlp.put("summary",_nlp0);
-                // _nlp.put("keywordExtraction",_nlp1);
-                // _nlp.put("sentimentAnalysis",_nlp2);
+                // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
                 params.setNlpConfig(_nlp);
                 String pp = new Gson().toJson(params);
-                ProjectVO param = summary.getSummary(pp);
+                ProjectVO param = summary.getSummary(pp, "전체 요약문");
                 if(StringUtils.isNotEmpty(param.getTitle())){
                     ProjectVO ridx = reportMapper.getReportIdx(paramVo);
                     Integer ridx0 = 0;
