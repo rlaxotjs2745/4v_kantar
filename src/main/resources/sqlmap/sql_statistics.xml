@@ -3,7 +3,7 @@
 
 <mapper namespace="com.kantar.mapper.StatisticsMapper">
     <select id="getFileCount" resultType="long">
-        SELECT count(1) FROM KT_FILE_STATISTICS
+        SELECT count(file_cnt) FROM KT_FILE_STATISTICS
     </select>
 
     <select id="getAllFileWordCnt" resultType="long">
