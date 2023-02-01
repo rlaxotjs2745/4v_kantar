@@ -29,4 +29,6 @@ public interface ReportMapper {
     public List<ProjectVO> getReportList(ProjectVO paramVo) throws Exception;
 
     public List<ProjectVO> getReportFilterList(ProjectVO paramVo) throws Exception;
+
+    public List<ProjectVO> getReportFileListOne(ProjectVO paramVo) throws Exception;
 }
