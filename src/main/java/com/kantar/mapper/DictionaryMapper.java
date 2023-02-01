@@ -31,4 +31,6 @@ public interface DictionaryMapper {
     public List<DictionaryDataVO> getDictionaryDataByKeyword(String keyword, Integer idx_dictionary) throws Exception;
 
     public List<DictionaryVO> getDictionaryByTitle(String title) throws Exception;
+
+    public List<DictionaryDataVO> getBulkDictionaryData(List<Integer> idx_dictionary) throws Exception;
 }

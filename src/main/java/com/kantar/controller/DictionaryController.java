@@ -320,5 +320,25 @@ public class DictionaryController extends BaseController {
         }
     }
 
+    @PostMapping("/get_bulk_dictionary_data")
+    public CommonResult getBulkDictionaryData(HttpServletRequest req, @RequestBody List<Integer> paramVo) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            UserVO userInfo = userMapper.getUserInfo(uinfo);
+            if(userInfo == null){
+                return responseService.getFailResult("get_bulk_dictionary_data","유저 정보를 찾을 수 없습니다.");
+            }
+            List<DictionaryDataVO> dictionaryDataVOList = dictionaryMapper.getBulkDictionaryData(paramVo);
+            if(dictionaryDataVOList != null && !dictionaryDataVOList.isEmpty()){
+                return responseService.getSuccessResult(dictionaryDataVOList, "get_bulk_dictionary_data", "사전 키워드 불러오기 성공");
+            } else {
+                return responseService.getFailResult("get_bulk_dictionary_data","불러올 수 있는 키워드가 없습니다.");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            return responseService.getFailResult("get_bulk_dictionary_data","오류가 발생하였습니다.");
+        }
+    }
+
 
 }

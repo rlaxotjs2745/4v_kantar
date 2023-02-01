@@ -18,7 +18,9 @@
         <if test="title neq null">
             AND title LIKE '%${title}%'
         </if>
-        LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+        <if test="recordCountPerPage neq 99999"> -- recordCountPerPage 99999일 경우 전체 가져옴
+            LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+        </if>
     </select>
 
     <select id="getDictionary" resultType="com.kantar.vo.DictionaryVO">
@@ -138,5 +140,13 @@
 
     <select id="getDictionaryByTitle" resultType="com.kantar.vo.DictionaryVO">
         SELECT * FROM KT_DICTIONARY WHERE title = #{title}
+    </select>
+
+    <select id="getBulkDictionaryData" resultType="com.kantar.vo.DictionaryDataVO">
+        SELECT * FROM KT_DICTIONARY_DATA
+        WHERE idx_dictionary IN
+        <foreach collection="idx_dictionary" open="(" close=")" separator="," item="idx">
+            #{idx}
+        </foreach>
     </select>
 </mapper>
