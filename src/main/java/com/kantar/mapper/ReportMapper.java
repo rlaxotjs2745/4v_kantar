@@ -2,6 +2,7 @@ package com.kantar.mapper;
 
 import java.util.List;
 
+import com.kantar.vo.ReportFilterKeywordVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kantar.vo.ProjectVO;
@@ -31,4 +32,8 @@ public interface ReportMapper {
     public List<ProjectVO> getReportFilterList(ProjectVO paramVo) throws Exception;
 
     public List<ProjectVO> getReportFileListOne(ProjectVO paramVo) throws Exception;
+
+    public void createReportFilterData(ReportFilterKeywordVO reKeywords) throws Exception;
+
+    public Integer findReportKeyword(ReportFilterKeywordVO reKeywords) throws Exception;
 }

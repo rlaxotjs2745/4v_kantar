@@ -35,4 +35,5 @@ public class ProjectVO extends BaseVO {
     List<ReportVO> reportList;
 
     private String project_merge_idx;
+    private String[] summary_keywords;
 }

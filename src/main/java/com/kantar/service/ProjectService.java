@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import com.kantar.mapper.FilterMapper;
 import com.kantar.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ import jakarta.servlet.http.HttpServletRequest;
 public class ProjectService {
     @Autowired
     private ReportMapper reportMapper;
+
+    @Autowired
+    private FilterMapper filterMapper;
 
     @Autowired
     private Excel excel;
@@ -217,11 +221,16 @@ public class ProjectService {
             String[] ty4;
             String[] ty5 = null;
 
-            if(StringUtils.isNotEmpty(filterVO.getTp1())){ ty1 = filterVO.getTp1().split("//");} else { return; } // 화자
+            ReportFilterKeywordVO rf = new ReportFilterKeywordVO();
+            List<String[]> summ_keywords = new ArrayList<>();
+
+            if(StringUtils.isNotEmpty(filterVO.getTp1())){ ty1 = filterVO.getTp1().split("//"); rf.setSpeaker(ty1); } else { return; } // 화자
             if(StringUtils.isNotEmpty(filterVO.getTp2())){ ty2 = filterVO.getTp2().split("//");} else { return; } // 챕터
             if(StringUtils.isNotEmpty(filterVO.getTp3())){ ty3 = filterVO.getTp3().split("//");} else { return; } // 서브챕터
             if(StringUtils.isNotEmpty(filterVO.getTp4())){ ty4 = filterVO.getTp4().split("//");} else { return; } // 질문
-            if(StringUtils.isNotEmpty(filterVO.getTp5())){ ty5 = filterVO.getTp5().split("//");} // 키워드
+            if(StringUtils.isNotEmpty(filterVO.getTp5())){ ty5 = filterVO.getTp5().split("//"); rf.setDic_keywords(ty5);} // 사전키워드
+
+            Boolean _isDicKey = StringUtils.isEmpty(filterVO.getTp5());
 
             List<ProjectVO> prs = reportMapper.getReportFileListOne(paramVo);
             int data_cnt = 0;
@@ -244,13 +253,13 @@ public class ProjectService {
                         for (String ty1_f : ty1) {
                             if (j > 0) {
                                 SumtextVO _elist = new SumtextVO();
-                                if (StringUtils.isEmpty(filterVO.getTp5()) && _ers0[3].equals(ty1_f)) {
+                                if (_isDicKey && _ers0[3].equals(ty1_f)) {
                                     _elist.setSpeaker(_ers0[3].toString());
                                     _elist.setText(_ers0[4].toString());
                                     _data.add(_elist);
                                 } else if(_ers0[3].equals(ty1_f)) {
-                                    for (String keyword_f : ty5) {
-                                        if (_ers0[4].contains(keyword_f)) {
+                                    for (String dic_key : ty5) {
+                                        if (_ers0[4].contains(dic_key)) {
                                             _elist.setSpeaker(_ers0[3].toString());
                                             _elist.setText(_ers0[4].toString());
                                             _data.add(_elist);
@@ -296,7 +305,11 @@ public class ProjectService {
                             paramVo.setSummary0(param.getSummary0());
                             paramVo.setTitle(param.getTitle());
                             reportMapper.saveReportData(paramVo);
+                            if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
+                                summ_keywords.add(param.getSummary_keywords());
+                            }
                             statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+
                             if(StringUtils.isNotEmpty(_token)){
                                 _msg = "필터 리포트가 생성되었습니다.";
                             }
@@ -318,7 +331,7 @@ public class ProjectService {
                                 for (String ty1_f : ty1) {
                                     if(j>0){
                                         SumtextVO _elist = new SumtextVO();
-                                        if(StringUtils.isEmpty(filterVO.getTp5())){
+                                        if(_isDicKey){
                                             if(_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f)){
                                                 _elist.setSpeaker(_ers0[3].toString());
                                                 _elist.setText(_ers0[4].toString());
@@ -326,8 +339,8 @@ public class ProjectService {
                                                 data_cnt++;
                                             }
                                         } else if(_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f)){
-                                            for(String keyword_f : ty5) {
-                                                if(_ers0[4].contains(keyword_f)){
+                                            for(String dic_key : ty5) {
+                                                if(_ers0[4].contains(dic_key)){
                                                     _elist.setSpeaker(_ers0[3].toString());
                                                     _elist.setText(_ers0[4].toString());
                                                     chapter_data.add(_elist);
@@ -369,7 +382,11 @@ public class ProjectService {
                                     paramVo.setSummary0(param.getSummary0());
                                     paramVo.setTitle(param.getTitle());
                                     reportMapper.saveReportData(paramVo);
+                                    if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
+                                        summ_keywords.add(param.getSummary_keywords());
+                                    }
                                     statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+
                                     if(StringUtils.isNotEmpty(_token)){
                                         _msg = "챕터 요약이 생성되었습니다.";
                                     }
@@ -391,7 +408,7 @@ public class ProjectService {
                                         for (String ty1_f : ty1) {
                                             if (j > 0) {
                                                 SumtextVO _elist = new SumtextVO();
-                                                if(StringUtils.isEmpty(filterVO.getTp5())){
+                                                if(_isDicKey){
                                                     if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
                                                         _elist.setSpeaker(_ers0[3].toString());
                                                         _elist.setText(_ers0[4].toString());
@@ -399,8 +416,8 @@ public class ProjectService {
                                                         data_cnt++;
                                                     }
                                                 } else if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
-                                                    for(String keyword_f : ty5) {
-                                                        if(_ers0[4].contains(keyword_f)){
+                                                    for(String dic_key : ty5) {
+                                                        if(_ers0[4].contains(dic_key)){
                                                             _elist.setSpeaker(_ers0[3].toString());
                                                             _elist.setText(_ers0[4].toString());
                                                             subChap_data.add(_elist);
@@ -444,7 +461,11 @@ public class ProjectService {
                                             paramVo.setSummary0(param.getSummary0());
                                             paramVo.setTitle(param.getTitle());
                                             reportMapper.saveReportData(paramVo);
+                                            if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
+                                                summ_keywords.add(param.getSummary_keywords());
+                                            }
                                             statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+
                                             if(StringUtils.isNotEmpty(_token)){
                                                 _msg = "서브챕터 요약이 생성되었습니다.";
                                             }
@@ -466,7 +487,7 @@ public class ProjectService {
                                                 for (String ty1_f : ty1) {
                                                     if (j > 0) {
                                                         SumtextVO _elist = new SumtextVO();
-                                                        if(StringUtils.isEmpty(filterVO.getTp5())){
+                                                        if(_isDicKey){
                                                             if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
                                                                 _elist.setSpeaker(_ers0[3].toString());
                                                                 _elist.setText(_ers0[4].toString());
@@ -474,8 +495,8 @@ public class ProjectService {
                                                                 data_cnt++;
                                                             }
                                                         } else if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
-                                                            for(String keyword_f : ty5) {
-                                                                if(_ers0[4].contains(keyword_f)){
+                                                            for(String dic_key : ty5) {
+                                                                if(_ers0[4].contains(dic_key)){
                                                                     _elist.setSpeaker(_ers0[3].toString());
                                                                     _elist.setText(_ers0[4].toString());
                                                                     quest_data.add(_elist);
@@ -519,7 +540,11 @@ public class ProjectService {
                                                     paramVo.setSummary0(param.getSummary0());
                                                     paramVo.setTitle(param.getTitle());
                                                     reportMapper.saveReportData(paramVo);
+                                                    if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
+                                                        summ_keywords.add(param.getSummary_keywords());
+                                                    }
                                                     statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+
                                                     if(StringUtils.isNotEmpty(_token)){
                                                         _msg = "질문 요약이 생성되었습니다.";
                                                     }
@@ -535,6 +560,7 @@ public class ProjectService {
                             }
                         } // 챕터
                     }
+                    saveSummaryKeyword(paramVo, summ_keywords);
                 } // 전체
             } else {
                 _msg = "리포트 필터 옵션을 다시 선택해주세요.";
@@ -544,6 +570,54 @@ public class ProjectService {
             _msg = "리포트 생성을 실패하였습니다.";
             if(StringUtils.isNotEmpty(_token)){
                 // kafkaSender.send(_token, _msg);
+            }
+        }
+    }
+
+    /**
+     * 요약문 키워드 저장
+     * @param param
+     */
+    private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword) throws Exception {
+
+        List<ProjectVO> prs = reportMapper.getReportFileListOne(param);
+        if(s_keyword.size()>0){
+            for(ProjectVO prs0 : prs) {
+                String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
+
+                ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
+                reKeywords.setIdx_report(param.getIdx_report());
+                reKeywords.setKeytype(0); // 임시작성 향후 수정 필요
+
+                for (String[] keywords : s_keyword) {
+                    for (String key : keywords) {
+                        reKeywords.setSum_keyword(key);
+                        List<String[]> ers = excel.getCsvListData(_fpath);
+
+                        int j = 0;
+                        int count = 0;
+                        for(String[] _ers0 : ers){
+                            if (j > 0) {
+                                int index = 0;
+                                while (index >= 0) {
+                                    index = _ers0[4].indexOf(key, index);
+                                    if (index >= 0) {
+                                        count++;
+                                        index += key.length();
+                                    }
+                                }
+                            }
+                            j++;
+                        }
+
+                        int _findkey = reportMapper.findReportKeyword(reKeywords);
+                        reKeywords.setKeycount(count);
+
+                        if(count>0 && _findkey==0){
+                            reportMapper.createReportFilterData(reKeywords);
+                        }
+                    }
+                }
             }
         }
     }

@@ -80,4 +80,11 @@
         SELECT DISTINCT filepath, `filename` FROM KT_REPORT WHERE idx_project=#{idx_project}
     </select>
 
+    <insert id="createReportFilterData" parameterType="com.kantar.vo.ReportFilterKeywordVO">
+        INSERT INTO KT_REPORT_KEYWORD (idx_report, keyword, keytype, keycount, create_dt) VALUES (#{idx_report}, #{sum_keyword}, #{keytype}, #{keycount}, SYSDATE())
+    </insert>
+
+    <select id="findReportKeyword" resultType="Integer">
+        SELECT count(*) FROM KT_REPORT_KEYWORD WHERE idx_report=#{idx_report} AND keyword = #{sum_keyword}
+    </select>
 </mapper>
