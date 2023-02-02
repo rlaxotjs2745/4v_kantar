@@ -314,7 +314,7 @@ public class ProjectService {
                                 _msg = "필터 리포트가 생성되었습니다.";
                             }
                         }else{
-                            _msg = "리포트 생성을 실패하였습니다.";
+                            _msg = "리포트 정보 저장을 실패하였습니다.";
                         }
                     }else{
                         _msg = "리포트 생성을 실패하였습니다.";
@@ -577,6 +577,7 @@ public class ProjectService {
     /**
      * 요약문 키워드 저장
      * @param param
+     * @param s_keyword
      */
     private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword) throws Exception {
 

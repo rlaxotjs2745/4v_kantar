@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.kantar.service.StatisticsService;
+import com.kantar.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +29,6 @@ import com.kantar.model.CommonResult;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
 import com.kantar.util.TokenJWT;
-import com.kantar.vo.ProjectVO;
-import com.kantar.vo.ReportVO;
-import com.kantar.vo.UserVO;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -347,7 +345,7 @@ public class ReportController extends BaseController {
                 String[] _mergeIdx = paramVo.getProject_merge_idx().split(",");
 
                 m0.setIdx_project(Integer.valueOf(String.valueOf(_mergeIdx[0])));
-                List<ProjectVO> prs = reportMapper.getReportFileList(m0);
+                List<ProjectVO> prs = reportMapper.getReportFileListOne(m0);
 
                 String fileName = prs.get(0).getFilename();
                 String fileNameEx = fileName.substring(0, fileName.lastIndexOf('.'));
@@ -422,6 +420,40 @@ public class ReportController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             return responseService.getFailResult("merge_report","오류가 발생하였습니다.");
+        }
+    }
+
+    @PostMapping("/save_filter_report")
+    @Transactional
+    public CommonResult test_report(HttpServletRequest req, @RequestBody ReportFilterDataVO filterVO) throws Exception {
+        String _token = tokenJWT.resolveToken(req);
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("save_filter_report","로그인이 필요합니다.");
+            }
+
+            filterVO.setIdx_user(uinfo.getIdx_user());
+
+            if(StringUtils.isEmpty(filterVO.getReport_name())){
+                return responseService.getFailResult("save_filter_report","리포트 이름을 입력해주세요.");
+            }
+
+            if(filterVO.getIdx_project()==null || filterVO.getIdx_project_job_projectid()==null){
+                return responseService.getFailResult("save_filter_report","프로젝트 정보를 다시 확인해주세요");
+            }
+
+            if(filterVO.getFilter_op1()==null){
+                return responseService.getFailResult("save_filter_report","필터 유형을 다시 확인해주세요");
+            }
+
+            projectService.list_reportfilter(_token, filterVO);
+
+            return responseService.getSuccessResult("test_report", "필터 리포트 생성을 시작하였습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("test_report","오류가 발생하였습니다.");
         }
     }
 
