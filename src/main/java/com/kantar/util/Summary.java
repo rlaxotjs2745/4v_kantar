@@ -22,10 +22,14 @@ public class Summary {
 			Map<String, String[]> _rss = new Gson().fromJson(_rs, new TypeToken<Map<String, String[]>>(){}.getType());
 			String[] _rsss = _rss.get("summaries");
 			String[] _rskey = _rss.get("keywords");
+
 			paramVo.setTitle(_title);
 			paramVo.setSummary0(_rsss[0]);
-			paramVo.setKeywords(_rskey[0]);
-			System.out.println(_rskey[0]);
+			if(_rskey!=null){
+				paramVo.setKeywords(_rskey[0]);
+			} else {
+				paramVo.setKeywords("");
+			}
 		}else{
 			paramVo.setTitle("");
 			paramVo.setSummary0("");

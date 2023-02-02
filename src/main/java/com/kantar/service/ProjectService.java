@@ -266,15 +266,15 @@ public class ProjectService {
                     _nlp0.put("enable",true);
                     _nlp0.put("model","dialogue");
                     _nlp0.put("outputSizeOption","small");
+                    _nlp.put("summary",_nlp0);
 
                     _nlp1.put("enable",true);
-                    _nlp1.put("maxCount","30");
+                    _nlp1.put("maxCount",30);
+                    _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+
 
                     _nlp2.put("enable",true);
-
-                    _nlp.put("summary",_nlp0);
-                    // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
-                    // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                    _nlp.put("sentimentAnalysis",_nlp2);     // default : true
                     params.setNlpConfig(_nlp);
 
                     String pp = new Gson().toJson(params);
@@ -353,11 +353,11 @@ public class ProjectService {
                                 _nlp.put("summary",_nlp0);
 
                                 _nlp1.put("enable",true);
-                                _nlp1.put("maxCount","30");
-                                //_nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                                _nlp1.put("maxCount",30);
+                                _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
 
                                 _nlp2.put("enable",true);
-                                //_nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                                _nlp.put("sentimentAnalysis",_nlp2);     // default : true
 
                                 params02.setNlpConfig(_nlp);
 
@@ -427,12 +427,12 @@ public class ProjectService {
 
 
                                         _nlp1.put("enable",true);
-                                        _nlp1.put("maxCount","30");
-                                        //_nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                                        _nlp1.put("maxCount",30);
+                                        _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
 
 
                                         _nlp2.put("enable",true);
-                                        //_nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                                        _nlp.put("sentimentAnalysis",_nlp2);     // default : true
 
                                         params02.setNlpConfig(_nlp);
 
@@ -502,12 +502,12 @@ public class ProjectService {
 
 
                                                 _nlp1.put("enable", true);
-                                                _nlp1.put("maxCount", "30");
-                                                //_nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                                                _nlp1.put("maxCount", 30);
+                                                _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
 
 
                                                 _nlp2.put("enable", true);
-                                                //_nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                                                _nlp.put("sentimentAnalysis",_nlp2);     // default : true
 
                                                 params02.setNlpConfig(_nlp);
 
