@@ -48,24 +48,19 @@ public class StatisticsController extends BaseController {
     @Autowired
     private TokenJWT tokenJWT;
 
-    @Value("${spring.smr.token}")
-    public String smrtoken;
-
     /**
      * 시스템 사용 현황
-     * @param paramVo
      * @return CommonResult
      * @throws Exception
      */
     @PostMapping("/system_statistics")
-    public CommonResult getSystemList(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
-        try{
+    public CommonResult getSystemList(HttpServletRequest req) throws Exception {
+        try {
             UserVO uinfo = getChkUserLogin(req);
-
-            if(uinfo==null){
-                return responseService.getFailResult("system_statistics","로그인이 필요합니다.");
+            if(uinfo == null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
             }
-            if(uinfo.getUser_type() == 1){
+            if(uinfo.getRole_type() == 1){
                 return responseService.getFailResult("system_statistics","관리자만 조회 가능한 기능힙니다.");
             }
 
@@ -82,19 +77,17 @@ public class StatisticsController extends BaseController {
 
     /**
      * API 사용량 회원 목록
-     * @param paramVo
      * @return CommonResult
      * @throws Exception
      */
     @PostMapping("/api_user")
-    public CommonResult apiUserList(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
+    public CommonResult apiUserList(HttpServletRequest req) throws Exception {
         try{
             UserVO uinfo = getChkUserLogin(req);
-
             if(uinfo==null){
-                return responseService.getFailResult("api_user","로그인이 필요합니다.");
+                return responseService.getFailResult("login","로그인이 필요합니다.");
             }
-            if(uinfo.getUser_type() == 1){
+            if(uinfo.getRole_type() == 1){
                 return responseService.getFailResult("api_user","관리자만 조회 가능한 기능힙니다.");
             }
 
@@ -118,11 +111,10 @@ public class StatisticsController extends BaseController {
     public CommonResult apiStatisticsByUser(HttpServletRequest req, @RequestBody StatisticsVO paramVo) throws Exception {
         try{
             UserVO uinfo = getChkUserLogin(req);
-
             if(uinfo==null){
-                return responseService.getFailResult("api_statistics","로그인이 필요합니다.");
+                return responseService.getFailResult("login","로그인이 필요합니다.");
             }
-            if(uinfo.getUser_type() == 1){
+            if(uinfo.getRole_type() == 1){
                 return responseService.getFailResult("api_statistics","관리자만 조회 가능한 기능힙니다.");
             }
 
@@ -131,6 +123,8 @@ public class StatisticsController extends BaseController {
             double user_data = statisticsMapper.getApiDataByUser(paramVo);
             long total_api = statisticsMapper.getApiStatisticsByUser();
             long user_api = statisticsMapper.getApiStatisticsByUser(paramVo);
+            //long total_keyword = statisticsMapper.getKeywordStatisticsByUser();
+            //long user_keyword = statisticsMapper.getKeywordStatisticsByUser(paramVo);
 
             result.put("total_data", total_data);
             result.put("user_data", user_data);
