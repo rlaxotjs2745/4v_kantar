@@ -91,6 +91,21 @@
         </if>
     </select>
 
+    <select id="getKeywordStatisticsByUser" resultType="long">
+        SELECT NVL(sum(keywordUsage),0) as keywordUsage
+        FROM KT_API_STATISTICS
+        WHERE report_status != 99
+        <if test="idx_user != null">
+            AND idx_user = #{idx_user}
+        </if>
+        <if test="startDate != null">
+            AND create_dt <![CDATA[>=]]> date_format(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null">
+            AND create_dt <![CDATA[<]]> date_format(date_add(#{endDate}, INTERVAL 1 DAY), '%Y-%m-%d')
+        </if>
+    </select>
+
     <select id="getApiDataByUser" resultType="Double">
         SELECT NVL(ROUND(SUM(data_length + index_length) / 1024 / 1024, 3),0) AS dataUsage
         FROM information_schema.tables A, KT_REPORT B, KT_API_STATISTICS C

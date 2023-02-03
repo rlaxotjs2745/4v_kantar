@@ -111,6 +111,7 @@ public class StatisticsController extends BaseController {
     public CommonResult apiStatisticsByUser(HttpServletRequest req, @RequestBody StatisticsVO paramVo) throws Exception {
         try{
             UserVO uinfo = getChkUserLogin(req);
+
             if(uinfo==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
@@ -123,15 +124,15 @@ public class StatisticsController extends BaseController {
             double user_data = statisticsMapper.getApiDataByUser(paramVo);
             long total_api = statisticsMapper.getApiStatisticsByUser();
             long user_api = statisticsMapper.getApiStatisticsByUser(paramVo);
-            //long total_keyword = statisticsMapper.getKeywordStatisticsByUser();
-            //long user_keyword = statisticsMapper.getKeywordStatisticsByUser(paramVo);
+            long total_keyword = statisticsMapper.getKeywordStatisticsByUser();
+            long user_keyword = statisticsMapper.getKeywordStatisticsByUser(paramVo);
 
             result.put("total_data", total_data);
             result.put("user_data", user_data);
             result.put("total_summary", total_api);
             result.put("user_summary", user_api);
-            result.put("total_keyword", 1);
-            result.put("user_keyword", 1);
+            result.put("total_keyword", total_keyword);
+            result.put("user_keyword", user_keyword);
 
             return responseService.getSuccessResult(result, "api_statistics", "API 사용량을 전달합니다");
 

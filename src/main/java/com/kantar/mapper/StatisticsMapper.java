@@ -42,4 +42,8 @@ public interface StatisticsMapper {
     double getApiDataByUser() throws Exception;
 
     double getApiDataByUser(StatisticsVO userInfo) throws Exception;
+
+    long getKeywordStatisticsByUser() throws Exception;
+
+    long getKeywordStatisticsByUser(StatisticsVO userInfo) throws Exception;
 }

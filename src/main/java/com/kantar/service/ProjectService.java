@@ -307,7 +307,7 @@ public class ProjectService {
                             if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
                                 summ_keywords.add(param.getSummary_keywords());
                             }
-                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
 
                             if(StringUtils.isNotEmpty(_token)){
                                 _msg = "필터 리포트가 생성되었습니다.";
@@ -589,6 +589,8 @@ public class ProjectService {
                 reKeywords.setIdx_report(param.getIdx_report());
                 reKeywords.setKeytype(0); // 임시작성. 향후 추가구현 필요
 
+                int total_count = 0;
+
                 for (String[] keywords : s_keyword) {
                     for (String key : keywords) {
                         reKeywords.setSum_keyword(key);
@@ -614,10 +616,13 @@ public class ProjectService {
                         reKeywords.setKeycount(count);
 
                         if(count>0 && _findkey==0){
-                            reportMapper.createReportFilterData(reKeywords);
+                            int apiUse = reKeywords.getSum_keyword().length() * count;
+                            reportMapper.createReportFilterData(reKeywords); // api 사용량 집계(요약문)
+                            total_count += apiUse;
                         }
                     }
                 }
+                statisticsService.createAPIUsage(param, 2, total_count);
             }
         }
     }
