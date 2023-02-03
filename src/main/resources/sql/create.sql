@@ -130,7 +130,7 @@ ENGINE=InnoDB
 
 
 CREATE TABLE `KT_REPORT_KEYWORD` (
-	`idx_report_keyword` BIGINT(20) NOT NULL DEFAULT '0',
+	`idx_report_keyword` BIGINT(20) NOT NULL AUTO_INCREMENT,
 	`idx_report` BIGINT(20) NOT NULL,
 	`keyword` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`keytype` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
