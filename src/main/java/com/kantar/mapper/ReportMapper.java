@@ -36,4 +36,10 @@ public interface ReportMapper {
     public void createReportFilterData(ReportFilterKeywordVO reKeywords) throws Exception;
 
     public Integer findReportKeyword(ReportFilterKeywordVO reKeywords) throws Exception;
+
+    List<ProjectVO> getReportDataViewAll(ProjectVO paramVo) throws Exception;
+
+    List<ReportFilterKeywordVO> getReportKeywordView(ProjectVO paramVo) throws Exception;
+
+    int getKeywordFindDictionary(String _keyword) throws Exception;
 }

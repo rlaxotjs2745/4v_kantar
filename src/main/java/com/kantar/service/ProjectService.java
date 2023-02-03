@@ -235,8 +235,7 @@ public class ProjectService {
             List<ProjectVO> prs = reportMapper.getReportFileListOne(paramVo);
             int data_cnt = 0;
 
-            if(filter_op1>0 && filter_op1<5){
-                //화자+키워드 전체요약문
+            if(filter_op1>0 && filter_op1<5){ //'화자+필터용 사전키워드'만 적용한 전체요약문
                 for(ProjectVO prs0 : prs){
                     String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
 
@@ -279,11 +278,11 @@ public class ProjectService {
 
                     _nlp1.put("enable",true);
                     _nlp1.put("maxCount",30);
-                    _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                    _nlp.put("keywordExtraction",_nlp1);
 
 
                     _nlp2.put("enable",true);
-                    _nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                    _nlp.put("sentimentAnalysis",_nlp2);
                     params.setNlpConfig(_nlp);
 
                     String pp = new Gson().toJson(params);
@@ -320,8 +319,8 @@ public class ProjectService {
                         _msg = "리포트 생성을 실패하였습니다.";
                     }
 
-                    if(filter_op1>1){
-                        for (String ty2_f : ty2) { // 화자+키워드+챕터 요약문
+                    if(filter_op1>1){ //'화자+필터용 사전키워드'+챕터 요약문
+                        for (String ty2_f : ty2) {
                             data_cnt = 0;
                             List<SumtextVO> chapter_data = new ArrayList<SumtextVO>();
                             SummaryVO params02 = new SummaryVO();
@@ -367,14 +366,13 @@ public class ProjectService {
 
                                 _nlp1.put("enable",true);
                                 _nlp1.put("maxCount",30);
-                                _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                                _nlp.put("keywordExtraction",_nlp1);
 
                                 _nlp2.put("enable",true);
-                                _nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                                _nlp.put("sentimentAnalysis",_nlp2);
 
                                 params02.setNlpConfig(_nlp);
 
-                                //summaries 추출
                                 pp = new Gson().toJson(params02);
                                 param = summary.getSummary(pp, "챕터 [" + ty2_f + "] 요약문");
 
@@ -385,7 +383,7 @@ public class ProjectService {
                                     if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
                                         summ_keywords.add(param.getSummary_keywords());
                                     }
-                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
 
                                     if(StringUtils.isNotEmpty(_token)){
                                         _msg = "챕터 요약이 생성되었습니다.";
@@ -398,13 +396,13 @@ public class ProjectService {
                             }
 
                             if(filter_op1>2){
-                                for (String ty3_f : ty3) { //화자+키워드+서브챕터 요약문
+                                for (String ty3_f : ty3) { //'화자+필터용 사전키워드'+챕터+서브챕터 요약문
                                     data_cnt = 0;
                                     List<SumtextVO> subChap_data = new ArrayList<SumtextVO>();
                                     SummaryVO params03 = new SummaryVO();
                                     ers = excel.getCsvListData(_fpath);
                                     j = 0;
-                                    for(String[] _ers0 : ers){  // 줄
+                                    for(String[] _ers0 : ers){
                                         for (String ty1_f : ty1) {
                                             if (j > 0) {
                                                 SumtextVO _elist = new SumtextVO();
@@ -445,11 +443,11 @@ public class ProjectService {
 
                                         _nlp1.put("enable",true);
                                         _nlp1.put("maxCount",30);
-                                        _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                                        _nlp.put("keywordExtraction",_nlp1);
 
 
                                         _nlp2.put("enable",true);
-                                        _nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                                        _nlp.put("sentimentAnalysis",_nlp2);
 
                                         params02.setNlpConfig(_nlp);
 
@@ -464,7 +462,7 @@ public class ProjectService {
                                             if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
                                                 summ_keywords.add(param.getSummary_keywords());
                                             }
-                                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+                                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
 
                                             if(StringUtils.isNotEmpty(_token)){
                                                 _msg = "서브챕터 요약이 생성되었습니다.";
@@ -477,13 +475,13 @@ public class ProjectService {
                                     }
 
                                     if(filter_op1>3){
-                                        for (String ty4_f : ty4) { // 화자+키워드+질문 요약문
+                                        for (String ty4_f : ty4) { //'화자+필터용 사전키워드'+챕터+서브챕터+질문 요약문
                                             data_cnt = 0;
                                             List<SumtextVO> quest_data = new ArrayList<SumtextVO>();
                                             SummaryVO params04 = new SummaryVO();
                                             ers = excel.getCsvListData(_fpath);
                                             j = 0;
-                                            for (String[] _ers0 : ers) {  // 줄
+                                            for (String[] _ers0 : ers) {
                                                 for (String ty1_f : ty1) {
                                                     if (j > 0) {
                                                         SumtextVO _elist = new SumtextVO();
@@ -524,11 +522,11 @@ public class ProjectService {
 
                                                 _nlp1.put("enable", true);
                                                 _nlp1.put("maxCount", 30);
-                                                _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                                                _nlp.put("keywordExtraction",_nlp1);
 
 
                                                 _nlp2.put("enable", true);
-                                                _nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                                                _nlp.put("sentimentAnalysis",_nlp2);
 
                                                 params02.setNlpConfig(_nlp);
 
@@ -543,7 +541,7 @@ public class ProjectService {
                                                     if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
                                                         summ_keywords.add(param.getSummary_keywords());
                                                     }
-                                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+                                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
 
                                                     if(StringUtils.isNotEmpty(_token)){
                                                         _msg = "질문 요약이 생성되었습니다.";
@@ -582,13 +580,14 @@ public class ProjectService {
     private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword) throws Exception {
 
         List<ProjectVO> prs = reportMapper.getReportFileListOne(param);
+
         if(s_keyword.size()>0){
             for(ProjectVO prs0 : prs) {
                 String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
 
                 ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
                 reKeywords.setIdx_report(param.getIdx_report());
-                reKeywords.setKeytype(0); // 임시작성 향후 수정 필요
+                reKeywords.setKeytype(0); // 임시작성. 향후 추가구현 필요
 
                 for (String[] keywords : s_keyword) {
                     for (String key : keywords) {

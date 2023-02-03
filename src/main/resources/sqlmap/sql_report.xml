@@ -29,6 +29,20 @@
         WHERE A.idx_report=#{idx}
     </select>
 
+    <select id="getReportDataViewAll" resultType="com.kantar.vo.ProjectVO">
+        SELECT B.title, B.summary0, LEFT(REPLACE(B.create_dt,'-','.'),16) AS create_dt, B.idx_report_data, A.idx_report
+        FROM KT_REPORT A
+            JOIN KT_REPORT_DATA B ON B.idx_report=A.idx_report
+        WHERE A.idx_report=#{idx}
+    </select>
+
+    <select id="getReportKeywordView" resultType="com.kantar.vo.ReportFilterKeywordVO">
+        SELECT A.idx_report, B.keyword AS sum_keyword, B.keytype, B.keycount
+        FROM KT_REPORT A
+                 JOIN KT_REPORT_KEYWORD B ON B.idx_report=A.idx_report
+        WHERE A.idx_report=#{idx}
+    </select>
+
     <select id="getReportFileList" resultType="com.kantar.vo.ProjectVO">
         SELECT filepath, `filename` FROM KT_REPORT WHERE idx_project=#{idx_project}
     </select>
@@ -87,4 +101,20 @@
     <select id="findReportKeyword" resultType="Integer">
         SELECT count(*) FROM KT_REPORT_KEYWORD WHERE idx_report=#{idx_report} AND keyword = #{sum_keyword}
     </select>
+
+    <select id="getReportCountByProject" resultType="Integer">
+        SELECT COUNT(1)
+        FROM KT_REPORT A
+                 JOIN KT_PROJECT_JOB_PROJECTID D ON D.idx_project_job_projectid=A.idx_project_job_projectid
+                 JOIN KT_PROJECT_JOB B ON B.idx_project_job=D.idx_project_job
+        WHERE CASE WHEN (SELECT user_type FROM KT_USER WHERE idx_user=#{idx_user})=1 THEN A.idx_user=#{idx_user} ELSE 1=1 END
+    </select>
+
+    <select id="getKeywordFindDictionary" resultType="Integer">
+        SELECT COUNT(1)
+        FROM KT_DICTIONARY_DATA A
+                 JOIN KT_REPORT_KEYWORD B ON A.keyword=B.keyword
+        WHERE A.keyword=#{keyword}
+    </select>
+
 </mapper>

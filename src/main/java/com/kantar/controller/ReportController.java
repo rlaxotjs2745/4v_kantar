@@ -273,10 +273,24 @@ public class ReportController extends BaseController {
             }
 
             ProjectVO rs0 = projectMapper.getProjectView(paramVo);
-            ProjectVO rs1 = reportMapper.getReportView(paramVo);
+            //ProjectVO rs1 = reportMapper.getReportView(paramVo); //기본리포트만 있을때
+            List<ProjectVO> rs1 = reportMapper.getReportDataViewAll(paramVo);
+
+            List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo);
+
+            if(key0.size()>0){
+                for (ReportFilterKeywordVO _keyword : key0) {
+                    int _dicCnt = reportMapper.getKeywordFindDictionary(_keyword.getSum_keyword());
+                    if (_dicCnt > 0){
+                        _keyword.setDic_yn(1);
+                    } else {  _keyword.setDic_yn(0);}
+                }
+            }
+
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("project",rs0);
             _data.put("report",rs1);
+            _data.put("keyword",key0);
             if(rs1!=null){
                 return responseService.getSuccessResult(_data, "report_view", "리포트 정보 성공");
             }else{

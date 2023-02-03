@@ -15,4 +15,5 @@ public class ReportFilterKeywordVO extends BaseVO {
     private String[] dic_keywords; // (필터링용) 사전필터 키워드
     private String[] speaker; // (필터링용) 화자
     private Integer keytype; // 1:명사 2:형용사
+    private Integer dic_yn; // 사전 포함 여부
 }
