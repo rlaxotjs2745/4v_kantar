@@ -36,4 +36,5 @@ public class ProjectVO extends BaseVO {
 
     private String project_merge_idx;
     private String[] summary_keywords;
+    private Integer idx_filter;
 }

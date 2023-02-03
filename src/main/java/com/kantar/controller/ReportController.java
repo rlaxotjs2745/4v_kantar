@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.kantar.mapper.FilterMapper;
+import com.kantar.service.FilterService;
 import com.kantar.service.StatisticsService;
 import com.kantar.vo.*;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +50,13 @@ public class ReportController extends BaseController {
     private ProjectService projectService;
 
     @Autowired
+    private FilterService filterService;
+
+    @Autowired
     private StatisticsService statisticsService;
+
+    @Autowired
+    private FilterMapper filterMapper;
 
     @Autowired
     private TokenJWT tokenJWT;
@@ -268,6 +276,7 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
+
             if(StringUtils.isEmpty(paramVo.getIdx()+"")){
                 return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
             }
@@ -287,10 +296,14 @@ public class ReportController extends BaseController {
                 }
             }
 
+            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
+
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("project",rs0);
             _data.put("report",rs1);
             _data.put("keyword",key0);
+            _data.put("filter",filter0);
+
             if(rs1!=null){
                 return responseService.getSuccessResult(_data, "report_view", "리포트 정보 성공");
             }else{
@@ -439,7 +452,7 @@ public class ReportController extends BaseController {
 
     @PostMapping("/save_filter_report")
     @Transactional
-    public CommonResult test_report(HttpServletRequest req, @RequestBody ReportFilterDataVO filterVO) throws Exception {
+    public CommonResult save_filter_report(HttpServletRequest req, @RequestBody ReportFilterDataVO filterVO) throws Exception {
         String _token = tokenJWT.resolveToken(req);
         try {
             UserVO uinfo = getChkUserLogin(req);
@@ -457,11 +470,14 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("save_filter_report","프로젝트 정보를 다시 확인해주세요");
             }
 
-            if(filterVO.getFilter_op1()==null){
-                return responseService.getFailResult("save_filter_report","필터 유형을 다시 확인해주세요");
+            if(StringUtils.isEmpty(filterVO.getTp1()) && StringUtils.isEmpty(filterVO.getTp2()) && StringUtils.isEmpty(filterVO.getTp3()) && StringUtils.isEmpty(filterVO.getTp4())){
+                return responseService.getFailResult("filter_create","필터 데이터가 없습니다.");
             }
 
+            Integer idx_filter = filterService.createReportFilter(filterVO);
+            filterVO.setIdx_filter(idx_filter);
             projectService.list_reportfilter(_token, filterVO);
+
 
             return responseService.getSuccessResult("test_report", "필터 리포트 생성을 시작하였습니다.");
 

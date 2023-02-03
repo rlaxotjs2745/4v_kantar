@@ -53,4 +53,14 @@
     <delete id="delFilterData">
         DELETE FROM KT_REPORT_FILTER_DATA WHERE idx_filter_data=#{idx_filter_data}
     </delete>
+
+    <select id="getReportFilterByIdx" parameterType="Integer" resultMap="filterDataList">
+        SELECT C.filter_type, C.filter_data
+        FROM KT_REPORT A
+                 LEFT JOIN KT_REPORT_FILTER B ON B.idx_filter=A.idx_filter
+                 LEFT JOIN KT_REPORT_FILTER_DATA C ON C.idx_filter=A.idx_filter
+        WHERE A.idx_report=#{idx}
+        ORDER BY C.filter_type
+    </select>
+
 </mapper>

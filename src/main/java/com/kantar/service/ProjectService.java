@@ -50,8 +50,8 @@ public class ProjectService {
 
     /**
      * 비동기 리포트 결과 만들기
-     * @param prs
      * @param paramVo
+     * @param _tp
      * @throws Exception
      */
     @Async
@@ -197,7 +197,7 @@ public class ProjectService {
     }
 
     /**
-     * 리포트 필터 적용해서 만들기
+     * 필터 적용 리포트 생성
      * @param filterVO
      * @throws Exception
      */
@@ -209,16 +209,13 @@ public class ProjectService {
         paramVo.setIdx_project(filterVO.getIdx_project());
         paramVo.setIdx_project_job_projectid(filterVO.getIdx_project_job_projectid());
         paramVo.setIdx_user(filterVO.getIdx_user());
+        paramVo.setIdx_filter(filterVO.getIdx_filter());
 
         int filter_op1 = filterVO.getFilter_op1();
-
         String _msg = "";
 
         try {
-            String[] ty1;
-            String[] ty2;
-            String[] ty3;
-            String[] ty4;
+            String[] ty1, ty2, ty3, ty4;
             String[] ty5 = null;
 
             ReportFilterKeywordVO rf = new ReportFilterKeywordVO();

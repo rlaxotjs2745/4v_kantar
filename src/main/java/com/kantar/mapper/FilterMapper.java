@@ -3,6 +3,8 @@ package com.kantar.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.kantar.vo.ProjectVO;
+import com.kantar.vo.ReportFilterKeywordVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kantar.vo.FilterVO;
@@ -18,4 +20,6 @@ public interface FilterMapper {
     public Integer createFilterData(Map<String, Object> paramVo) throws Exception;
 
     public Integer delFilterData(FilterVO paramVo) throws Exception;
+
+    public List<FilterVO> getReportFilterByIdx(Integer idx) throws Exception;
 }
