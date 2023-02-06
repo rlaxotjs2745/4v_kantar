@@ -585,7 +585,7 @@ public class ProjectService {
 
                 ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
                 reKeywords.setIdx_report(param.getIdx_report());
-                reKeywords.setKeytype(0); // 임시작성. 향후 추가구현 필요
+                reKeywords.setKeytype(0); // 임시작성. 명사형용사 향후 추가적용 필요
 
                 int total_count = 0;
 
