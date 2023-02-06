@@ -84,6 +84,7 @@ CREATE TABLE `KT_REPORT` (
 	`report_id` VARCHAR(10) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`filename` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`filepath` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+    `idx_filter` INT(11) NOT NULL,
 	`idx_user` INT(11) NOT NULL DEFAULT '0',
 	`summary0` VARCHAR(4000) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`create_dt` DATETIME NULL DEFAULT current_timestamp(),
