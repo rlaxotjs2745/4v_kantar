@@ -26,7 +26,7 @@ public class Summary {
 			paramVo.setTitle(_title);
 			paramVo.setSummary0(_rsss[0]);
 			paramVo.setSummary_keywords(_rskey);
-			if(_rskey!=null){
+			if(_rskey!=null && _rskey.length>0){
 				paramVo.setKeywords(_rskey[0]);
 			} else {
 				paramVo.setKeywords("");

@@ -212,6 +212,7 @@ public class ProjectService {
         paramVo.setIdx_filter(filterVO.getIdx_filter());
 
         int filter_op1 = filterVO.getFilter_op1();
+        int filter_op2 = filterVO.getFilter_op2();
         String _msg = "";
 
         try {
@@ -555,7 +556,7 @@ public class ProjectService {
                             }
                         } // 챕터
                     }
-                    saveSummaryKeyword(paramVo, summ_keywords);
+                    saveSummaryKeyword(paramVo, summ_keywords, filter_op2);
                 } // 전체
             } else {
                 _msg = "리포트 필터 옵션을 다시 선택해주세요.";
@@ -574,7 +575,7 @@ public class ProjectService {
      * @param param
      * @param s_keyword
      */
-    private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword) throws Exception {
+    private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword, int op2) throws Exception {
 
         List<ProjectVO> prs = reportMapper.getReportFileListOne(param);
 
@@ -590,32 +591,34 @@ public class ProjectService {
 
                 for (String[] keywords : s_keyword) {
                     for (String key : keywords) {
-                        reKeywords.setSum_keyword(key);
-                        List<String[]> ers = excel.getCsvListData(_fpath);
+                        if(op2==1 || (op2==0 && key.length()>1)){
+                            reKeywords.setSum_keyword(key);
+                            List<String[]> ers = excel.getCsvListData(_fpath);
 
-                        int j = 0;
-                        int count = 0;
-                        for(String[] _ers0 : ers){
-                            if (j > 0) {
-                                int index = 0;
-                                while (index >= 0) {
-                                    index = _ers0[4].indexOf(key, index);
-                                    if (index >= 0) {
-                                        count++;
-                                        index += key.length();
+                            int j = 0;
+                            int count = 0;
+                            for(String[] _ers0 : ers){
+                                if (j > 0) {
+                                    int index = 0;
+                                    while (index >= 0) {
+                                        index = _ers0[4].indexOf(key, index);
+                                        if (index >= 0) {
+                                            count++;
+                                            index += key.length();
+                                        }
                                     }
                                 }
+                                j++;
                             }
-                            j++;
-                        }
 
-                        int _findkey = reportMapper.findReportKeyword(reKeywords);
-                        reKeywords.setKeycount(count);
+                            int _findkey = reportMapper.findReportKeyword(reKeywords);
+                            reKeywords.setKeycount(count);
 
-                        if(count>0 && _findkey==0){
-                            int apiUse = reKeywords.getSum_keyword().length() * count;
-                            reportMapper.createReportFilterData(reKeywords); // api 사용량 집계(요약문)
-                            total_count += apiUse;
+                            if(count>0 && _findkey==0){
+                                int apiUse = reKeywords.getSum_keyword().length() * count;
+                                reportMapper.createReportFilterData(reKeywords); // api 사용량 집계(요약문)
+                                total_count += apiUse;
+                            }
                         }
                     }
                 }
