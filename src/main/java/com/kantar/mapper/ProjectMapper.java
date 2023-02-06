@@ -32,4 +32,6 @@ public interface ProjectMapper {
     public Integer comProject(ProjectVO paramVo) throws Exception;
 
     Integer savMergeProject(ProjectVO paramVo) throws Exception;
+
+    ProjectVO getProjectInfoByIdx(ProjectVO paramVo) throws Exception;
 }

@@ -39,6 +39,10 @@
         </if>
     </select>
 
+    <select id="getProjectInfoByIdx" resultType="com.kantar.vo.ProjectVO">
+        SELECT idx_project, idx_project_job_projectid, project_name FROM KT_PROJECT WHERE idx_project=#{idx_project}
+    </select>
+
     <select id="getProjectListCount" resultType="Integer">
         SELECT COUNT(1)
         FROM KT_PROJECT_JOB_PROJECTID A
