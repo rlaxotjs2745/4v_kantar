@@ -337,7 +337,7 @@ public class ProjectService {
                                 summ_keywords.add(param.getSummary_keywords());
                             }
                             statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
-                            saveMetadata(_metalist); // 메타데이터 집계
+                            savMetadata(_metalist); // 메타데이터 집계
                             if(StringUtils.isNotEmpty(_token)){
                                 _msg = "필터 리포트가 생성되었습니다.";
                             }
@@ -655,7 +655,7 @@ public class ProjectService {
         }
     }
 
-    private void saveMetadata(List<ReportMetaDataVO> metalist) throws Exception {
+    private void savMetadata(List<ReportMetaDataVO> metalist) throws Exception {
         for (ReportMetaDataVO md : metalist) {
             int _isSave = reportMapper.getMetadataInfoByIdx(md);
             if(_isSave==0){
@@ -667,7 +667,6 @@ public class ProjectService {
     }
 
     private int checkEmptyKey(ReportFilterDataVO filterVO) {
-
         Boolean _isKeywordKey = StringUtils.isNotEmpty(filterVO.getTp5());
         Boolean _isSpeakerKey = StringUtils.isNotEmpty(filterVO.getTp1());
 

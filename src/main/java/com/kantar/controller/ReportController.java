@@ -310,11 +310,9 @@ public class ReportController extends BaseController {
                     } else {  _keyword.setDic_yn(0);}
                 }
             }
-            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx()); // 필터 조건
+            List<FilterDataVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx()); // 필터 조건
             List<ReportMetaDataVO> metaSpeaker = reportMapper.getMetadataInfoSpeaker(paramVo.getIdx());
             List<ReportMetaDataVO> metaChapter = reportMapper.getMetadataInfoChapter(paramVo.getIdx());
-
-            List<FilterDataVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
 
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("project",rs0);
