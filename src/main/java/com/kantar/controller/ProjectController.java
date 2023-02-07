@@ -205,13 +205,18 @@ public class ProjectController extends BaseController {
                 return responseService.getFailResult("project_view","프로젝트 INDEX가 없습니다.");
             }
 
-            List<ProjectVO> rs = reportMapper.getReportFileList(paramVo);
+            List<Object> result = new ArrayList<>();
             List<ProjectViewVO> rlist = new ArrayList<ProjectViewVO>();
+
+            List<ProjectVO> rs = reportMapper.getReportFileList(paramVo);
             for(ProjectVO prs0 : rs){
+                ProjectVO rs0 = projectMapper.getProjectInfoByIdx(paramVo);
                 rlist = projectService.get_projectListView(rlist, prs0);
+                result.add(rs0);
+                result.add(rlist);
             }
             if(rlist!=null){
-                return responseService.getSuccessResult(rlist, "project_view", "프로젝트 정보 성공");
+                return responseService.getSuccessResult(result, "project_view", "프로젝트 정보 성공");
             }else{
                 return responseService.getFailResult("project_view","프로젝트 정보가 없습니다.");
             }

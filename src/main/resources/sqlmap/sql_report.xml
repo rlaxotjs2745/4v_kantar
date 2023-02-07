@@ -30,7 +30,7 @@
     </select>
 
     <select id="getReportDataViewAll" resultType="com.kantar.vo.ProjectVO">
-        SELECT B.title, B.summary0, LEFT(REPLACE(B.create_dt,'-','.'),16) AS create_dt, B.idx_report_data, A.idx_report
+        SELECT A.title, B.title AS filter_tp , B.summary0, LEFT(REPLACE(B.create_dt,'-','.'),16) AS create_dt, B.idx_report_data, A.idx_report
         FROM KT_REPORT A
             JOIN KT_REPORT_DATA B ON B.idx_report=A.idx_report
         WHERE A.idx_report=#{idx}

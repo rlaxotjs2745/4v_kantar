@@ -216,24 +216,26 @@ public class ProjectService {
         String _msg = "";
 
         try {
-            String[] ty1, ty2, ty3, ty4;
+            String[] ty1 = null;
+            String[] ty2 = null;
+            String[] ty3 = null;
+            String[] ty4 = null;
             String[] ty5 = null;
 
-            ReportFilterKeywordVO rf = new ReportFilterKeywordVO();
             List<String[]> summ_keywords = new ArrayList<>();
 
-            if(StringUtils.isNotEmpty(filterVO.getTp1())){ ty1 = filterVO.getTp1().split("//"); rf.setSpeaker(ty1); } else { return; } // 화자
-            if(StringUtils.isNotEmpty(filterVO.getTp2())){ ty2 = filterVO.getTp2().split("//");} else { return; } // 챕터
-            if(StringUtils.isNotEmpty(filterVO.getTp3())){ ty3 = filterVO.getTp3().split("//");} else { return; } // 서브챕터
-            if(StringUtils.isNotEmpty(filterVO.getTp4())){ ty4 = filterVO.getTp4().split("//");} else { return; } // 질문
-            if(StringUtils.isNotEmpty(filterVO.getTp5())){ ty5 = filterVO.getTp5().split("//"); rf.setDic_keywords(ty5);} // 사전키워드
+            if(StringUtils.isNotEmpty(filterVO.getTp1())){ ty1 = filterVO.getTp1().split("//");} // 화자
+            if(StringUtils.isNotEmpty(filterVO.getTp2())){ ty2 = filterVO.getTp2().split("//");} // 챕터
+            if(StringUtils.isNotEmpty(filterVO.getTp3())){ ty3 = filterVO.getTp3().split("//");} // 서브챕터
+            if(StringUtils.isNotEmpty(filterVO.getTp4())){ ty4 = filterVO.getTp4().split("//");} // 질문
+            if(StringUtils.isNotEmpty(filterVO.getTp5())){ ty5 = filterVO.getTp5().split("//");} // 사전키워드
 
-            Boolean _isDicKey = StringUtils.isEmpty(filterVO.getTp5());
+            int _isKey = checkEmptyKey(filterVO);
 
             List<ProjectVO> prs = reportMapper.getReportFileListOne(paramVo);
             int data_cnt = 0;
 
-            if(filter_op1>0 && filter_op1<5){ //'화자+필터용 사전키워드'만 적용한 전체요약문
+            if(filter_op1>0 && filter_op1<5){ //전 체요약문
                 for(ProjectVO prs0 : prs){
                     String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
 
@@ -247,16 +249,32 @@ public class ProjectService {
                     List<String[]> ers = excel.getCsvListData(_fpath);
                     int j = 0;
                     for(String[] _ers0 : ers){  // 줄
-                        for (String ty1_f : ty1) {
-                            if (j > 0) {
-                                SumtextVO _elist = new SumtextVO();
-                                if (_isDicKey && _ers0[3].equals(ty1_f)) {
-                                    _elist.setSpeaker(_ers0[3].toString());
-                                    _elist.setText(_ers0[4].toString());
-                                    _data.add(_elist);
-                                } else if(_ers0[3].equals(ty1_f)) {
-                                    for (String dic_key : ty5) {
-                                        if (_ers0[4].contains(dic_key)) {
+                        if (j > 0) {
+                            SumtextVO _elist = new SumtextVO();
+                            if (_isKey == 99) {
+                                _elist.setSpeaker(_ers0[3].toString());
+                                _elist.setText(_ers0[4].toString());
+                                _data.add(_elist);
+                            } else if(_isKey == 10){
+                                for (String ty1_f : ty1) {
+                                    if(_ers0[3].equals(ty1_f)){
+                                        _elist.setSpeaker(_ers0[3].toString());
+                                        _elist.setText(_ers0[4].toString());
+                                        _data.add(_elist);
+                                    }
+                                }
+                            } else if(_isKey == 50){
+                                for (String ty5_f : ty5) {
+                                    if(_ers0[4].contains(ty5_f)){
+                                        _elist.setSpeaker(_ers0[3].toString());
+                                        _elist.setText(_ers0[4].toString());
+                                        _data.add(_elist);
+                                    }
+                                }
+                            } else if (_isKey == 0){
+                                for (String ty5_f : ty5) {
+                                    for (String ty1_f : ty1) {
+                                        if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)){
                                             _elist.setSpeaker(_ers0[3].toString());
                                             _elist.setText(_ers0[4].toString());
                                             _data.add(_elist);
@@ -325,19 +343,35 @@ public class ProjectService {
                             ers = excel.getCsvListData(_fpath);
                             j = 0;
                             for(String[] _ers0 : ers){
-                                for (String ty1_f : ty1) {
-                                    if(j>0){
-                                        SumtextVO _elist = new SumtextVO();
-                                        if(_isDicKey){
-                                            if(_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f)){
+                                if(j>0 && _ers0[0].equals(ty2_f)){
+                                    SumtextVO _elist = new SumtextVO();
+                                    if (_isKey == 99) {
+                                        _elist.setSpeaker(_ers0[3].toString());
+                                        _elist.setText(_ers0[4].toString());
+                                        chapter_data.add(_elist);
+                                        data_cnt++;
+                                    } else if(_isKey == 10){
+                                        for (String ty1_f : ty1) {
+                                            if(_ers0[3].equals(ty1_f)){
                                                 _elist.setSpeaker(_ers0[3].toString());
                                                 _elist.setText(_ers0[4].toString());
                                                 chapter_data.add(_elist);
                                                 data_cnt++;
                                             }
-                                        } else if(_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f)){
-                                            for(String dic_key : ty5) {
-                                                if(_ers0[4].contains(dic_key)){
+                                        }
+                                    } else if(_isKey == 50){
+                                        for(String dic_key : ty5) {
+                                            if(_ers0[4].contains(dic_key)){
+                                                _elist.setSpeaker(_ers0[3].toString());
+                                                _elist.setText(_ers0[4].toString());
+                                                chapter_data.add(_elist);
+                                                data_cnt++;
+                                            }
+                                        }
+                                    } else if (_isKey == 0){
+                                        for (String ty5_f : ty5) {
+                                            for (String ty1_f : ty1) {
+                                                if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
                                                     _elist.setSpeaker(_ers0[3].toString());
                                                     _elist.setText(_ers0[4].toString());
                                                     chapter_data.add(_elist);
@@ -401,22 +435,38 @@ public class ProjectService {
                                     ers = excel.getCsvListData(_fpath);
                                     j = 0;
                                     for(String[] _ers0 : ers){
-                                        for (String ty1_f : ty1) {
-                                            if (j > 0) {
-                                                SumtextVO _elist = new SumtextVO();
-                                                if(_isDicKey){
-                                                    if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
+                                        if (j>0 && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
+                                            SumtextVO _elist = new SumtextVO();
+                                            if (_isKey == 99) {
+                                                _elist.setSpeaker(_ers0[3].toString());
+                                                _elist.setText(_ers0[4].toString());
+                                                subChap_data.add(_elist);
+                                                data_cnt++;
+                                            } else if(_isKey == 10){
+                                                for (String ty1_f : ty1) {
+                                                    if(_ers0[3].equals(ty1_f)){
                                                         _elist.setSpeaker(_ers0[3].toString());
                                                         _elist.setText(_ers0[4].toString());
                                                         subChap_data.add(_elist);
                                                         data_cnt++;
                                                     }
-                                                } else if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
-                                                    for(String dic_key : ty5) {
-                                                        if(_ers0[4].contains(dic_key)){
+                                                }
+                                            } else if(_isKey == 50){
+                                                for(String dic_key : ty5) {
+                                                    if(_ers0[4].contains(dic_key)){
+                                                        _elist.setSpeaker(_ers0[3].toString());
+                                                        _elist.setText(_ers0[4].toString());
+                                                        subChap_data.add(_elist);
+                                                        data_cnt++;
+                                                    }
+                                                }
+                                            } else if (_isKey == 0){
+                                                for (String ty5_f : ty5) {
+                                                    for (String ty1_f : ty1) {
+                                                        if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
                                                             _elist.setSpeaker(_ers0[3].toString());
                                                             _elist.setText(_ers0[4].toString());
-                                                            subChap_data.add(_elist);
+                                                            chapter_data.add(_elist);
                                                             data_cnt++;
                                                         }
                                                     }
@@ -480,19 +530,36 @@ public class ProjectService {
                                             ers = excel.getCsvListData(_fpath);
                                             j = 0;
                                             for (String[] _ers0 : ers) {
-                                                for (String ty1_f : ty1) {
-                                                    if (j > 0) {
-                                                        SumtextVO _elist = new SumtextVO();
-                                                        if(_isDicKey){
-                                                            if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
+                                                if (j>0 && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
+                                                    SumtextVO _elist = new SumtextVO();
+
+                                                    if (_isKey == 99) {
+                                                        _elist.setSpeaker(_ers0[3].toString());
+                                                        _elist.setText(_ers0[4].toString());
+                                                        quest_data.add(_elist);
+                                                        data_cnt++;
+                                                    } else if(_isKey == 10){
+                                                        for (String ty1_f : ty1) {
+                                                            if(_ers0[3].equals(ty1_f)){
                                                                 _elist.setSpeaker(_ers0[3].toString());
                                                                 _elist.setText(_ers0[4].toString());
                                                                 quest_data.add(_elist);
                                                                 data_cnt++;
                                                             }
-                                                        } else if (_ers0[3].equals(ty1_f) && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
-                                                            for(String dic_key : ty5) {
-                                                                if(_ers0[4].contains(dic_key)){
+                                                        }
+                                                    } else if(_isKey == 50){
+                                                        for(String dic_key : ty5) {
+                                                            if(_ers0[4].contains(dic_key)){
+                                                                _elist.setSpeaker(_ers0[3].toString());
+                                                                _elist.setText(_ers0[4].toString());
+                                                                quest_data.add(_elist);
+                                                                data_cnt++;
+                                                            }
+                                                        }
+                                                    } else if (_isKey == 0){
+                                                        for (String ty5_f : ty5) {
+                                                            for (String ty1_f : ty1) {
+                                                                if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
                                                                     _elist.setSpeaker(_ers0[3].toString());
                                                                     _elist.setText(_ers0[4].toString());
                                                                     quest_data.add(_elist);
@@ -556,7 +623,12 @@ public class ProjectService {
                             }
                         } // 챕터
                     }
-                    saveSummaryKeyword(paramVo, summ_keywords, filter_op2);
+                    ReportFilterKeywordVO option = new ReportFilterKeywordVO();
+                    option.setDic_keywords(ty5);
+                    option.setSpeaker(ty1);
+                    option.setKeytype(_isKey);
+                    option.setFilter(filter_op2);
+                    saveSummaryKeyword(paramVo, summ_keywords, option);
                 } // 전체
             } else {
                 _msg = "리포트 필터 옵션을 다시 선택해주세요.";
@@ -570,14 +642,35 @@ public class ProjectService {
         }
     }
 
+    private int checkEmptyKey(ReportFilterDataVO filterVO) {
+
+        Boolean _isKeywordKey = StringUtils.isNotEmpty(filterVO.getTp5());
+        Boolean _isSpeakerKey = StringUtils.isNotEmpty(filterVO.getTp1());
+
+        if (_isKeywordKey && _isSpeakerKey) {
+            return 0;
+        } else if (_isKeywordKey && !_isSpeakerKey) {
+            return 50;
+        } else if (!_isKeywordKey && _isSpeakerKey) {
+            return 10;
+        } else {
+            return 99;
+        }
+
+    }
+
     /**
      * 요약문 키워드 저장
      * @param param
      * @param s_keyword
      */
-    private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword, int op2) throws Exception {
+    private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword, ReportFilterKeywordVO option) throws Exception {
 
         List<ProjectVO> prs = reportMapper.getReportFileListOne(param);
+        int op2 = option.getFilter();
+        int _isKey = option.getKeytype();
+        String[] ty1 = option.getSpeaker();
+        String[] ty5 = option.getDic_keywords();
 
         if(s_keyword.size()>0){
             for(ProjectVO prs0 : prs) {
@@ -585,7 +678,7 @@ public class ProjectService {
 
                 ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
                 reKeywords.setIdx_report(param.getIdx_report());
-                reKeywords.setKeytype(0); // 임시작성. 향후 추가구현 필요
+                reKeywords.setKeytype(0); // 임시작성. 명사형용사 향후 추가적용 필요
 
                 int total_count = 0;
 
@@ -599,12 +692,55 @@ public class ProjectService {
                             int count = 0;
                             for(String[] _ers0 : ers){
                                 if (j > 0) {
-                                    int index = 0;
-                                    while (index >= 0) {
-                                        index = _ers0[4].indexOf(key, index);
-                                        if (index >= 0) {
-                                            count++;
-                                            index += key.length();
+                                    if (_isKey == 99) { // 화자,키워드 필터없을때
+                                        int index = 0;
+                                        while (index >= 0) {
+                                            index = _ers0[4].indexOf(key, index);
+                                            if (index >= 0) {
+                                                count++;
+                                                index += key.length();
+                                            }
+                                        }
+                                    } else if(_isKey == 10){ // 화자 키워드만 지정했을때
+                                        for (String ty1_f : ty1) {
+                                            if(_ers0[3].equals(ty1_f)){
+                                                int index = 0;
+                                                while (index >= 0) {
+                                                    index = _ers0[4].indexOf(key, index);
+                                                    if (index >= 0) {
+                                                        count++;
+                                                        index += key.length();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else if(_isKey == 50){ // 키워드 필터만 지정했을때
+                                        for(String dic_key : ty5) {
+                                            if(_ers0[4].contains(dic_key)){
+                                                int index = 0;
+                                                while (index >= 0) {
+                                                    index = _ers0[4].indexOf(key, index);
+                                                    if (index >= 0) {
+                                                        count++;
+                                                        index += key.length();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else if (_isKey == 0) { // 화자,키워드 필터 모두 지정했을때
+                                        for (String ty5_f : ty5) {
+                                            for (String ty1_f : ty1) {
+                                                if (_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
+                                                    int index = 0;
+                                                    while (index >= 0) {
+                                                        index = _ers0[4].indexOf(key, index);
+                                                        if (index >= 0) {
+                                                            count++;
+                                                            index += key.length();
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -685,7 +821,6 @@ public class ProjectService {
             out.flush();
             out.close();
         }
-
         return mergeCsv;
     }
 
