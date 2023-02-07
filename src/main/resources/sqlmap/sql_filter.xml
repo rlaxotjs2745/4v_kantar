@@ -35,12 +35,18 @@
             </if>
     </select>
 
+    <select id="chkFilterAuth" resultType="Integer">
+        SELECT COUNT(1)
+            FROM KT_REPORT_FILTER
+            WHERE idx_filter=#{idx_filter} AND idx_user=#{idx_user}
+    </select>
+
     <insert id="createFilter" useGeneratedKeys="true" keyColumn="idx_filter" keyProperty="idx_filter">
-        INSERT INTO KT_REPORT_FILTER (idx_project_job_projectid, filter_title) VALUES (#{idx_project_job_projectid}, #{filter_title})
+        INSERT INTO KT_REPORT_FILTER (idx_project_job_projectid, filter_title, idx_user) VALUES (#{idx_project_job_projectid}, #{filter_title}, #{idx_user})
     </insert>
 
     <delete id="delFilter">
-        DELETE FROM KT_REPORT_FILTER WHERE idx_filter=#{idx_filter}
+        DELETE FROM KT_REPORT_FILTER WHERE idx_filter=#{idx_filter} AND idx=#{idx_user}
     </delete>
 
     <insert id="createFilterData" parameterType="java.util.Map">

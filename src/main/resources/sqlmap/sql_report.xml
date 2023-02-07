@@ -117,4 +117,7 @@
         WHERE A.keyword=#{keyword}
     </select>
 
+    <select id="getReportDown" resultType="com.kantar.vo.ProjectVO">
+        SELECT filepath, `filename` FROM KT_REPORT WHERE idx_report=#{idx_report}
+    </select>
 </mapper>
