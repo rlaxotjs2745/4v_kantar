@@ -296,14 +296,11 @@ public class ReportController extends BaseController {
     @PostMapping("/report_view")
     public CommonResult getReportView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
-            /*
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
-
-             */
 
             if(StringUtils.isEmpty(paramVo.getIdx()+"")){
                 return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
