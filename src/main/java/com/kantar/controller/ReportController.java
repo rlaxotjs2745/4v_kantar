@@ -822,7 +822,7 @@ public class ReportController extends BaseController {
             row = sheet.createRow(rowNum++);
             cell = row.createCell(0);
             cell.setCellValue(rs0.getSummary());
-            cell.setCellStyle(style);
+            cell.setCellStyle(style2);
                 
             /* 엑셀 파일 생성 */
             response.setContentType("ms-vnd/excel");
