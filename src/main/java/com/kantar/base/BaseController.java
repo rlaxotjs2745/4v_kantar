@@ -1,10 +1,8 @@
 package com.kantar.base;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;

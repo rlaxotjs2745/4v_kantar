@@ -116,8 +116,4 @@
                  JOIN KT_REPORT_KEYWORD B ON A.keyword=B.keyword
         WHERE A.keyword=#{keyword}
     </select>
-
-    <select id="getReportDown" resultType="com.kantar.vo.ProjectVO">
-        SELECT filepath, `filename` FROM KT_REPORT WHERE idx_report=#{idx_report}
-    </select>
 </mapper>

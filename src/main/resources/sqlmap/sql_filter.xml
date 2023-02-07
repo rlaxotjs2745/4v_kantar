@@ -61,10 +61,17 @@
     </delete>
 
     <select id="getReportFilterByIdx" parameterType="Integer" resultMap="filterDataList">
-        SELECT C.filter_type, C.filter_data
+        SELECT C.idx_filter_data, C.idx_filter AS idx_filter2, C.filter_type, C.filter_data
         FROM KT_REPORT A
-                 LEFT JOIN KT_REPORT_FILTER B ON B.idx_filter=A.idx_filter
-                 LEFT JOIN KT_REPORT_FILTER_DATA C ON C.idx_filter=A.idx_filter
+            LEFT JOIN KT_REPORT_FILTER_DATA C ON C.idx_filter=A.idx_filter
+        WHERE A.idx_report=#{idx}
+        ORDER BY C.filter_type
+    </select>
+
+    <select id="getReportFilter" parameterType="Integer" resultType="com.kantar.vo.FilterDataVO">
+        SELECT C.idx_filter_data, C.idx_filter AS idx_filter2, C.filter_type, C.filter_data
+        FROM KT_REPORT A
+            LEFT JOIN KT_REPORT_FILTER_DATA C ON C.idx_filter=A.idx_filter
         WHERE A.idx_report=#{idx}
         ORDER BY C.filter_type
     </select>

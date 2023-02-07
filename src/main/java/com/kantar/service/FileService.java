@@ -2,16 +2,12 @@ package com.kantar.service;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +21,6 @@ import com.kantar.vo.ProjectVO;
 public class FileService {
     @Value("${file.upload-dir}")
     public String filepath;
-
-    @Autowired
-    private Path fileLocation;
 
     /**
      * 파일 저장
@@ -90,8 +83,13 @@ public class FileService {
         return param;
     }
 
-
-    public ResponseEntity<Resource> getFileDown(String fileName) throws Exception {
+    /**
+     * 파일 다운로드
+     * @param fileName
+     * @return ResponseEntity<InputStreamResource>
+     * @throws Exception
+     */
+    public ResponseEntity<Object> getFileDown(String fileName) throws Exception {
         try {
             File file = new File(fileName);
             // Path fPath = Paths.get(file.getAbsolutePath());

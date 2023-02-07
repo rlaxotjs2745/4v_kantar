@@ -42,6 +42,4 @@ public interface ReportMapper {
     List<ReportFilterKeywordVO> getReportKeywordView(ProjectVO paramVo) throws Exception;
 
     int getKeywordFindDictionary(String _keyword) throws Exception;
-
-    public ProjectVO getReportDown(ProjectVO paramVo) throws Exception;
 }

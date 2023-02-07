@@ -65,6 +65,10 @@
     </pluginRepositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -232,7 +236,13 @@
             <artifactId>jakarta.mail-api</artifactId>
             <version>2.1.0</version>
         </dependency>
-	</dependencies>
+ 
+		<dependency>
+			<groupId>org.qbicc.rt</groupId>
+			<artifactId>qbicc-rt-java.base</artifactId>
+			<version>17.alpha.0.47</version>
+		</dependency>
+ </dependencies>
 
 	<build>
 		<directory>${basedir}/target</directory>

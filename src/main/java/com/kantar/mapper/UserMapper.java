@@ -1,6 +1,5 @@
 package com.kantar.mapper;
 
-import com.kantar.vo.StatisticsVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kantar.vo.UserVO;

@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.kantar.model.CommonResult;
 import com.kantar.vo.ReportFilterDataVO;
-import com.kantar.vo.UserVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,8 +12,6 @@ import org.springframework.stereotype.Service;
 import com.kantar.mapper.FilterMapper;
 import com.kantar.vo.FilterDataVO;
 import com.kantar.vo.FilterVO;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Service
 public class FilterService {

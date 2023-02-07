@@ -1,40 +1,29 @@
 package com.kantar.controller;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.kantar.mapper.FilterMapper;
-import com.kantar.service.FileService;
+// import com.kantar.service.FileService;
 import com.kantar.service.FilterService;
 import com.kantar.service.StatisticsService;
 import com.kantar.vo.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.util.IOUtils;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.util.UriUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import com.kantar.base.BaseController;
@@ -55,6 +45,8 @@ import com.kantar.util.TokenJWT;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.net.URLEncoder;
 
 @RestController
 @RequestMapping("/api/report")
@@ -80,8 +72,8 @@ public class ReportController extends BaseController {
     @Autowired
     private FilterMapper filterMapper;
 
-    @Autowired
-    private FileService fileService;
+    // @Autowired
+    // private FileService fileService;
 
     @Autowired
     private TokenJWT tokenJWT;
@@ -321,7 +313,7 @@ public class ReportController extends BaseController {
                 }
             }
 
-            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
+            List<FilterDataVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
 
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("project",rs0);
@@ -524,13 +516,13 @@ public class ReportController extends BaseController {
      * @throws Exception
      */
     @GetMapping("/download")
-    public void getReportDown(HttpServletResponse response, HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
+    public void getReportDown(HttpServletResponse response, HttpServletRequest req, ProjectVO paramVo) throws Exception {
         try {
-            UserVO uinfo = getChkUserLogin(req);
-            if(uinfo==null){
-                return;
-            }
-            paramVo.setIdx_user(uinfo.getIdx_user());
+            // UserVO uinfo = getChkUserLogin(req);
+            // if(uinfo==null){
+            //     return;
+            // }
+            paramVo.setIdx_user(1);
 
             if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
                 return;
@@ -538,7 +530,7 @@ public class ReportController extends BaseController {
 
             paramVo.setIdx(paramVo.getIdx_report());
             ProjectVO rs0 = projectMapper.getProjectView(paramVo);
-            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
+            List<FilterDataVO> filter0 = filterMapper.getReportFilter(paramVo.getIdx());
             List<ProjectVO> reportarr = reportMapper.getReportDataViewAll(paramVo);
             List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo);
 
@@ -551,7 +543,7 @@ public class ReportController extends BaseController {
             font.setBold(true);
             font.setFontName("맑은 고딕");
             style.setWrapText(true); //문자열을 입력할때 \n 같은 개행을 인식해준다.
-            // style.setVerticalAlignment(VerticalAlignment.CENTER);
+            style.setVerticalAlignment(VerticalAlignment.CENTER);
             // style.setAlignment(HorizontalAlignment.CENTER);
             style.setFont(font);
 
@@ -560,21 +552,22 @@ public class ReportController extends BaseController {
             Font font2 = wb.createFont();
             font2.setBold(false);
             font2.setFontName("맑은 고딕");
+            style2.setVerticalAlignment(VerticalAlignment.CENTER);
             style2.setWrapText(true); //문자열을 입력할때 \n 같은 개행을 인식해준다.
             style2.setFont(font2);
 
-            int rowNum = 0;
-
-            Row titleRow = sheet.createRow(rowNum); // 타이틀행을 생성한다. 첫번째줄이기때문에 createRow(0)
-            Cell titleCell = titleRow.createCell(0); // 첫번째행의 첫번째열을 지정한다. 
-            titleCell.setCellValue("01. 기본정보"); // setCellValue 셀에 값넣기.
+            Integer rowNum = 0;
+            // rowNum++;
+            Row row = sheet.createRow(rowNum++); // 타이틀행을 생성한다. 첫번째줄이기때문에 createRow(0)
+            Cell cell = row.createCell(0); // 첫번째행의 첫번째열을 지정한다. 
+            cell.setCellValue("01. 기본정보"); // setCellValue 셀에 값넣기.
             // titleRow.setHeight((short)920); // Row에서 setHeight를 하면 행 높이가 조정된다. 
             // sheet.addMergedRegion(new CellRangeAddress(0,0,0,9)); // 셀 병합  첫번째줄~아홉번째 열까지 병합 
             // new CellRangeAddress(시작 row, 끝 row, 시작 col, 끝 col) 
-            titleCell.setCellStyle(style);
+            cell.setCellStyle(style);
             
-            Row row = sheet.createRow(rowNum++);
-            Cell cell = row.createCell(0);
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
             cell.setCellValue("리포트 이름");
             cell.setCellStyle(style);
 
@@ -582,11 +575,11 @@ public class ReportController extends BaseController {
             cell.setCellValue("프로젝트 이름");
             cell.setCellStyle(style);
 
-            cell = row.createCell(1);
+            cell = row.createCell(2);
             cell.setCellValue("생성일자");
             cell.setCellStyle(style);
 
-            cell = row.createCell(1);
+            cell = row.createCell(3);
             cell.setCellValue("프로젝트 세부내용");
             cell.setCellStyle(style);
 
@@ -599,11 +592,11 @@ public class ReportController extends BaseController {
             cell.setCellValue(rs0.getProject_name());
             cell.setCellStyle(style2);
 
-            cell = row.createCell(1);
+            cell = row.createCell(2);
             cell.setCellValue(rs0.getCreate_dt());
             cell.setCellStyle(style2);
 
-            cell = row.createCell(1);
+            cell = row.createCell(3);
             cell.setCellValue(rs0.getSummary0());
             cell.setCellStyle(style2);
 
@@ -641,66 +634,63 @@ public class ReportController extends BaseController {
             Integer rowNum3 = rowNum;
             Integer rowNum4 = rowNum;
 
-            // 화자
-            for(int i = 0; i<filter0.size(); i++) {
-                if(filter0.get(i).getFilter_type() == 1)
-                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
-                    row = sheet.createRow(rowNum0++);
-                    cell = row.createCell(0);
-                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
-                    cell.setCellStyle(style2);
+            if(filter0.size()>0){
+                // 화자
+                for(FilterDataVO _rs : filter0) {
+                    if(_rs.getFilter_type() == 1){
+                        row = sheet.createRow(rowNum0++);
+                        cell = row.createCell(0);
+                        cell.setCellValue(_rs.getFilter_data());
+                        cell.setCellStyle(style2);
+                    }
                 }
-            }
 
-            // 챕터
-            for(int i = 0; i<filter0.size(); i++) {
-                if(filter0.get(i).getFilter_type() == 2)
-                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
-                    row = sheet.createRow(rowNum1++);
-                    cell = row.createCell(1);
-                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
-                    cell.setCellStyle(style2);
+                // 챕터
+                for(FilterDataVO _rs : filter0) {
+                    if(_rs.getFilter_type() == 2){
+                        row = sheet.createRow(rowNum1++);
+                        cell = row.createCell(1);
+                        cell.setCellValue(_rs.getFilter_data());
+                        cell.setCellStyle(style2);
+                    }
                 }
-            }
 
-            // 서브챕터
-            for(int i = 0; i<filter0.size(); i++) {
-                if(filter0.get(i).getFilter_type() == 2)
-                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
-                    row = sheet.createRow(rowNum2++);
-                    cell = row.createCell(2);
-                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
-                    cell.setCellStyle(style2);
+                // 서브챕터
+                for(FilterDataVO _rs : filter0) {
+                    if(_rs.getFilter_type() == 3){
+                        row = sheet.createRow(rowNum2++);
+                        cell = row.createCell(2);
+                        cell.setCellValue(_rs.getFilter_data());
+                        cell.setCellStyle(style2);
+                    }
                 }
-            }
 
-            // 질문
-            for(int i = 0; i<filter0.size(); i++) {
-                if(filter0.get(i).getFilter_type() == 2)
-                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
-                    row = sheet.createRow(rowNum3++);
-                    cell = row.createCell(3);
-                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
-                    cell.setCellStyle(style2);
+                // 질문
+                for(FilterDataVO _rs : filter0) {
+                    if(_rs.getFilter_type() == 4){
+                        row = sheet.createRow(rowNum3++);
+                        cell = row.createCell(3);
+                        cell.setCellValue(_rs.getFilter_data());
+                        cell.setCellStyle(style2);
+                    }
                 }
-            }
 
-            // 키워드
-            for(int i = 0; i<filter0.size(); i++) {
-                if(filter0.get(i).getFilter_type() == 2)
-                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
-                    row = sheet.createRow(rowNum4++);
-                    cell = row.createCell(4);
-                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
-                    cell.setCellStyle(style2);
+                // 키워드
+                for(FilterDataVO _rs : filter0) {
+                    if(_rs.getFilter_type() == 5){
+                        row = sheet.createRow(rowNum4++);
+                        cell = row.createCell(4);
+                        cell.setCellValue(_rs.getFilter_data());
+                        cell.setCellStyle(style2);
+                    }
                 }
-            }
 
-            rowNum = rowNum0;
-            if(rowNum1 > rowNum){rowNum=rowNum1;}
-            if(rowNum2 > rowNum){rowNum=rowNum2;}
-            if(rowNum3 > rowNum){rowNum=rowNum3;}
-            if(rowNum4 > rowNum){rowNum=rowNum4;}
+                rowNum = rowNum0;
+                if(rowNum1 > rowNum){rowNum=rowNum1;}
+                if(rowNum2 > rowNum){rowNum=rowNum2;}
+                if(rowNum3 > rowNum){rowNum=rowNum3;}
+                if(rowNum4 > rowNum){rowNum=rowNum4;}
+            }
 
             rowNum++;
 
@@ -718,8 +708,8 @@ public class ReportController extends BaseController {
                 cell.setCellValue(_rs.getTitle());
                 cell.setCellStyle(style);
                 
-                Row row1 = sheet.createRow(_rpNum0+1);
-                cell = row1.createCell(_rpNum1);
+                row = sheet.createRow(_rpNum0+1);
+                cell = row.createCell(_rpNum1);
                 cell.setCellValue(_rs.getSummary0());
                 cell.setCellStyle(style2);
 
@@ -785,7 +775,7 @@ public class ReportController extends BaseController {
             cell.setCellValue("텍스트 길이");
             cell.setCellStyle(style);
 
-
+            rowNum++;
             rowNum++;
 
             row = sheet.createRow(rowNum++);
@@ -808,6 +798,7 @@ public class ReportController extends BaseController {
 
 
             rowNum++;
+            rowNum++;
 
             row = sheet.createRow(rowNum++);
             cell = row.createCell(0);
@@ -825,9 +816,13 @@ public class ReportController extends BaseController {
             cell.setCellStyle(style2);
                 
             /* 엑셀 파일 생성 */
+            String _fName = "REPORT_" + rs0.getProject_name() +".xls";
+            String outputFileName = UriUtils.encode(_fName, StandardCharsets.UTF_8.toString());
             response.setContentType("ms-vnd/excel");
-            response.setHeader("Content-Disposition", "attachment;filename=poiTest.xls");
+            response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''"+ outputFileName);
+            // response.setHeader( "Content-Transfer-Encoding", "binary" );
             wb.write(response.getOutputStream());
+            // wb.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

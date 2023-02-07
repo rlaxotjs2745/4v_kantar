@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-import com.kantar.mapper.FilterMapper;
 import com.kantar.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +19,10 @@ import com.kantar.mapper.ReportMapper;
 import com.kantar.util.Excel;
 import com.kantar.util.Summary;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 @Service
 public class ProjectService {
     @Autowired
     private ReportMapper reportMapper;
-
-    @Autowired
-    private FilterMapper filterMapper;
 
     @Autowired
     private Excel excel;

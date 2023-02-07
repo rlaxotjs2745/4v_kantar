@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.kantar.vo.FilterDataVO;
 import com.kantar.vo.FilterVO;
 
 @Mapper
@@ -21,5 +22,7 @@ public interface FilterMapper {
 
     public Integer delFilterData(FilterVO paramVo) throws Exception;
 
-    public List<FilterVO> getReportFilterByIdx(Integer idx) throws Exception;
+    public List<FilterDataVO> getReportFilterByIdx(Integer idx) throws Exception;
+
+    public List<FilterDataVO> getReportFilter(Integer idx) throws Exception;
 }

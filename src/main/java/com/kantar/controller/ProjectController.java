@@ -1,7 +1,7 @@
 package com.kantar.controller;
 
 import java.io.File;
-import java.nio.file.Path;
+// import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,13 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 
-import com.google.gson.Gson;
+// import com.google.gson.Gson;
 import com.kantar.base.BaseController;
 import com.kantar.mapper.ProjectMapper;
 import com.kantar.mapper.ReportMapper;
 import com.kantar.model.CommonResult;
 import com.kantar.service.FileService;
-import com.kantar.service.KafkaSender;
+// import com.kantar.service.KafkaSender;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
 import com.kantar.vo.ProjectListVO;
@@ -58,8 +59,8 @@ public class ProjectController extends BaseController {
     @Autowired
     private FileService fileService;
 
-    @Autowired
-    private KafkaSender kafkaSender;
+    // @Autowired
+    // private KafkaSender kafkaSender;
 
     @Value("${file.upload-dir}")
     public String filepath;
@@ -234,7 +235,7 @@ public class ProjectController extends BaseController {
      * @throws Exception
      */
     @GetMapping("/download")
-    public ResponseEntity<Resource> getProjectDown(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
+    public ResponseEntity<Object> getProjectDown(HttpServletRequest req, ProjectVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
@@ -247,6 +248,9 @@ public class ProjectController extends BaseController {
             }
 
             ProjectVO rs = projectMapper.getProjectDown(paramVo);
+            if(rs==null){
+                return null;
+            }
             String _fpath = this.filepath + rs.getFilepath() + rs.getFilename();
             return fileService.getFileDown(_fpath);
         } catch (Exception e) {
