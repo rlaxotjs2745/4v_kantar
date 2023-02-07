@@ -18,7 +18,7 @@
         <if test="title neq null">
             AND title LIKE '%${title}%'
         </if>
-        <if test="recordCountPerPage neq 99999"> -- recordCountPerPage 99999일 경우 전체 가져옴
+        <if test="recordCountPerPage neq 99999"> -- recordCountPerPage 99999일 경우 페이징 x
             LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
         </if>
     </select>

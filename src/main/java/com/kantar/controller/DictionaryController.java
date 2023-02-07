@@ -79,6 +79,7 @@ public class DictionaryController extends BaseController {
             if(dictList != null){
                 rs.put("dictList", dictList);
                 rs.put("idx_user", uinfo.getIdx_user());
+                rs.put("user_type", uinfo.getRole_type());
                 return responseService.getSuccessResult(rs, "list_dictionary", "사전 리스팅 성공");
             }else{
                 return responseService.getFailResult("list_dictionary","사전 리스트가 없습니다.");
