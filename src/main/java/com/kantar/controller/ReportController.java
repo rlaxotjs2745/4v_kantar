@@ -326,6 +326,7 @@ public class ReportController extends BaseController {
             _data.put("project",rs0);
             _data.put("report",rs1);
             _data.put("keyword",key0);
+            _data.put("filter",filter0);
             _data.put("metaSpeaker",metaSpeaker);
             _data.put("metaChapter",metaChapter);
 
