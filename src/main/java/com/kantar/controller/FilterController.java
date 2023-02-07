@@ -65,6 +65,42 @@ public class FilterController extends BaseController {
     }
 
     /**
+     * 필터 프리셋 삭제
+     * @param req
+     * @param paramVo
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/del")
+    public CommonResult delFilter(HttpServletRequest req, @RequestBody FilterVO paramVo) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
+            if(StringUtils.isEmpty(paramVo.getIdx_filter()+"")){
+                return responseService.getFailResult("filter_del","필터 프리셋 값이 없습니다.");
+            }
+
+            Integer rs = filterMapper.chkFilterAuth(paramVo);
+            if(rs==0){
+                return responseService.getFailResult("filter_del","필터 프리셋에 대한 권한이 없습니다.");
+            }
+
+            Integer rs0 = filterMapper.delFilter(paramVo);
+            if(rs0 == 1){
+                return responseService.getSuccessResult(rs, "filter_del", "필터 프리셋을 삭제하였습니다.");
+            }else{
+                return responseService.getFailResult("filter_del","필터 프리셋 정보가 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("filter_del","오류가 발생하였습니다.");
+        }
+    }
+
+    /**
      * 프로젝트 - 필터 생성
      * <p>filter_tp : 1:화자, 2:챕터, 3:서브챕터, 4:질문</p>
      * <p>filter_data : 화자텍스트//화자텍스트 (구분자 //)</p>

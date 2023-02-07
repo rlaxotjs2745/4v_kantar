@@ -53,4 +53,8 @@ public interface ReportMapper {
     List<ReportMetaDataVO> getMetadataInfoSpeaker(Integer idx) throws Exception;
 
     List<ReportMetaDataVO> getMetadataInfoChapter(Integer idx) throws Exception;
+
+    int getKeywordFindDictionary(String _keyword) throws Exception;
+
+    public ProjectVO getReportDown(ProjectVO paramVo) throws Exception;
 }
