@@ -253,3 +253,22 @@ CREATE TABLE `KT_API_STATISTICS` (
     COLLATE='utf8mb4_general_ci'
     ENGINE=InnoDB
 ;
+
+
+CREATE TABLE `KT_REPORT_FILTER_METADATA` (
+    `idx_report_metadata` INT(11) NOT NULL AUTO_INCREMENT,
+    `idx_report` INT(11) NOT NULL,
+    `speaker` VARCHAR(4000) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+    `chapter` VARCHAR(4000) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+    `word_length` BIGINT(20) NOT NULL,
+    `answer_cnt` INT(11) NOT NULL,
+    `create_dt` DATETIME NULL DEFAULT current_timestamp(),
+    `update_dt` DATETIME NULL DEFAULT NULL ON UPDATE current_timestamp(),
+    PRIMARY KEY (`idx_report_metadata`) USING BTREE,
+    INDEX `FK_KT_REPORT_METADATA_KT_REPORT` (`idx_report`) USING BTREE,
+    CONSTRAINT `FK_KT_REPORT_METADATA_KT_REPORT` FOREIGN KEY (`idx_report`) REFERENCES `KT_REPORT` (`idx_report`) ON UPDATE NO ACTION ON DELETE CASCADE
+)
+    COMMENT='리포트 필터적용 메타데이터'
+    COLLATE='utf8mb4_general_ci'
+    ENGINE=InnoDB
+;

@@ -298,20 +298,21 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
             }
 
-            ProjectVO rs0 = projectMapper.getProjectView(paramVo);
-            //ProjectVO rs1 = reportMapper.getReportView(paramVo); //기본리포트만 있을때
-            List<ProjectVO> rs1 = reportMapper.getReportDataViewAll(paramVo);
-
-            List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo);
-
+            ProjectVO rs0 = projectMapper.getProjectView(paramVo); // 프로젝트 기본정보
+            List<ProjectVO> rs1 = reportMapper.getReportDataViewAll(paramVo); // 리포트 기본정보
+            List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo); // 키워드
             if(key0.size()>0){
                 for (ReportFilterKeywordVO _keyword : key0) {
-                    int _dicCnt = reportMapper.getKeywordFindDictionary(_keyword.getSum_keyword());
+                    paramVo.setKeywords(_keyword.getSum_keyword());
+                    int _dicCnt = reportMapper.getKeywordFindDictionary(paramVo);
                     if (_dicCnt > 0){
                         _keyword.setDic_yn(1);
                     } else {  _keyword.setDic_yn(0);}
                 }
             }
+            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx()); // 필터 조건
+            List<ReportMetaDataVO> metaSpeaker = reportMapper.getMetadataInfoSpeaker(paramVo.getIdx());
+            List<ReportMetaDataVO> metaChapter = reportMapper.getMetadataInfoChapter(paramVo.getIdx());
 
             List<FilterDataVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
 
@@ -320,6 +321,8 @@ public class ReportController extends BaseController {
             _data.put("report",rs1);
             _data.put("keyword",key0);
             _data.put("filter",filter0);
+            _data.put("metaSpeaker",metaSpeaker);
+            _data.put("metaChapter",metaChapter);
 
             if(rs1!=null){
                 return responseService.getSuccessResult(_data, "report_view", "리포트 정보 성공");

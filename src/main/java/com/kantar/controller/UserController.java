@@ -495,4 +495,27 @@ public class UserController extends BaseController {
         return responseService.getFailResult("first_login_confirm","오류가 발생하였습니다.");
     }
 
+    /**
+     * 헤더 권한
+     * @param req
+     * @return CommonResult
+     * @throws Exception
+     */
+    @GetMapping("/header_info")
+    public CommonResult getHeaderInfo(HttpServletRequest req) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo == null){
+                return responseService.getFailResult("header_info","로그인이 필요합니다.");
+            }
+            Map<String, Object> rs = new HashMap<>();
+            rs.put("user_type", uinfo.getRole_type());
+            return responseService.getSuccessResult(rs, "header_info", "회원 타입 불러오기 성공");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("header_info","오류가 발생하였습니다.");
+        }
+
+    }
+
 }
