@@ -271,38 +271,41 @@ public class ReportController extends BaseController {
     @PostMapping("/report_view")
     public CommonResult getReportView(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
+            /*
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
 
+             */
+
             if(StringUtils.isEmpty(paramVo.getIdx()+"")){
                 return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
             }
 
-            ProjectVO rs0 = projectMapper.getProjectView(paramVo);
-            //ProjectVO rs1 = reportMapper.getReportView(paramVo); //기본리포트만 있을때
-            List<ProjectVO> rs1 = reportMapper.getReportDataViewAll(paramVo);
-
-            List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo);
-
+            ProjectVO rs0 = projectMapper.getProjectView(paramVo); // 프로젝트 기본정보
+            List<ProjectVO> rs1 = reportMapper.getReportDataViewAll(paramVo); // 리포트 기본정보
+            List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo); // 키워드
             if(key0.size()>0){
                 for (ReportFilterKeywordVO _keyword : key0) {
-                    int _dicCnt = reportMapper.getKeywordFindDictionary(_keyword.getSum_keyword());
+                    paramVo.setKeywords(_keyword.getSum_keyword());
+                    int _dicCnt = reportMapper.getKeywordFindDictionary(paramVo);
                     if (_dicCnt > 0){
                         _keyword.setDic_yn(1);
                     } else {  _keyword.setDic_yn(0);}
                 }
             }
-
-            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
+            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx()); // 필터 조건
+            List<ReportMetaDataVO> metaSpeaker = reportMapper.getMetadataInfoSpeaker(paramVo.getIdx());
+            List<ReportMetaDataVO> metaChapter = reportMapper.getMetadataInfoChapter(paramVo.getIdx());
 
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("project",rs0);
             _data.put("report",rs1);
             _data.put("keyword",key0);
-            _data.put("filter",filter0);
+            _data.put("metaSpeaker",metaSpeaker);
+            _data.put("metaChapter",metaChapter);
 
             if(rs1!=null){
                 return responseService.getSuccessResult(_data, "report_view", "리포트 정보 성공");

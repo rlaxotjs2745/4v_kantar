@@ -3,6 +3,7 @@ package com.kantar.mapper;
 import java.util.List;
 
 import com.kantar.vo.ReportFilterKeywordVO;
+import com.kantar.vo.ReportMetaDataVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kantar.vo.ProjectVO;
@@ -41,5 +42,15 @@ public interface ReportMapper {
 
     List<ReportFilterKeywordVO> getReportKeywordView(ProjectVO paramVo) throws Exception;
 
-    int getKeywordFindDictionary(String _keyword) throws Exception;
+    int getKeywordFindDictionary(ProjectVO paramVo) throws Exception;
+
+    int getMetadataInfoByIdx(ReportMetaDataVO md) throws Exception;
+
+    void insertMetadata(ReportMetaDataVO md) throws Exception;
+
+    void updateMetadataCnt(ReportMetaDataVO md) throws Exception;
+
+    List<ReportMetaDataVO> getMetadataInfoSpeaker(Integer idx) throws Exception;
+
+    List<ReportMetaDataVO> getMetadataInfoChapter(Integer idx) throws Exception;
 }
