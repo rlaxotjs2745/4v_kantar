@@ -26,8 +26,8 @@ public class FileService {
     @Value("${file.upload-dir}")
     public String filepath;
 
-    @Autowired
-    private Path fileLocation;
+    //@Autowired
+    //private Path fileLocation;
 
     /**
      * 파일 저장
