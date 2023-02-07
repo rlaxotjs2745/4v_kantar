@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.kantar.mapper.ReportMapper">
+
     <select id="getReportList" resultType="com.kantar.vo.ReportListVO">
         SELECT A.idx_report, B.job_no, A.report_id, A.title, LEFT(REPLACE(A.create_dt,'-','.'),16) AS create_dt, IF((A.d_count_total-A.d_count)=0,'생성완료','생성중') AS status_str
         FROM KT_REPORT A
@@ -94,6 +95,10 @@
         SELECT DISTINCT filepath, `filename` FROM KT_REPORT WHERE idx_project=#{idx_project}
     </select>
 
+    <select id="getReportFileByRp" resultType="com.kantar.vo.ProjectVO">
+        SELECT filepath, `filename` FROM KT_REPORT WHERE idx_project=#{idx_report}
+    </select>
+
     <insert id="createReportFilterData" parameterType="com.kantar.vo.ReportFilterKeywordVO">
         INSERT INTO KT_REPORT_KEYWORD (idx_report, keyword, keytype, keycount, create_dt) VALUES (#{idx_report}, #{sum_keyword}, #{keytype}, #{keycount}, SYSDATE())
     </insert>
@@ -114,7 +119,43 @@
         SELECT COUNT(1)
         FROM KT_DICTIONARY_DATA A
                  JOIN KT_REPORT_KEYWORD B ON A.keyword=B.keyword
-        WHERE A.keyword=#{keyword}
+                 JOIN KT_DICTIONARY C ON A.idx_dictionary=C.idx_dictionary
+        WHERE A.keyword=#{keywords}
+          AND (C.dic_type = 0 OR C.idx_user = #{idx_user})
     </select>
 
+    <select id="getMetadataInfoByIdx" resultType="Integer">
+        SELECT COUNT(1)
+        FROM KT_REPORT_FILTER_METADATA
+        WHERE idx_report=#{idx_report} AND #{speaker} AND #{chapter}
+    </select>
+
+    <insert id="insertMetadata">
+        INSERT INTO KT_REPORT_FILTER_METADATA (idx_report, speaker, chapter, answer_cnt, word_length, create_dt) VALUES (#{idx_report}, #{speaker}, #{chapter}, #{cnt}, #{length}, SYSDATE())
+    </insert>
+
+    <update id="updateMetadataCnt">
+        UPDATE KT_REPORT_FILTER_METADATA
+        SET answer_cnt= answer_cnt+1,
+            word_length = word_length+#{length}
+        WHERE idx_report=#{idx_report} AND #{speaker} AND #{chapter}
+    </update>
+
+    <select id="getMetadataInfoSpeaker" resultType="com.kantar.vo.ReportMetaDataVO">
+        SELECT speaker, sum(answer_cnt) as cnt, sum(word_length) as length
+        FROM KT_REPORT_FILTER_METADATA
+        WHERE idx_report=#{idx_report}
+        GROUP BY speaker
+    </select>
+
+    <select id="getMetadataInfoChapter" resultType="com.kantar.vo.ReportMetaDataVO">
+        SELECT chapter, speaker, sum(answer_cnt) cnt, sum(word_length) length
+        FROM KT_REPORT_FILTER_METADATA
+        WHERE idx_report=#{idx_report}
+        GROUP BY chapter,speaker
+    </select>
+
+    <select id="getReportDown" resultType="com.kantar.vo.ProjectVO">
+        SELECT filepath, `filename` FROM KT_REPORT WHERE idx_report=#{idx_report}
+    </select>
 </mapper>

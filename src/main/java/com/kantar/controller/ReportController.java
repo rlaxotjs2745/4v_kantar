@@ -9,13 +9,34 @@ import java.util.List;
 import java.util.Map;
 
 import com.kantar.mapper.FilterMapper;
+import com.kantar.service.FileService;
 import com.kantar.service.FilterService;
 import com.kantar.service.StatisticsService;
 import com.kantar.vo.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Picture;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +54,7 @@ import com.kantar.service.ResponseService;
 import com.kantar.util.TokenJWT;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/report")
@@ -57,6 +79,9 @@ public class ReportController extends BaseController {
 
     @Autowired
     private FilterMapper filterMapper;
+
+    @Autowired
+    private FileService fileService;
 
     @Autowired
     private TokenJWT tokenJWT;
@@ -281,28 +306,29 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("report_view","리포트 INDEX가 없습니다.");
             }
 
-            ProjectVO rs0 = projectMapper.getProjectView(paramVo);
-            //ProjectVO rs1 = reportMapper.getReportView(paramVo); //기본리포트만 있을때
-            List<ProjectVO> rs1 = reportMapper.getReportDataViewAll(paramVo);
-
-            List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo);
-
+            ProjectVO rs0 = projectMapper.getProjectView(paramVo); // 프로젝트 기본정보
+            List<ProjectVO> rs1 = reportMapper.getReportDataViewAll(paramVo); // 리포트 기본정보
+            List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo); // 키워드
             if(key0.size()>0){
                 for (ReportFilterKeywordVO _keyword : key0) {
-                    int _dicCnt = reportMapper.getKeywordFindDictionary(_keyword.getSum_keyword());
+                    paramVo.setKeywords(_keyword.getSum_keyword());
+                    int _dicCnt = reportMapper.getKeywordFindDictionary(paramVo);
                     if (_dicCnt > 0){
                         _keyword.setDic_yn(1);
                     } else {  _keyword.setDic_yn(0);}
                 }
             }
-
-            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
+            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx()); // 필터 조건
+            List<ReportMetaDataVO> metaSpeaker = reportMapper.getMetadataInfoSpeaker(paramVo.getIdx());
+            List<ReportMetaDataVO> metaChapter = reportMapper.getMetadataInfoChapter(paramVo.getIdx());
 
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("project",rs0);
             _data.put("report",rs1);
             _data.put("keyword",key0);
             _data.put("filter",filter0);
+            _data.put("metaSpeaker",metaSpeaker);
+            _data.put("metaChapter",metaChapter);
 
             if(rs1!=null){
                 return responseService.getSuccessResult(_data, "report_view", "리포트 정보 성공");
@@ -491,4 +517,320 @@ public class ReportController extends BaseController {
         }
     }
 
+    /**
+     * 리포트 다운로드
+     * @param req
+     * @param paramVo
+     * @return void
+     * @throws Exception
+     */
+    @GetMapping("/download")
+    public void getReportDown(HttpServletResponse response, HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return;
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
+
+            if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
+                return;
+            }
+
+            paramVo.setIdx(paramVo.getIdx_report());
+            ProjectVO rs0 = projectMapper.getProjectView(paramVo);
+            List<FilterVO> filter0 = filterMapper.getReportFilterByIdx(paramVo.getIdx());
+            List<ProjectVO> reportarr = reportMapper.getReportDataViewAll(paramVo);
+            List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo);
+
+            Workbook wb = new HSSFWorkbook();
+            Sheet sheet = wb.createSheet("REPORT_" + rs0.getProject_name());
+
+            // 타이틀 스타일
+            CellStyle style = wb.createCellStyle();
+            Font font = wb.createFont();
+            font.setBold(true);
+            font.setFontName("맑은 고딕");
+            style.setWrapText(true); //문자열을 입력할때 \n 같은 개행을 인식해준다.
+            // style.setVerticalAlignment(VerticalAlignment.CENTER);
+            // style.setAlignment(HorizontalAlignment.CENTER);
+            style.setFont(font);
+
+            // 내용 스타일
+            CellStyle style2 = wb.createCellStyle();
+            Font font2 = wb.createFont();
+            font2.setBold(false);
+            font2.setFontName("맑은 고딕");
+            style2.setWrapText(true); //문자열을 입력할때 \n 같은 개행을 인식해준다.
+            style2.setFont(font2);
+
+            int rowNum = 0;
+
+            Row titleRow = sheet.createRow(rowNum); // 타이틀행을 생성한다. 첫번째줄이기때문에 createRow(0)
+            Cell titleCell = titleRow.createCell(0); // 첫번째행의 첫번째열을 지정한다. 
+            titleCell.setCellValue("01. 기본정보"); // setCellValue 셀에 값넣기.
+            // titleRow.setHeight((short)920); // Row에서 setHeight를 하면 행 높이가 조정된다. 
+            // sheet.addMergedRegion(new CellRangeAddress(0,0,0,9)); // 셀 병합  첫번째줄~아홉번째 열까지 병합 
+            // new CellRangeAddress(시작 row, 끝 row, 시작 col, 끝 col) 
+            titleCell.setCellStyle(style);
+            
+            Row row = sheet.createRow(rowNum++);
+            Cell cell = row.createCell(0);
+            cell.setCellValue("리포트 이름");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue("프로젝트 이름");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue("생성일자");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue("프로젝트 세부내용");
+            cell.setCellStyle(style);
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("");
+            cell.setCellStyle(style2);
+
+            cell = row.createCell(1);
+            cell.setCellValue(rs0.getProject_name());
+            cell.setCellStyle(style2);
+
+            cell = row.createCell(1);
+            cell.setCellValue(rs0.getCreate_dt());
+            cell.setCellStyle(style2);
+
+            cell = row.createCell(1);
+            cell.setCellValue(rs0.getSummary0());
+            cell.setCellStyle(style2);
+
+            rowNum++;
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("02. 적용된 필터값");
+            cell.setCellStyle(style);
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("화자");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue("챕터");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(2);
+            cell.setCellValue("서브챕터");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(3);
+            cell.setCellValue("질문");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(4);
+            cell.setCellValue("키워드");
+            cell.setCellStyle(style);
+
+            Integer rowNum0 = rowNum;
+            Integer rowNum1 = rowNum;
+            Integer rowNum2 = rowNum;
+            Integer rowNum3 = rowNum;
+            Integer rowNum4 = rowNum;
+
+            // 화자
+            for(int i = 0; i<filter0.size(); i++) {
+                if(filter0.get(i).getFilter_type() == 1)
+                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
+                    row = sheet.createRow(rowNum0++);
+                    cell = row.createCell(0);
+                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
+                    cell.setCellStyle(style2);
+                }
+            }
+
+            // 챕터
+            for(int i = 0; i<filter0.size(); i++) {
+                if(filter0.get(i).getFilter_type() == 2)
+                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
+                    row = sheet.createRow(rowNum1++);
+                    cell = row.createCell(1);
+                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
+                    cell.setCellStyle(style2);
+                }
+            }
+
+            // 서브챕터
+            for(int i = 0; i<filter0.size(); i++) {
+                if(filter0.get(i).getFilter_type() == 2)
+                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
+                    row = sheet.createRow(rowNum2++);
+                    cell = row.createCell(2);
+                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
+                    cell.setCellStyle(style2);
+                }
+            }
+
+            // 질문
+            for(int i = 0; i<filter0.size(); i++) {
+                if(filter0.get(i).getFilter_type() == 2)
+                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
+                    row = sheet.createRow(rowNum3++);
+                    cell = row.createCell(3);
+                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
+                    cell.setCellStyle(style2);
+                }
+            }
+
+            // 키워드
+            for(int i = 0; i<filter0.size(); i++) {
+                if(filter0.get(i).getFilter_type() == 2)
+                for(int j = 0; j<filter0.get(i).getFilterDataList().size(); j++) {
+                    row = sheet.createRow(rowNum4++);
+                    cell = row.createCell(4);
+                    cell.setCellValue(filter0.get(i).getFilterDataList().get(j).getFilter_data());
+                    cell.setCellStyle(style2);
+                }
+            }
+
+            rowNum = rowNum0;
+            if(rowNum1 > rowNum){rowNum=rowNum1;}
+            if(rowNum2 > rowNum){rowNum=rowNum2;}
+            if(rowNum3 > rowNum){rowNum=rowNum3;}
+            if(rowNum4 > rowNum){rowNum=rowNum4;}
+
+            rowNum++;
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("03. 요약문");
+            cell.setCellStyle(style);
+            
+            Integer _rpNum0 = rowNum++;
+            Integer _rpNum1 = 0;
+
+            for(ProjectVO _rs : reportarr){
+                row = sheet.createRow(_rpNum0);
+                cell = row.createCell(_rpNum1);
+                cell.setCellValue(_rs.getTitle());
+                cell.setCellStyle(style);
+                
+                Row row1 = sheet.createRow(_rpNum0+1);
+                cell = row1.createCell(_rpNum1);
+                cell.setCellValue(_rs.getSummary0());
+                cell.setCellStyle(style2);
+
+                _rpNum1++;
+            }
+
+            rowNum++;
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("04. 키워드 빈도");
+            cell.setCellStyle(style);
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("키워드 이름");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue("형태");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(2);
+            cell.setCellValue("건수");
+            cell.setCellStyle(style);
+
+            for(ReportFilterKeywordVO _rs : key0){
+                row = sheet.createRow(rowNum++);
+                cell = row.createCell(0);
+                cell.setCellValue(_rs.getSum_keyword());
+                cell.setCellStyle(style2);
+
+                cell = row.createCell(1);
+                cell.setCellValue(_rs.getKeytype());
+                cell.setCellStyle(style2);
+
+                cell = row.createCell(2);
+                cell.setCellValue(_rs.getKeycount());
+                cell.setCellStyle(style2);
+            }
+
+            rowNum++;
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("05. 챕터별 메타 데이터");
+            cell.setCellStyle(style);
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("챕터");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue("화자");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(2);
+            cell.setCellValue("건수");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(3);
+            cell.setCellValue("텍스트 길이");
+            cell.setCellStyle(style);
+
+
+            rowNum++;
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("06. 화자별 메타 데이터");
+            cell.setCellStyle(style);
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("화자");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(1);
+            cell.setCellValue("건수");
+            cell.setCellStyle(style);
+
+            cell = row.createCell(2);
+            cell.setCellValue("텍스트 길이");
+            cell.setCellStyle(style);
+
+
+            rowNum++;
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("07. 사용자 메모");
+            cell.setCellStyle(style);
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue("메모");
+            cell.setCellStyle(style);
+
+            row = sheet.createRow(rowNum++);
+            cell = row.createCell(0);
+            cell.setCellValue(rs0.getSummary());
+            cell.setCellStyle(style2);
+                
+            /* 엑셀 파일 생성 */
+            response.setContentType("ms-vnd/excel");
+            response.setHeader("Content-Disposition", "attachment;filename=poiTest.xls");
+            wb.write(response.getOutputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

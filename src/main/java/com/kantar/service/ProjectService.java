@@ -235,11 +235,12 @@ public class ProjectService {
             List<ProjectVO> prs = reportMapper.getReportFileListOne(paramVo);
             int data_cnt = 0;
 
-            if(filter_op1>0 && filter_op1<5){ //전 체요약문
+            if(filter_op1>0 && filter_op1<5){ //전체요약문
                 for(ProjectVO prs0 : prs){
                     String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
 
                     List<SumtextVO> _data = new ArrayList<SumtextVO>();
+                    List<ReportMetaDataVO> _metalist = new ArrayList<ReportMetaDataVO>();
                     Map<String, Object> _nlp = new HashMap<String, Object>();
                     Map<String, Object> _nlp0 = new HashMap<String, Object>();
                     Map<String, Object> _nlp1 = new HashMap<String, Object>();
@@ -248,19 +249,29 @@ public class ProjectService {
                     SummaryVO params = new SummaryVO();
                     List<String[]> ers = excel.getCsvListData(_fpath);
                     int j = 0;
+                    int _metaCnt = 0;
                     for(String[] _ers0 : ers){  // 줄
                         if (j > 0) {
                             SumtextVO _elist = new SumtextVO();
+                            ReportMetaDataVO _meta = new ReportMetaDataVO();
                             if (_isKey == 99) {
                                 _elist.setSpeaker(_ers0[3].toString());
                                 _elist.setText(_ers0[4].toString());
                                 _data.add(_elist);
+                                _meta.setSpeaker(_ers0[3].toString());
+                                _meta.setChapter(_ers0[0].toString());
+                                _meta.setLength(_ers0[4].toString().length());
+                                _metalist.add(_meta);
                             } else if(_isKey == 10){
                                 for (String ty1_f : ty1) {
                                     if(_ers0[3].equals(ty1_f)){
                                         _elist.setSpeaker(_ers0[3].toString());
                                         _elist.setText(_ers0[4].toString());
                                         _data.add(_elist);
+                                        _meta.setSpeaker(_ers0[3].toString());
+                                        _meta.setChapter(_ers0[0].toString());
+                                        _meta.setLength(_ers0[4].toString().length());
+                                        _metalist.add(_meta);
                                     }
                                 }
                             } else if(_isKey == 50){
@@ -269,6 +280,10 @@ public class ProjectService {
                                         _elist.setSpeaker(_ers0[3].toString());
                                         _elist.setText(_ers0[4].toString());
                                         _data.add(_elist);
+                                        _meta.setSpeaker(_ers0[3].toString());
+                                        _meta.setChapter(_ers0[0].toString());
+                                        _meta.setLength(_ers0[4].toString().length());
+                                        _metalist.add(_meta);
                                     }
                                 }
                             } else if (_isKey == 0){
@@ -278,6 +293,10 @@ public class ProjectService {
                                             _elist.setSpeaker(_ers0[3].toString());
                                             _elist.setText(_ers0[4].toString());
                                             _data.add(_elist);
+                                            _meta.setSpeaker(_ers0[3].toString());
+                                            _meta.setChapter(_ers0[0].toString());
+                                            _meta.setLength(_ers0[4].toString().length());
+                                            _metalist.add(_meta);
                                         }
                                     }
                                 }
@@ -324,7 +343,7 @@ public class ProjectService {
                                 summ_keywords.add(param.getSummary_keywords());
                             }
                             statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
-
+                            saveMetadata(_metalist); // 메타데이터 집계
                             if(StringUtils.isNotEmpty(_token)){
                                 _msg = "필터 리포트가 생성되었습니다.";
                             }
@@ -356,6 +375,7 @@ public class ProjectService {
                                                 _elist.setSpeaker(_ers0[3].toString());
                                                 _elist.setText(_ers0[4].toString());
                                                 chapter_data.add(_elist);
+                                                data_cnt++;
                                             }
                                         }
                                     } else if(_isKey == 50){
@@ -364,6 +384,7 @@ public class ProjectService {
                                                 _elist.setSpeaker(_ers0[3].toString());
                                                 _elist.setText(_ers0[4].toString());
                                                 chapter_data.add(_elist);
+                                                data_cnt++;
                                             }
                                         }
                                     } else if (_isKey == 0){
@@ -446,6 +467,7 @@ public class ProjectService {
                                                         _elist.setSpeaker(_ers0[3].toString());
                                                         _elist.setText(_ers0[4].toString());
                                                         subChap_data.add(_elist);
+                                                        data_cnt++;
                                                     }
                                                 }
                                             } else if(_isKey == 50){
@@ -454,6 +476,7 @@ public class ProjectService {
                                                         _elist.setSpeaker(_ers0[3].toString());
                                                         _elist.setText(_ers0[4].toString());
                                                         subChap_data.add(_elist);
+                                                        data_cnt++;
                                                     }
                                                 }
                                             } else if (_isKey == 0){
@@ -540,6 +563,7 @@ public class ProjectService {
                                                                 _elist.setSpeaker(_ers0[3].toString());
                                                                 _elist.setText(_ers0[4].toString());
                                                                 quest_data.add(_elist);
+                                                                data_cnt++;
                                                             }
                                                         }
                                                     } else if(_isKey == 50){
@@ -548,6 +572,7 @@ public class ProjectService {
                                                                 _elist.setSpeaker(_ers0[3].toString());
                                                                 _elist.setText(_ers0[4].toString());
                                                                 quest_data.add(_elist);
+                                                                data_cnt++;
                                                             }
                                                         }
                                                     } else if (_isKey == 0){
@@ -617,7 +642,12 @@ public class ProjectService {
                             }
                         } // 챕터
                     }
-                    saveSummaryKeyword(paramVo, summ_keywords, filter_op2);
+                    ReportFilterKeywordVO option = new ReportFilterKeywordVO();
+                    option.setDic_keywords(ty5);
+                    option.setSpeaker(ty1);
+                    option.setKeytype(_isKey);
+                    option.setFilter(filter_op2);
+                    saveSummaryKeyword(paramVo, summ_keywords, option);
                 } // 전체
             } else {
                 _msg = "리포트 필터 옵션을 다시 선택해주세요.";
@@ -627,6 +657,17 @@ public class ProjectService {
             _msg = "리포트 생성을 실패하였습니다.";
             if(StringUtils.isNotEmpty(_token)){
                 // kafkaSender.send(_token, _msg);
+            }
+        }
+    }
+
+    private void saveMetadata(List<ReportMetaDataVO> metalist) throws Exception {
+        for (ReportMetaDataVO md : metalist) {
+            int _isSave = reportMapper.getMetadataInfoByIdx(md);
+            if(_isSave==0){
+                reportMapper.insertMetadata(md);
+            } else if (_isSave>0) {
+                reportMapper.updateMetadataCnt(md);
             }
         }
     }
@@ -653,9 +694,13 @@ public class ProjectService {
      * @param param
      * @param s_keyword
      */
-    private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword, int op2) throws Exception {
+    private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword, ReportFilterKeywordVO option) throws Exception {
 
         List<ProjectVO> prs = reportMapper.getReportFileListOne(param);
+        int op2 = option.getFilter();
+        int _isKey = option.getKeytype();
+        String[] ty1 = option.getSpeaker();
+        String[] ty5 = option.getDic_keywords();
 
         if(s_keyword.size()>0){
             for(ProjectVO prs0 : prs) {
@@ -677,12 +722,55 @@ public class ProjectService {
                             int count = 0;
                             for(String[] _ers0 : ers){
                                 if (j > 0) {
-                                    int index = 0;
-                                    while (index >= 0) {
-                                        index = _ers0[4].indexOf(key, index);
-                                        if (index >= 0) {
-                                            count++;
-                                            index += key.length();
+                                    if (_isKey == 99) { // 화자,키워드 필터없을때
+                                        int index = 0;
+                                        while (index >= 0) {
+                                            index = _ers0[4].indexOf(key, index);
+                                            if (index >= 0) {
+                                                count++;
+                                                index += key.length();
+                                            }
+                                        }
+                                    } else if(_isKey == 10){ // 화자 키워드만 지정했을때
+                                        for (String ty1_f : ty1) {
+                                            if(_ers0[3].equals(ty1_f)){
+                                                int index = 0;
+                                                while (index >= 0) {
+                                                    index = _ers0[4].indexOf(key, index);
+                                                    if (index >= 0) {
+                                                        count++;
+                                                        index += key.length();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else if(_isKey == 50){ // 키워드 필터만 지정했을때
+                                        for(String dic_key : ty5) {
+                                            if(_ers0[4].contains(dic_key)){
+                                                int index = 0;
+                                                while (index >= 0) {
+                                                    index = _ers0[4].indexOf(key, index);
+                                                    if (index >= 0) {
+                                                        count++;
+                                                        index += key.length();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else if (_isKey == 0) { // 화자,키워드 필터 모두 지정했을때
+                                        for (String ty5_f : ty5) {
+                                            for (String ty1_f : ty1) {
+                                                if (_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
+                                                    int index = 0;
+                                                    while (index >= 0) {
+                                                        index = _ers0[4].indexOf(key, index);
+                                                        if (index >= 0) {
+                                                            count++;
+                                                            index += key.length();
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }

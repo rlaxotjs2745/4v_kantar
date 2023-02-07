@@ -1,6 +1,7 @@
 package com.kantar.controller;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +13,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +29,7 @@ import com.kantar.base.BaseController;
 import com.kantar.mapper.ProjectMapper;
 import com.kantar.mapper.ReportMapper;
 import com.kantar.model.CommonResult;
+import com.kantar.service.FileService;
 import com.kantar.service.KafkaSender;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
@@ -49,6 +54,9 @@ public class ProjectController extends BaseController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private FileService fileService;
 
     @Autowired
     private KafkaSender kafkaSender;
@@ -216,5 +224,34 @@ public class ProjectController extends BaseController {
             e.printStackTrace();
             return responseService.getFailResult("project_view","오류가 발생하였습니다.");
         }
+    }
+
+    /**
+     * 프로젝트 다운로드
+     * @param req
+     * @param paramVo
+     * @return ResponseEntity<Resource>
+     * @throws Exception
+     */
+    @GetMapping("/download")
+    public ResponseEntity<Resource> getProjectDown(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return null;
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
+
+            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
+                return null;
+            }
+
+            ProjectVO rs = projectMapper.getProjectDown(paramVo);
+            String _fpath = this.filepath + rs.getFilepath() + rs.getFilename();
+            return fileService.getFileDown(_fpath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

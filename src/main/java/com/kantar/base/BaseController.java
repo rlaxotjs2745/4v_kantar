@@ -32,6 +32,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.gson.Gson;
@@ -46,6 +47,15 @@ public class BaseController {
 	@Autowired
 	private TokenJWT tokenJWT;
 
+	@Value("${file.upload-dir}")
+    public String filepath;
+
+	/**
+	 * 로그인 체크
+	 * @param req
+	 * @return UserVO
+	 * @throws Exception
+	 */
 	public UserVO getChkUserLogin(HttpServletRequest req) throws Exception{
 		UserVO paramVo = null;
         String token = tokenJWT.resolveToken(req);
@@ -60,6 +70,12 @@ public class BaseController {
 		return paramVo;
     }
 
+	/**
+	 * 로그인 체크
+	 * @param req
+	 * @return UserVO
+	 * @throws Exception
+	 */
 	public UserVO getChkUserLogin(MultipartHttpServletRequest req) throws Exception{
 		UserVO paramVo = null;
         String token = tokenJWT.resolveToken(req);
@@ -77,7 +93,7 @@ public class BaseController {
     /**
 	 * Client IP 조회
 	 * @param request
-	 * @return
+	 * @return String
 	 */
 	protected String getClientIP(HttpServletRequest req) {
 		String ip = req.getHeader("X-FORWARDED-FOR");
