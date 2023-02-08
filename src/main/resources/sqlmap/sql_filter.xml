@@ -38,7 +38,14 @@
     <select id="chkFilterAuth" resultType="Integer">
         SELECT COUNT(1)
             FROM KT_REPORT_FILTER
-            WHERE idx_filter=#{idx_filter} AND idx_user=#{idx_user}
+            WHERE idx_filter=#{idx_filter} AND (idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=#{idx_user} AND user_type IN (11,99))>0)
+    </select>
+
+    <select id="chkFilterUse" resultType="Integer">
+        SELECT COUNT(1)
+            FROM KT_REPORT_FILTER A
+                JOIN KT_REPORT B ON B.idx_filter=A.idx_filter
+            WHERE A.idx_filter=#{idx_filter}
     </select>
 
     <insert id="createFilter" useGeneratedKeys="true" keyColumn="idx_filter" keyProperty="idx_filter">
@@ -46,7 +53,7 @@
     </insert>
 
     <delete id="delFilter">
-        DELETE FROM KT_REPORT_FILTER WHERE idx_filter=#{idx_filter} AND idx=#{idx_user}
+        DELETE FROM KT_REPORT_FILTER WHERE idx_filter=#{idx_filter} AND (idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=#{idx_user} AND user_type IN (11,99))>0)
     </delete>
 
     <insert id="createFilterData" parameterType="java.util.Map">

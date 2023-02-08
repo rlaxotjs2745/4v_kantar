@@ -22,6 +22,8 @@ public interface FilterMapper {
 
     public Integer delFilterData(FilterVO paramVo) throws Exception;
 
+    public Integer chkFilterUse(FilterVO paramVo) throws Exception;
+
     public List<FilterDataVO> getReportFilterByIdx(Integer idx) throws Exception;
 
     public List<FilterDataVO> getReportFilter(Integer idx) throws Exception;
