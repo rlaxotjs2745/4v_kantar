@@ -851,13 +851,13 @@ public class ReportController extends BaseController {
     }
 
     /**
-     * 리포트 메모 수정
+     * 리포트 수정
      * @param req
      * @param paramVo
      * @return
      * @throws Exception
      */
-    @PostMapping("/update_memo")
+    @PostMapping("mod_report")
     public CommonResult updateReportMemo(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
@@ -868,10 +868,10 @@ public class ReportController extends BaseController {
 
             int _check = reportMapper.chkReportAuth(paramVo);
             if(_check<1){
-                return responseService.getFailResult("update_memo","리포트 수정 권한이 없습니다.");
+                return responseService.getFailResult("mod_report","리포트 수정 권한이 없습니다.");
             }
             if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
-                return responseService.getFailResult("update_memo","리포트 정보를 다시 확인해주세요.");
+                return responseService.getFailResult("mod_report","리포트 정보를 다시 확인해주세요.");
             }
 
             if(StringUtils.isNotEmpty(paramVo.getTitle()) || StringUtils.isNotEmpty(paramVo.getSummary0())) {
@@ -885,11 +885,11 @@ public class ReportController extends BaseController {
                 }
             }
 
-            return responseService.getSuccessResult("update_memo", "리포트 정보를 수정했습니다.");
+            return responseService.getSuccessResult("mod_report", "리포트 정보를 수정했습니다.");
 
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("update_memo","오류가 발생하였습니다.");
+            return responseService.getFailResult("mod_report","오류가 발생하였습니다.");
         }
     }
 }
