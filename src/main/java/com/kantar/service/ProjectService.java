@@ -701,13 +701,13 @@ public class ProjectService {
 
                 ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
                 reKeywords.setIdx_report(param.getIdx_report());
-                reKeywords.setKeytype(0); // 임시작성. 명사형용사 향후 추가적용 필요
+                reKeywords.setKeytype(1); // 임시작성. 명사형용사 향후 추가적용 필요
 
                 int total_count = 0;
 
                 for (String[] keywords : s_keyword) {
                     for (String key : keywords) {
-                        if(op2==1 || (op2==0 && key.length()>1)){
+                        if(op2==0 || (op2==1 && key.length()>1)){
                             reKeywords.setSum_keyword(key);
                             List<String[]> ers = excel.getCsvListData(_fpath);
 
