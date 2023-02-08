@@ -5,6 +5,7 @@ import com.kantar.mapper.DictionaryMapper;
 import com.kantar.mapper.UserMapper;
 import com.kantar.model.CommonResult;
 import com.kantar.service.DictionaryService;
+import com.kantar.service.FileService;
 import com.kantar.service.ResponseService;
 import com.kantar.util.Excel;
 import com.kantar.vo.DictionaryDataVO;
@@ -17,6 +18,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +29,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +47,8 @@ public class DictionaryController extends BaseController {
     private UserMapper userMapper;
     @Autowired
     private DictionaryService dictionaryService;
+    @Autowired
+    private FileService fileService;
     @Value("${file.upload-dir}")
     public String filepath;
     @Autowired
@@ -334,5 +341,43 @@ public class DictionaryController extends BaseController {
         }
     }
 
+    /**
+     * 사전 다운로드
+     * @param req
+     * @param paramVo
+     * @return ResponseEntity<Resource>
+     * @throws Exception
+     */
+    @GetMapping("/download")
+    public ResponseEntity<Object> getDictDown(HttpServletRequest req, DictionaryVO paramVo) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return null;
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
+
+            if(StringUtils.isEmpty(paramVo.getIdx_dictionary()+"")){
+                return null;
+            }
+
+            String _fpath = this.filepath;
+
+            if(paramVo.getDic_type() != null && paramVo.getDic_type() == 11111){
+                _fpath += "/dictionary/sample_kantar.csv";
+            } else {
+                DictionaryVO rs = dictionaryMapper.getDictDown(paramVo);
+                if(rs==null){
+                    return null;
+                }
+                _fpath += rs.getFilepath() + rs.getFilename();
+            }
+
+            return fileService.getFileDown(_fpath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

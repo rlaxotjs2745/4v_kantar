@@ -24,7 +24,6 @@ public class FileService {
     /**
      * 파일 저장
      * @param req
-     * @param _idx
      * @return
      * @throws Exception
      */

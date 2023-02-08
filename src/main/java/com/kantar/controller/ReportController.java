@@ -858,7 +858,7 @@ public class ReportController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/update_memo")
-    public CommonResult updateReportMemo(HttpServletRequest req, ProjectVO paramVo) throws Exception {
+    public CommonResult updateReportMemo(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
@@ -894,13 +894,12 @@ public class ReportController extends BaseController {
      * @throws Exception
      */
     @PostMapping("/update_report_summary")
-    public CommonResult updateReportSummary(HttpServletRequest req, ProjectVO paramVo) throws Exception {
+    public CommonResult updateReportSummary(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
-
             paramVo.setIdx_user(uinfo.getIdx_user());
             int _check = reportMapper.chkReportDataAuth(paramVo);
             if(_check<1){
@@ -910,7 +909,7 @@ public class ReportController extends BaseController {
             if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
                 return responseService.getFailResult("update_report_summary","리포트 정보를 다시 확인해주세요.");
             }
-            if(StringUtils.isEmpty(paramVo.getSummary())){
+            if(StringUtils.isEmpty(paramVo.getSummary0())){
                 return responseService.getFailResult("update_report_summary","입력된 메모가 없습니다.");
             }
 
