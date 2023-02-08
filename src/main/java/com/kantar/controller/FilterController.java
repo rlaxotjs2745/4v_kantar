@@ -88,6 +88,11 @@ public class FilterController extends BaseController {
                 return responseService.getFailResult("filter_del","필터 프리셋에 대한 권한이 없습니다.");
             }
 
+            Integer rs1 = filterMapper.chkFilterUse(paramVo);
+            if(rs1>1){
+                return responseService.getFailResult("filter_del","이용한 필터 프리셋은 삭제할 수 없습니다.");
+            }
+
             Integer rs0 = filterMapper.delFilter(paramVo);
             if(rs0 == 1){
                 return responseService.getSuccessResult(rs, "filter_del", "필터 프리셋을 삭제하였습니다.");
