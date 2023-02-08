@@ -33,4 +33,6 @@ public interface DictionaryMapper {
     public List<DictionaryVO> getDictionaryByTitle(String title) throws Exception;
 
     public List<DictionaryDataVO> getBulkDictionaryData(List<Integer> idx_dictionary) throws Exception;
+
+    public DictionaryVO getDictDown(DictionaryVO dictionaryVO) throws Exception;
 }
