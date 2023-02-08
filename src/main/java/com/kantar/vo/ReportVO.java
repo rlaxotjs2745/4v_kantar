@@ -15,6 +15,9 @@ public class ReportVO extends BaseVO {
     private String keyword;
     private String keytype;
     private Integer keycount;
+    private Integer reportStatus;
+    private Integer d_count;
+    private Integer d_count_total;
 
     private String title;
     private String rfil0;   // 전체 요약 포함 여부 - 0:미포함,1:포함

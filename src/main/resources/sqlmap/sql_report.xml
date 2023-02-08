@@ -8,7 +8,7 @@
         FROM KT_REPORT A
         JOIN KT_PROJECT_JOB_PROJECTID D ON D.idx_project_job_projectid=A.idx_project_job_projectid
         JOIN KT_PROJECT_JOB B ON B.idx_project_job=D.idx_project_job
-        WHERE CASE WHEN (SELECT user_type FROM KT_USER WHERE idx_user=#{idx_user})=1 THEN A.idx_user=#{idx_user} ELSE 1=1 END
+        WHERE (A.idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=A.idx_user AND user_type IN (11,99))>0)
         ORDER BY A.idx_report DESC
         <if test="currentPage != null">
         LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
@@ -20,7 +20,7 @@
         FROM KT_REPORT A
         JOIN KT_PROJECT_JOB_PROJECTID D ON D.idx_project_job_projectid=A.idx_project_job_projectid
         JOIN KT_PROJECT_JOB B ON B.idx_project_job=D.idx_project_job
-        WHERE CASE WHEN (SELECT user_type FROM KT_USER WHERE idx_user=#{idx_user})=1 THEN A.idx_user=#{idx_user} ELSE 1=1 END
+        WHERE (A.idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=A.idx_user AND user_type IN (11,99))>0)
     </select>
 
     <select id="getReportView" resultType="com.kantar.vo.ProjectVO">
@@ -53,11 +53,17 @@
     </select>
 
     <insert id="savReport" useGeneratedKeys="true" keyColumn="idx_report" keyProperty="idx_report">
-		INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, report_seq, report_id, title, filepath, `filename`, idx_user, idx_filter) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{report_seq}, #{report_id}, #{title}, #{filepath}, #{filename}, #{idx_user}, #{idx_filter})
+		INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, report_seq, report_id, title, filepath, `filename`, idx_user, idx_filterm, d_count_total) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{report_seq}, #{report_id}, #{title}, #{filepath}, #{filename}, #{idx_user}, #{idx_filter}, #{d_count_total})
     </insert>
 
     <select id="getReportIdx" resultType="com.kantar.vo.ProjectVO">
         SELECT idx_report FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+    </select>
+
+    <select id="getReportListIdx" resultType="com.kantar.vo.ProjectVO">
+        SELECT idx_report, `title` 
+            , IF(d_count_total!=d_count,0,1) AS reportStatus
+            FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
     </select>
 
     <insert id="savReportIdx" useGeneratedKeys="true" keyColumn="idx_report" keyProperty="idx_report">
@@ -77,7 +83,7 @@
             <if test="summary0 != null">
             , summary0=#{summary0}
             </if>
-            WHERE idx_report_data=#{idx_report_data}
+            WHERE idx_report=#{idx_report}
     </update>
 
     <update id="comProject">
@@ -180,4 +186,10 @@
         FROM KT_REPORT_DATAt
         WHERE idx_report_data=#{idx_report_data} AND idx_user=#{idx_user}
     </select>
+
+    <update id="updReportCountUp">
+        UPDATE KT_REPORT
+            SET d_count = d_count + 1
+            WHERE idx_report=#{idx_report>
+    </update>
 </mapper>

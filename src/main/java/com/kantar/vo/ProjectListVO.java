@@ -24,5 +24,6 @@ public class ProjectListVO {
     private String user_name;
     private String create_dt;
     private String doc_version;
+    private Integer reportStatus;
     List<ReportListVO> reportList;
 }
