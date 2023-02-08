@@ -61,7 +61,7 @@
     </select>
 
     <select id="getReportListIdx" resultType="com.kantar.vo.ProjectVO">
-        SELECT idx_report, `title` 
+        SELECT idx_report, `title`, idx_project_job_projectid
             , IF(d_count_total!=d_count,0,1) AS reportStatus
             FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
     </select>
