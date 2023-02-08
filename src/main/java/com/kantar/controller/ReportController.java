@@ -489,11 +489,11 @@ public class ReportController extends BaseController {
             }
 
             if(StringUtils.isEmpty(filterVO.getTp1()) && StringUtils.isEmpty(filterVO.getTp2()) && StringUtils.isEmpty(filterVO.getTp3()) && StringUtils.isEmpty(filterVO.getTp4())){
-                return responseService.getFailResult("filter_create","필터 데이터가 없습니다.");
+                return responseService.getFailResult("save_filter_report","필터 데이터가 없습니다.");
             }
 
             if(filterVO.getFilter_op2()==null || filterVO.getFilter_op2()>1 || filterVO.getFilter_op2()<0){
-                return responseService.getFailResult("filter_create","지정된 키워드 필터 옵션이 올바르지 않습니다.");
+                return responseService.getFailResult("save_filter_report","지정된 키워드 필터 옵션이 올바르지 않습니다.");
             }
 
             Integer idx_filter = filterService.createReportFilter(filterVO);
@@ -501,11 +501,11 @@ public class ReportController extends BaseController {
             projectService.list_reportfilter(_token, filterVO);
 
 
-            return responseService.getSuccessResult("test_report", "필터 리포트 생성을 시작하였습니다.");
+            return responseService.getSuccessResult("save_filter_report", "필터 리포트 생성을 시작하였습니다.");
 
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("test_report","오류가 발생하였습니다.");
+            return responseService.getFailResult("save_filter_report","오류가 발생하였습니다.");
         }
     }
 
@@ -849,4 +849,79 @@ public class ReportController extends BaseController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 리포트 메모 수정
+     * @param req
+     * @param paramVo
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/update_memo")
+    public CommonResult updateReportMemo(HttpServletRequest req, ProjectVO paramVo) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            paramVo.setIdx_user(uinfo.getIdx_user());
+            int _check = reportMapper.chkReportAuth(paramVo);
+            if(_check<1){
+                return responseService.getFailResult("update_memo","리포트 수정 권한이 없습니다.");
+            }
+            if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
+                return responseService.getFailResult("update_memo","리포트 정보를 다시 확인해주세요.");
+            }
+            if(StringUtils.isEmpty(paramVo.getSummary())){
+                return responseService.getFailResult("update_memo","입력된 메모가 없습니다.");
+            }
+
+            reportMapper.updateReportMemo(paramVo);
+
+            return responseService.getSuccessResult("update_memo", "리포트 메모 수정을 성공하였습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("update_memo","오류가 발생하였습니다.");
+        }
+    }
+
+    /**
+     * 리포트 요약문 수정
+     * @param req
+     * @param paramVo
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/update_report_summary")
+    public CommonResult updateReportSummary(HttpServletRequest req, ProjectVO paramVo) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+
+            paramVo.setIdx_user(uinfo.getIdx_user());
+            int _check = reportMapper.chkReportDataAuth(paramVo);
+            if(_check<1){
+                return responseService.getFailResult("update_report_summary","리포트 수정 권한이 없습니다.");
+            }
+
+            if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
+                return responseService.getFailResult("update_report_summary","리포트 정보를 다시 확인해주세요.");
+            }
+            if(StringUtils.isEmpty(paramVo.getSummary())){
+                return responseService.getFailResult("update_report_summary","입력된 메모가 없습니다.");
+            }
+
+            int _r = reportMapper.updateReportSummary(paramVo);
+
+            return responseService.getSuccessResult("update_report_summary", "리포트 메모 수정을 성공하였습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("update_report_summary","오류가 발생하였습니다.");
+        }
+    }
+
 }
