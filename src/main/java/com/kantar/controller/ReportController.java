@@ -628,69 +628,83 @@ public class ReportController extends BaseController {
             cell = row.createCell(4);
             cell.setCellValue("키워드");
             cell.setCellStyle(style);
-
-            Integer rowNum0 = rowNum;
-            Integer rowNum1 = rowNum;
-            Integer rowNum2 = rowNum;
-            Integer rowNum3 = rowNum;
-            Integer rowNum4 = rowNum;
-
+            
             if(filter0.size()>0){
-                // 화자
+                List<String> cv0 = new ArrayList<String>();
+                List<String> cv1 = new ArrayList<String>();
+                List<String> cv2 = new ArrayList<String>();
+                List<String> cv3 = new ArrayList<String>();
+                List<String> cv4 = new ArrayList<String>();
+
+                Integer cvcnt = 0;
                 for(FilterDataVO _rs : filter0) {
                     if(_rs.getFilter_type() == 1){
-                        row = sheet.createRow(rowNum0++);
-                        cell = row.createCell(0);
-                        cell.setCellValue(_rs.getFilter_data());
-                        cell.setCellStyle(style2);
+                        cv0.add(_rs.getFilter_data());
                     }
-                }
-
-                // 챕터
-                for(FilterDataVO _rs : filter0) {
                     if(_rs.getFilter_type() == 2){
-                        row = sheet.createRow(rowNum1++);
-                        cell = row.createCell(1);
-                        cell.setCellValue(_rs.getFilter_data());
-                        cell.setCellStyle(style2);
+                        cv1.add(_rs.getFilter_data());
                     }
-                }
-
-                // 서브챕터
-                for(FilterDataVO _rs : filter0) {
                     if(_rs.getFilter_type() == 3){
-                        row = sheet.createRow(rowNum2++);
-                        cell = row.createCell(2);
-                        cell.setCellValue(_rs.getFilter_data());
-                        cell.setCellStyle(style2);
+                        cv2.add(_rs.getFilter_data());
                     }
-                }
-
-                // 질문
-                for(FilterDataVO _rs : filter0) {
                     if(_rs.getFilter_type() == 4){
-                        row = sheet.createRow(rowNum3++);
-                        cell = row.createCell(3);
-                        cell.setCellValue(_rs.getFilter_data());
-                        cell.setCellStyle(style2);
+                        cv3.add(_rs.getFilter_data());
                     }
-                }
-
-                // 키워드
-                for(FilterDataVO _rs : filter0) {
                     if(_rs.getFilter_type() == 5){
-                        row = sheet.createRow(rowNum4++);
+                        cv4.add(_rs.getFilter_data());
+                    }
+                }
+                cvcnt = cv0.size();
+                if(cvcnt < cv1.size()){
+                    cvcnt = cv1.size();
+                }
+                if(cvcnt < cv2.size()){
+                    cvcnt = cv2.size();
+                }
+                if(cvcnt < cv3.size()){
+                    cvcnt = cv3.size();
+                }
+                if(cvcnt < cv4.size()){
+                    cvcnt = cv4.size();
+                }
+                for(int i = 0; i<cvcnt; i++){
+                    row = sheet.createRow(rowNum++);
+
+                    // 화자
+                    if(cv0.size() > 0 && cv0.size()-1 >= i){
+                        cell = row.createCell(0);
+                        cell.setCellValue(cv0.get(i));
+                        cell.setCellStyle(style2);
+                    }
+
+                    // 챕터
+                    if(cv1.size() > 0 && cv1.size()-1 >= i){
+                        cell = row.createCell(1);
+                        cell.setCellValue(cv1.get(i));
+                        cell.setCellStyle(style2);
+                    }
+
+                    // 서브챕터
+                    if(cv2.size() > 0 && cv2.size()-1 >= i){
+                        cell = row.createCell(2);
+                        cell.setCellValue(cv2.get(i));
+                        cell.setCellStyle(style2);
+                    }
+
+                    // 질문
+                    if(cv3.size() > 0 && cv3.size()-1 >= i){
+                        cell = row.createCell(3);
+                        cell.setCellValue(cv3.get(i));
+                        cell.setCellStyle(style2);
+                    }
+
+                    // 키워드
+                    if(cv4.size() > 0 && cv4.size()-1 >= i){
                         cell = row.createCell(4);
-                        cell.setCellValue(_rs.getFilter_data());
+                        cell.setCellValue(cv4.get(i));
                         cell.setCellStyle(style2);
                     }
                 }
-
-                rowNum = rowNum0;
-                if(rowNum1 > rowNum){rowNum=rowNum1;}
-                if(rowNum2 > rowNum){rowNum=rowNum2;}
-                if(rowNum3 > rowNum){rowNum=rowNum3;}
-                if(rowNum4 > rowNum){rowNum=rowNum4;}
             }
 
             rowNum++;
@@ -699,22 +713,29 @@ public class ReportController extends BaseController {
             cell = row.createCell(0);
             cell.setCellValue("03. 요약문");
             cell.setCellStyle(style);
-            
-            Integer _rpNum0 = rowNum++;
-            Integer _rpNum1 = 0;
 
-            for(ProjectVO _rs : reportarr){
-                row = sheet.createRow(_rpNum0);
-                cell = row.createCell(_rpNum1);
-                cell.setCellValue(_rs.getTitle());
-                cell.setCellStyle(style);
+
+            if(reportarr.size()>0){
+                List<String> rpsum0 = new ArrayList<String>();
+                List<String> rpsum1 = new ArrayList<String>();
+
+                for(ProjectVO _rs : reportarr){
+                    rpsum0.add(_rs.getFilter_tp());
+                    rpsum1.add(_rs.getSummary0());
+                }
+                row = sheet.createRow(rowNum++);
+                for(int i = 0; i<rpsum0.size(); i++){
+                    cell = row.createCell(i);
+                    cell.setCellValue(rpsum0.get(i));
+                    cell.setCellStyle(style);
+                }
                 
-                row = sheet.createRow(_rpNum0+1);
-                cell = row.createCell(_rpNum1);
-                cell.setCellValue(_rs.getSummary0());
-                cell.setCellStyle(style2);
-
-                _rpNum1++;
+                row = sheet.createRow(rowNum++);
+                for(int i = 0; i<rpsum1.size(); i++){
+                    cell = row.createCell(i);
+                    cell.setCellValue(rpsum1.get(i));
+                    cell.setCellStyle(style2);
+                }
             }
 
             rowNum++;
