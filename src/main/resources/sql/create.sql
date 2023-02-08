@@ -192,6 +192,7 @@ ENGINE=InnoDB
 CREATE TABLE `KT_REPORT_FILTER` (
 	`idx_filter` INT(11) NOT NULL AUTO_INCREMENT,
 	`idx_project` INT(11) NOT NULL,
+    `idx_user` INT(11) NOT NULL DEFAULT '0' COMMENT '등록자',
 	`filter_title` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`create_dt` DATETIME NULL DEFAULT current_timestamp(),
 	`update_dt` DATETIME NULL DEFAULT NULL ON UPDATE current_timestamp(),

@@ -42,15 +42,23 @@ public interface ReportMapper {
 
     List<ReportFilterKeywordVO> getReportKeywordView(ProjectVO paramVo) throws Exception;
 
-    int getKeywordFindDictionary(ProjectVO paramVo) throws Exception;
+    public int getKeywordFindDictionary(ProjectVO paramVo) throws Exception;
 
-    int getMetadataInfoByIdx(ReportMetaDataVO md) throws Exception;
+    public int getMetadataInfoByIdx(ReportMetaDataVO md) throws Exception;
 
-    void insertMetadata(ReportMetaDataVO md) throws Exception;
+    public void insertMetadata(ReportMetaDataVO md) throws Exception;
 
-    void updateMetadataCnt(ReportMetaDataVO md) throws Exception;
+    public void updateMetadataCnt(ReportMetaDataVO md) throws Exception;
 
-    List<ReportMetaDataVO> getMetadataInfoSpeaker(Integer idx) throws Exception;
+    public List<ReportMetaDataVO> getMetadataInfoSpeaker(Integer idx) throws Exception;
 
-    List<ReportMetaDataVO> getMetadataInfoChapter(Integer idx) throws Exception;
+    public List<ReportMetaDataVO> getMetadataInfoChapter(Integer idx) throws Exception;
+
+    public int updateReportMemo(ProjectVO paramVo) throws Exception;
+
+    public int updateReportSummary(ProjectVO paramVo) throws Exception;
+
+    public int chkReportAuth(ProjectVO paramVo) throws Exception;
+
+    public int chkReportDataAuth(ProjectVO paramVo) throws Exception;
 }
