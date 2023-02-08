@@ -85,7 +85,7 @@
     </update>
 
     <select id="getProjectView" resultType="com.kantar.vo.ProjectVO">
-        SELECT A.idx_project_job_projectid, B.project_name, B.project_type, B.project_status, C.project_id, A.create_dt, B.summary0, A.summary0 AS summary
+        SELECT A.idx_project_job_projectid, B.project_name, B.project_type, B.project_status, C.project_id, A.title, A.create_dt, B.summary0, A.summary0 AS summary
         FROM KT_REPORT A
         JOIN KT_PROJECT B ON B.idx_project_job_projectid=A.idx_project_job_projectid
         JOIN KT_PROJECT_JOB_PROJECTID C ON C.idx_project_job_projectid=B.idx_project_job_projectid

@@ -851,13 +851,13 @@ public class ReportController extends BaseController {
     }
 
     /**
-     * 리포트 메모 수정
+     * 리포트 수정
      * @param req
      * @param paramVo
      * @return
      * @throws Exception
      */
-    @PostMapping("/update_memo")
+    @PostMapping("/mod_report")
     public CommonResult updateReportMemo(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
@@ -865,62 +865,31 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
+
             int _check = reportMapper.chkReportAuth(paramVo);
             if(_check<1){
-                return responseService.getFailResult("update_memo","리포트 수정 권한이 없습니다.");
+                return responseService.getFailResult("mod_report","리포트 수정 권한이 없습니다.");
             }
             if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
-                return responseService.getFailResult("update_memo","리포트 정보를 다시 확인해주세요.");
-            }
-            if(StringUtils.isEmpty(paramVo.getSummary())){
-                return responseService.getFailResult("update_memo","입력된 메모가 없습니다.");
+                return responseService.getFailResult("mod_report","리포트 정보를 다시 확인해주세요.");
             }
 
-            reportMapper.updateReportMemo(paramVo);
+            if(StringUtils.isNotEmpty(paramVo.getTitle()) || StringUtils.isNotEmpty(paramVo.getSummary0())) {
+                reportMapper.updateReportInfo(paramVo);
+            }
 
-            return responseService.getSuccessResult("update_memo", "리포트 메모 수정을 성공하였습니다.");
+            if(!paramVo.getReportList().isEmpty()) {
+                for (ReportVO _r : paramVo.getReportList()) {
+                    _r.setIdx(paramVo.getIdx_user());
+                    reportMapper.updateReportSummary(_r);
+                }
+            }
+
+            return responseService.getSuccessResult("mod_report", "리포트 정보를 수정했습니다.");
 
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("update_memo","오류가 발생하였습니다.");
+            return responseService.getFailResult("mod_report","오류가 발생하였습니다.");
         }
     }
-
-    /**
-     * 리포트 요약문 수정
-     * @param req
-     * @param paramVo
-     * @return
-     * @throws Exception
-     */
-    @PostMapping("/update_report_summary")
-    public CommonResult updateReportSummary(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
-        try {
-            UserVO uinfo = getChkUserLogin(req);
-            if(uinfo==null){
-                return responseService.getFailResult("login","로그인이 필요합니다.");
-            }
-            paramVo.setIdx_user(uinfo.getIdx_user());
-            int _check = reportMapper.chkReportDataAuth(paramVo);
-            if(_check<1){
-                return responseService.getFailResult("update_report_summary","리포트 수정 권한이 없습니다.");
-            }
-
-            if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
-                return responseService.getFailResult("update_report_summary","리포트 정보를 다시 확인해주세요.");
-            }
-            if(StringUtils.isEmpty(paramVo.getSummary0())){
-                return responseService.getFailResult("update_report_summary","입력된 메모가 없습니다.");
-            }
-
-            int _r = reportMapper.updateReportSummary(paramVo);
-
-            return responseService.getSuccessResult("update_report_summary", "리포트 메모 수정을 성공하였습니다.");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return responseService.getFailResult("update_report_summary","오류가 발생하였습니다.");
-        }
-    }
-
 }
