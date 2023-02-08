@@ -492,7 +492,7 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("filter_create","필터 데이터가 없습니다.");
             }
 
-            if(filterVO.getFilter_op2()==null || filterVO.getFilter_op2()>3 || filterVO.getFilter_op2()<1){
+            if(filterVO.getFilter_op2()==null || filterVO.getFilter_op2()>1 || filterVO.getFilter_op2()<0){
                 return responseService.getFailResult("filter_create","지정된 키워드 필터 옵션이 올바르지 않습니다.");
             }
 
