@@ -857,7 +857,7 @@ public class ReportController extends BaseController {
      * @return
      * @throws Exception
      */
-    @PostMapping("mod_report")
+    @PostMapping("/mod_report")
     public CommonResult updateReportMemo(HttpServletRequest req, @RequestBody ProjectVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
