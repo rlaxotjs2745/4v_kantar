@@ -34,6 +34,7 @@ import com.kantar.service.FileService;
 // import com.kantar.service.KafkaSender;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
+import com.kantar.vo.ReportListVO;
 import com.kantar.vo.ProjectListVO;
 import com.kantar.vo.ProjectVO;
 import com.kantar.vo.ProjectViewVO;
@@ -168,6 +169,14 @@ public class ProjectController extends BaseController {
             paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
             Integer tcnt = projectMapper.getProjectListCount(paramVo);
             List<ProjectListVO> rs = projectMapper.getProjectList(paramVo);
+            if(rs != null){
+                for(ProjectListVO _rs : rs){
+                    List<ReportListVO> _rs0 = reportMapper.getReportListIdx(_rs);
+                    if(_rs0!=null){
+                        _rs.setReportList(_rs0);
+                    }
+                }
+            }
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("tcnt",tcnt);
             _data.put("list",rs);

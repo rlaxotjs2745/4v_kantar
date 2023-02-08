@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,6 @@ public class FileService {
     /**
      * 파일 저장
      * @param req
-     * @param _idx
      * @return
      * @throws Exception
      */

@@ -7,7 +7,9 @@ import com.kantar.vo.ReportMetaDataVO;
 import com.kantar.vo.ReportVO;
 import org.apache.ibatis.annotations.Mapper;
 
+import com.kantar.vo.ReportListVO;
 import com.kantar.vo.ProjectVO;
+import com.kantar.vo.ProjectListVO;
 
 @Mapper
 public interface ReportMapper {
@@ -20,6 +22,8 @@ public interface ReportMapper {
     public Integer savReport(ProjectVO paramVo) throws Exception;
 
     public ProjectVO getReportIdx(ProjectVO paramVo) throws Exception;
+
+    public List<ReportListVO> getReportListIdx(ProjectListVO paramVo) throws Exception;
 
     public Integer saveReportData(ProjectVO paramVo) throws Exception;
 
@@ -58,6 +62,10 @@ public interface ReportMapper {
     public int updateReportSummary(ProjectVO paramVo) throws Exception;
 
     public int chkReportAuth(ProjectVO paramVo) throws Exception;
+
+    public int chkReportDataAuth(ProjectVO paramVo) throws Exception;
+
+    public Integer updReportCountUp(ProjectVO paramVo) throws Exception;
 
     public void updateReportInfo(ProjectVO paramVo) throws Exception;
 
