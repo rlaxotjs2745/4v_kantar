@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.kantar.vo.ReportFilterKeywordVO;
 import com.kantar.vo.ReportMetaDataVO;
+import com.kantar.vo.ReportVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.kantar.vo.ProjectVO;
@@ -54,11 +55,11 @@ public interface ReportMapper {
 
     public List<ReportMetaDataVO> getMetadataInfoChapter(Integer idx) throws Exception;
 
-    public int updateReportMemo(ProjectVO paramVo) throws Exception;
-
     public int updateReportSummary(ProjectVO paramVo) throws Exception;
 
     public int chkReportAuth(ProjectVO paramVo) throws Exception;
 
-    public int chkReportDataAuth(ProjectVO paramVo) throws Exception;
+    public void updateReportInfo(ProjectVO paramVo) throws Exception;
+
+    public void updateReportSummary(ReportVO paramVo) throws Exception;
 }

@@ -155,29 +155,34 @@
         GROUP BY chapter,speaker
     </select>
 
-    <update id="updateReportMemo">
-        UPDATE KT_REPORT A
-            INNER JOIN KT_PROJECT B on A.idx_project = B.idx_project
-        SET A.summary0=#{summary}
-        WHERE A.idx_report=#{idx_report} AND B.idx_user=#{idx_user}
+    <update id="updateReportInfo">
+        UPDATE KT_REPORT
+        SET create_dt = create_dt
+        <if test="title != null">
+            , title=#{title}
+        </if>
+        <if test="summary0 != null">
+            , summary0=#{summary0}
+        </if>
+        WHERE idx_report=#{idx_report}
     </update>
 
     <update id="updateReportSummary">
         UPDATE KT_REPORT_DATA
-        SET summary0=#{summary0}
-        WHERE idx_report_data=#{idx_report_data} AND idx_user=#{idx_user}
+        SET summary0=#{summary_md}
+        WHERE idx_report_data=#{idx_data} AND idx_user=#{idx}
     </update>
 
     <select id="chkReportAuth" resultType="Integer">
         SELECT count(1)
         FROM KT_REPORT A
             INNER JOIN KT_PROJECT B on A.idx_project = B.idx_project
-        WHERE idx_report=#{idx_report} AND idx_user=#{idx_user}
+        WHERE A.idx_report=#{idx_report} AND B.idx_user=#{idx_user}
     </select>
 
     <select id="chkReportDataAuth" resultType="Integer">
         SELECT count(1)
-        FROM KT_REPORT_DATAt
+        FROM KT_REPORT_DATA
         WHERE idx_report_data=#{idx_report_data} AND idx_user=#{idx_user}
     </select>
 </mapper>
