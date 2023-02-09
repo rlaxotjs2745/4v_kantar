@@ -195,6 +195,6 @@
     <update id="updReportCountUp">
         UPDATE KT_REPORT
             SET d_count = d_count + 1
-            WHERE idx_report=#{idx_report>
+            WHERE idx_report=#{idx_report}
     </update>
 </mapper>

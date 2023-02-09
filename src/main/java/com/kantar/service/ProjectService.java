@@ -320,6 +320,7 @@ public class ProjectService {
                     ProjectVO param = summary.getSummary(pp, "전체 요약문");
 
                     Integer _totalCount = 0; // 요약문 생성수
+
                     if(StringUtils.isNotEmpty(param.getTitle())){
                         if(filter_op1>1){ //'화자+필터용 사전키워드'+챕터 요약문
                             for (String ty2_f : ty2) {
@@ -482,6 +483,7 @@ public class ProjectService {
                                 }
                             }
                         }
+
                         Integer _seq = reportMapper.getReportSeq();
                         _seq = _seq+1;
                         String b1 = ("000"+_seq);
@@ -503,7 +505,7 @@ public class ProjectService {
                                 summ_keywords.add(param.getSummary_keywords()); // 추출된 키워드 있으면 키워드 리스트에 저장
                             }
                             statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
-                            savMetadata(_metalist); // 메타데이터 집계
+                            savMetadata(paramVo.getIdx_report(), _metalist); // 메타데이터 집계
                             if(StringUtils.isNotEmpty(_token)){
                                 _msg = "필터 리포트가 생성되었습니다.";
                             }
@@ -824,10 +826,11 @@ public class ProjectService {
         }
     }
 
-    private void savMetadata(List<ReportMetaDataVO> metalist) throws Exception {
+    private void savMetadata(int idx, List<ReportMetaDataVO> metalist) throws Exception {
         for (ReportMetaDataVO md : metalist) {
             int _isSave = reportMapper.getMetadataInfoByIdx(md);
             if(_isSave==0){
+                md.setIdx_report(idx);
                 reportMapper.insertMetadata(md);
             } else if (_isSave>0) {
                 reportMapper.updateMetadataCnt(md);
