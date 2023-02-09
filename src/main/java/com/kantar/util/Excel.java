@@ -33,8 +33,14 @@ public class Excel {
 			settings.setMaxCharsPerColumn(65535);
 			
 			CsvParser parser = new CsvParser(settings);
+			File _f = new File(file);
+			if(!_f.exists()){
+				return allRows;
+			}
 			Reader inputReader = new InputStreamReader(new FileInputStream(new File(file)), "UTF-8");
-			allRows = parser.parseAll(inputReader);
+			if(inputReader!=null){
+				allRows = parser.parseAll(inputReader);
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

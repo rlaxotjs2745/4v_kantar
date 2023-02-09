@@ -163,7 +163,7 @@ public class ProjectService {
     public List<ProjectViewVO> getCsvParse(List<ProjectViewVO> rlist, String _fPath) throws Exception {
         List<String[]> ers = excel.getCsvListData(_fPath);
         int j = 0;
-        if(ers.size() > 0){
+        if(ers != null && ers.size() > 0){
             for(String[] _ers0 : ers){  // 줄
                 if(j>0){
                     int i = 0;
