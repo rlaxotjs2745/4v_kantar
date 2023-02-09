@@ -53,7 +53,7 @@
     </select>
 
     <insert id="savReport" useGeneratedKeys="true" keyColumn="idx_report" keyProperty="idx_report">
-		INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, report_seq, report_id, title, filepath, `filename`, idx_user, idx_filterm, d_count_total) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{report_seq}, #{report_id}, #{title}, #{filepath}, #{filename}, #{idx_user}, #{idx_filter}, #{d_count_total})
+		INSERT INTO KT_REPORT (idx_project, idx_project_job_projectid, report_seq, report_id, title, filepath, `filename`, idx_user, idx_filter, d_count_total) VALUES (#{idx_project}, #{idx_project_job_projectid}, #{report_seq}, #{report_id}, #{title}, #{filepath}, #{filename}, #{idx_user}, #{idx_filter}, #{d_count_total})
     </insert>
 
     <select id="getReportIdx" resultType="com.kantar.vo.ProjectVO">
