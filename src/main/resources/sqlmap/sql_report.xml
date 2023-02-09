@@ -137,7 +137,7 @@
     </select>
 
     <insert id="insertMetadata">
-        INSERT INTO KT_REPORT_FILTER_METADATA (idx_report, speaker, chapter, answer_cnt, word_length, create_dt) VALUES (#{idx_report}, #{speaker}, #{chapter}, #{cnt}, #{length}, SYSDATE())
+        INSERT INTO KT_REPORT_FILTER_METADATA (idx_report, speaker, chapter, answer_cnt, word_length, create_dt) VALUES (#{idx_report}, #{speaker}, #{chapter}, 1, #{length}, SYSDATE())
     </insert>
 
     <update id="updateMetadataCnt">

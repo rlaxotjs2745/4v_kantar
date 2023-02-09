@@ -245,7 +245,6 @@ public class ProjectService {
                     SummaryVO params = new SummaryVO();
                     List<String[]> ers = excel.getCsvListData(_fpath);
                     int j = 0;
-                    int _metaCnt = 0;
                     for(String[] _ers0 : ers){  // 줄
                         if (j > 0) {
                             SumtextVO _elist = new SumtextVO();
@@ -257,6 +256,7 @@ public class ProjectService {
                                 _meta.setSpeaker(_ers0[3].toString());
                                 _meta.setChapter(_ers0[0].toString());
                                 _meta.setLength(_ers0[4].toString().length());
+                                _meta.setCnt(1);
                                 _metalist.add(_meta);
                             } else if(_isKey == 10){
                                 for (String ty1_f : ty1) {
