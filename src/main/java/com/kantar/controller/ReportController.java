@@ -387,13 +387,9 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("merge_report","JOB No를 입력해주세요.");
             }
             if(StringUtils.isEmpty(paramVo.getProject_name())){
-                ProjectVO m0 = new ProjectVO();
-                String[] _mergeIdx = paramVo.getProject_merge_idx().split(",");
+                ProjectVO rs0 = projectMapper.getProjectJobProjectid(paramVo);
 
-                m0.setIdx_project(Integer.valueOf(String.valueOf(_mergeIdx[0])));
-                List<ProjectVO> prs = reportMapper.getReportFileListOne(m0);
-
-                String fileName = prs.get(0).getFilename();
+                String fileName = rs0.getFilename();
                 String fileNameEx = fileName.substring(0, fileName.lastIndexOf('.'));
                 paramVo.setProject_name(fileNameEx);
             }
@@ -423,7 +419,9 @@ public class ReportController extends BaseController {
                 String PRID = "P" + a1.substring(a1.length()-4,a1.length());
                 paramVo.setProject_seq(prseq);
                 paramVo.setProject_id(PRID);
-                Integer pridrs = projectMapper.savProjectJobProjectid(paramVo);
+                paramVo.setFilepath("/report/" + paramVo.getJob_no() + "/");
+                paramVo.setFilename(mergeCsv.getName());
+                Integer pridrs = projectMapper.savProjectJobProjectidAndFileInfo(paramVo);
                 if(pridrs>0){
                     Integer rs = projectMapper.savMergeProject(paramVo);
                     if(rs == 0){
@@ -442,8 +440,6 @@ public class ReportController extends BaseController {
                             result.setIdx_user(paramVo.getIdx_user());
                             result.setIdx_project(paramVo.getIdx_project());
                             result.setIdx_project_job_projectid(paramVo.getIdx_project_job_projectid());
-                            result.setFilename(mergeCsv.getName());
-                            result.setFilepath("/report/" + paramVo.getJob_no() + "/");
                             result.setProject_name(paramVo.getProject_name());
                             result.setTitle(paramVo.getProject_name() + "_병합리포트");
                             Integer _rs0 = reportMapper.savReport(result);

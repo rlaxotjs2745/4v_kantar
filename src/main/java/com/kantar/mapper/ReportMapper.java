@@ -37,8 +37,6 @@ public interface ReportMapper {
 
     public List<ProjectVO> getReportFilterList(ProjectVO paramVo) throws Exception;
 
-    public List<ProjectVO> getReportFileListOne(ProjectVO paramVo) throws Exception;
-
     public void createReportFilterData(ReportFilterKeywordVO reKeywords) throws Exception;
 
     public Integer findReportKeyword(ReportFilterKeywordVO reKeywords) throws Exception;

@@ -222,11 +222,11 @@ public class ProjectController extends BaseController {
             // for(ProjectVO prs0 : rs){
             //     ProjectVO rs0 = projectMapper.getProjectInfoByIdx(paramVo);
             //     rlist = projectService.get_projectListView(rlist, prs0);
-            //     result.add(rs0);
-            //     result.add(rlist);
             // }
             ProjectVO rs0 = projectMapper.getProjectJobProjectid(paramVo);
             rlist = projectService.get_projectListView(rlist, rs0);
+            result.add(rs0);
+            result.add(rlist);
             if(rlist!=null){
                 return responseService.getSuccessResult(result, "project_view", "프로젝트 정보 성공");
             }else{

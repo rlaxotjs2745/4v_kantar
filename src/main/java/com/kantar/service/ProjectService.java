@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import com.kantar.mapper.ProjectMapper;
 import com.kantar.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ import com.kantar.util.Summary;
 public class ProjectService {
     @Autowired
     private ReportMapper reportMapper;
+
+    @Autowired
+    private ProjectMapper projectMapper;
 
     @Autowired
     private Excel excel;
@@ -53,87 +57,85 @@ public class ProjectService {
     public void create_report(String _token, ProjectVO paramVo, Integer _tp) throws Exception{
         String _msg = "";
         try {
-            List<ProjectVO> prs = reportMapper.getReportFileList(paramVo);
+            ProjectVO rs0 = projectMapper.getProjectJobProjectid(paramVo);
 
-            for(ProjectVO prs0 : prs){
-                String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
-                
-                List<SumtextVO> _data = new ArrayList<SumtextVO>();
+            String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
 
-                Map<String, Object> _nlp = new HashMap<String, Object>();
-                Map<String, Object> _nlp0 = new HashMap<String, Object>();
-                Map<String, Object> _nlp1 = new HashMap<String, Object>();
-                Map<String, Object> _nlp2 = new HashMap<String, Object>();
-                SummaryVO params = new SummaryVO();
-                List<String[]> ers = excel.getCsvListData(_fpath);
-                int j = 0;
-                for(String[] _ers0 : ers){  // 줄
-                    if(j>0){
-                        int i = 0;
-                        SumtextVO _elist = new SumtextVO();
-                        for(String _ers00 : _ers0){ // 컬럼
-                            if(i==3){
-                                _elist.setSpeaker(_ers00.toString());
-                            }
-                            if(i==4){
-                                _elist.setText(_ers00.toString());
-                            }
-                            i++;
+            List<SumtextVO> _data = new ArrayList<SumtextVO>();
+
+            Map<String, Object> _nlp = new HashMap<String, Object>();
+            Map<String, Object> _nlp0 = new HashMap<String, Object>();
+            Map<String, Object> _nlp1 = new HashMap<String, Object>();
+            Map<String, Object> _nlp2 = new HashMap<String, Object>();
+            SummaryVO params = new SummaryVO();
+            List<String[]> ers = excel.getCsvListData(_fpath);
+            int j = 0;
+            for(String[] _ers0 : ers){  // 줄
+                if(j>0){
+                    int i = 0;
+                    SumtextVO _elist = new SumtextVO();
+                    for(String _ers00 : _ers0){ // 컬럼
+                        if(i==3){
+                            _elist.setSpeaker(_ers00.toString());
                         }
-                        _data.add(_elist);
+                        if(i==4){
+                            _elist.setText(_ers00.toString());
+                        }
+                        i++;
                     }
-                    j++;
+                    _data.add(_elist);
                 }
+                j++;
+            }
 
-                params.setText(_data);
+            params.setText(_data);
 
-                _nlp0.put("enable",true);
-                _nlp0.put("model","dialogue");
-                _nlp0.put("outputSizeOption","small");
+            _nlp0.put("enable",true);
+            _nlp0.put("model","dialogue");
+            _nlp0.put("outputSizeOption","small");
 
-                _nlp1.put("enable",true);
-                _nlp1.put("maxCount","30");
+            _nlp1.put("enable",true);
+            _nlp1.put("maxCount","30");
 
-                _nlp2.put("enable",true);
+            _nlp2.put("enable",true);
 
-                _nlp.put("summary",_nlp0);
-                // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
-                // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
-                params.setNlpConfig(_nlp);
-                String pp = new Gson().toJson(params);
-                ProjectVO param = summary.getSummary(pp, "전체 요약문");
-                if(StringUtils.isNotEmpty(param.getTitle())){
-                    ProjectVO ridx = reportMapper.getReportIdx(paramVo);
-                    Integer ridx0 = 0;
-                    if(ridx==null){
-                        Integer _seq = reportMapper.getReportSeq();
-                        _seq = _seq+1;
-                        String b1 = ("000"+_seq);
-                        String RPID = "R" + b1.substring(b1.length()-4,b1.length());
-                        paramVo.setReport_seq(_seq);
-                        paramVo.setReport_id(RPID);
-                        paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
-                        paramVo.setD_count_total(1);
-                        ridx0 = reportMapper.savReport(paramVo);
-                    }else{
-                        paramVo.setIdx_report(ridx.getIdx_report());
-                        ridx0 = 1;
-                    }
-                    if(ridx0==1){
-                        paramVo.setTitle(param.getTitle());
-                        paramVo.setSummary0(param.getSummary0());
-                        reportMapper.saveReportData(paramVo);
-                        reportMapper.updReportCountUp(paramVo);
-                        statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
-                        if(StringUtils.isNotEmpty(_token)){
-                            _msg = "리포트가 생성되었습니다.";
-                        }
-                    }else{
-                        _msg = "리포트 생성을 실패하였습니다.";
+            _nlp.put("summary",_nlp0);
+            // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+            // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
+            params.setNlpConfig(_nlp);
+            String pp = new Gson().toJson(params);
+            ProjectVO param = summary.getSummary(pp, "전체 요약문");
+            if(StringUtils.isNotEmpty(param.getTitle())){
+                ProjectVO ridx = reportMapper.getReportIdx(paramVo);
+                Integer ridx0 = 0;
+                if(ridx==null){
+                    Integer _seq = reportMapper.getReportSeq();
+                    _seq = _seq+1;
+                    String b1 = ("000"+_seq);
+                    String RPID = "R" + b1.substring(b1.length()-4,b1.length());
+                    paramVo.setReport_seq(_seq);
+                    paramVo.setReport_id(RPID);
+                    paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
+                    paramVo.setD_count_total(1);
+                    ridx0 = reportMapper.savReport(paramVo);
+                }else{
+                    paramVo.setIdx_report(ridx.getIdx_report());
+                    ridx0 = 1;
+                }
+                if(ridx0==1){
+                    paramVo.setTitle(param.getTitle());
+                    paramVo.setSummary0(param.getSummary0());
+                    reportMapper.saveReportData(paramVo);
+                    reportMapper.updReportCountUp(paramVo);
+                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+                    if(StringUtils.isNotEmpty(_token)){
+                        _msg = "리포트가 생성되었습니다.";
                     }
                 }else{
                     _msg = "리포트 생성을 실패하였습니다.";
                 }
+            }else{
+                _msg = "리포트 생성을 실패하였습니다.";
             }
             if(StringUtils.isNotEmpty(_token)){
                 // kafkaSender.send(_token, _msg);
@@ -230,39 +232,63 @@ public class ProjectService {
 
             int _isKey = checkEmptyKey(filterVO);
 
-            List<ProjectVO> prs = reportMapper.getReportFileListOne(paramVo);
+            ProjectVO rs0 = projectMapper.getProjectJobProjectid(paramVo);
             int data_cnt = 0;
 
             if(filter_op1>0 && filter_op1<5){ //전체요약문
-                for(ProjectVO prs0 : prs){
-                    String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
+                String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
 
-                    List<SumtextVO> _data = new ArrayList<SumtextVO>();
-                    List<ReportMetaDataVO> _metalist = new ArrayList<ReportMetaDataVO>();
-                    Map<String, Object> _nlp = new HashMap<String, Object>();
-                    Map<String, Object> _nlp0 = new HashMap<String, Object>();
-                    Map<String, Object> _nlp1 = new HashMap<String, Object>();
-                    Map<String, Object> _nlp2 = new HashMap<String, Object>();
+                List<SumtextVO> _data = new ArrayList<SumtextVO>();
+                List<ReportMetaDataVO> _metalist = new ArrayList<ReportMetaDataVO>();
+                Map<String, Object> _nlp = new HashMap<String, Object>();
+                Map<String, Object> _nlp0 = new HashMap<String, Object>();
+                Map<String, Object> _nlp1 = new HashMap<String, Object>();
+                Map<String, Object> _nlp2 = new HashMap<String, Object>();
 
-                    SummaryVO params = new SummaryVO();
-                    List<String[]> ers = excel.getCsvListData(_fpath);
-                    int j = 0;
-                    for(String[] _ers0 : ers){  // 줄
-                        if (j > 0) {
-                            SumtextVO _elist = new SumtextVO();
-                            ReportMetaDataVO _meta = new ReportMetaDataVO();
-                            if (_isKey == 99) {
-                                _elist.setSpeaker(_ers0[3].toString());
-                                _elist.setText(_ers0[4].toString());
-                                _data.add(_elist);
-                                _meta.setSpeaker(_ers0[3].toString());
-                                _meta.setChapter(_ers0[0].toString());
-                                _meta.setLength(_ers0[4].toString().length());
-                                _meta.setCnt(1);
-                                _metalist.add(_meta);
-                            } else if(_isKey == 10){
+                SummaryVO params = new SummaryVO();
+                List<String[]> ers = excel.getCsvListData(_fpath);
+                int j = 0;
+                for(String[] _ers0 : ers){  // 줄
+                    if (j > 0) {
+                        SumtextVO _elist = new SumtextVO();
+                        ReportMetaDataVO _meta = new ReportMetaDataVO();
+                        if (_isKey == 99) {
+                            _elist.setSpeaker(_ers0[3].toString());
+                            _elist.setText(_ers0[4].toString());
+                            _data.add(_elist);
+                            _meta.setSpeaker(_ers0[3].toString());
+                            _meta.setChapter(_ers0[0].toString());
+                            _meta.setLength(_ers0[4].toString().length());
+                            _meta.setCnt(1);
+                            _metalist.add(_meta);
+                        } else if(_isKey == 10){
+                            for (String ty1_f : ty1) {
+                                if(_ers0[3].equals(ty1_f)){
+                                    _elist.setSpeaker(_ers0[3].toString());
+                                    _elist.setText(_ers0[4].toString());
+                                    _data.add(_elist);
+                                    _meta.setSpeaker(_ers0[3].toString());
+                                    _meta.setChapter(_ers0[0].toString());
+                                    _meta.setLength(_ers0[4].toString().length());
+                                    _metalist.add(_meta);
+                                }
+                            }
+                        } else if(_isKey == 50){
+                            for (String ty5_f : ty5) {
+                                if(_ers0[4].contains(ty5_f)){
+                                    _elist.setSpeaker(_ers0[3].toString());
+                                    _elist.setText(_ers0[4].toString());
+                                    _data.add(_elist);
+                                    _meta.setSpeaker(_ers0[3].toString());
+                                    _meta.setChapter(_ers0[0].toString());
+                                    _meta.setLength(_ers0[4].toString().length());
+                                    _metalist.add(_meta);
+                                }
+                            }
+                        } else if (_isKey == 0){
+                            for (String ty5_f : ty5) {
                                 for (String ty1_f : ty1) {
-                                    if(_ers0[3].equals(ty1_f)){
+                                    if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)){
                                         _elist.setSpeaker(_ers0[3].toString());
                                         _elist.setText(_ers0[4].toString());
                                         _data.add(_elist);
@@ -272,257 +298,37 @@ public class ProjectService {
                                         _metalist.add(_meta);
                                     }
                                 }
-                            } else if(_isKey == 50){
-                                for (String ty5_f : ty5) {
-                                    if(_ers0[4].contains(ty5_f)){
-                                        _elist.setSpeaker(_ers0[3].toString());
-                                        _elist.setText(_ers0[4].toString());
-                                        _data.add(_elist);
-                                        _meta.setSpeaker(_ers0[3].toString());
-                                        _meta.setChapter(_ers0[0].toString());
-                                        _meta.setLength(_ers0[4].toString().length());
-                                        _metalist.add(_meta);
-                                    }
-                                }
-                            } else if (_isKey == 0){
-                                for (String ty5_f : ty5) {
-                                    for (String ty1_f : ty1) {
-                                        if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)){
-                                            _elist.setSpeaker(_ers0[3].toString());
-                                            _elist.setText(_ers0[4].toString());
-                                            _data.add(_elist);
-                                            _meta.setSpeaker(_ers0[3].toString());
-                                            _meta.setChapter(_ers0[0].toString());
-                                            _meta.setLength(_ers0[4].toString().length());
-                                            _metalist.add(_meta);
-                                        }
-                                    }
-                                }
                             }
                         }
-                        j++;
                     }
-                    params.setText(_data);
+                    j++;
+                }
+                params.setText(_data);
 
-                    _nlp0.put("enable",true);
-                    _nlp0.put("model","dialogue");
-                    _nlp0.put("outputSizeOption","small");
-                    _nlp.put("summary",_nlp0);
+                _nlp0.put("enable",true);
+                _nlp0.put("model","dialogue");
+                _nlp0.put("outputSizeOption","small");
+                _nlp.put("summary",_nlp0);
 
-                    _nlp1.put("enable",true);
-                    _nlp1.put("maxCount",30);
-                    _nlp.put("keywordExtraction",_nlp1);
+                _nlp1.put("enable",true);
+                _nlp1.put("maxCount",30);
+                _nlp.put("keywordExtraction",_nlp1);
 
 
-                    _nlp2.put("enable",true);
-                    _nlp.put("sentimentAnalysis",_nlp2);
-                    params.setNlpConfig(_nlp);
+                _nlp2.put("enable",true);
+                _nlp.put("sentimentAnalysis",_nlp2);
+                params.setNlpConfig(_nlp);
 
-                    String pp = new Gson().toJson(params);
-                    ProjectVO param = summary.getSummary(pp, "전체 요약문");
+                String pp = new Gson().toJson(params);
+                ProjectVO param = summary.getSummary(pp, "전체 요약문");
 
-                    Integer _totalCount = 0; // 요약문 생성수
+                Integer _totalCount = 0; // 요약문 생성수
 
-                    if(StringUtils.isNotEmpty(param.getTitle())){
-                        if(filter_op1>1){ //'화자+필터용 사전키워드'+챕터 요약문
-                            for (String ty2_f : ty2) {
-                                data_cnt = 0;
-                                List<SumtextVO> chapter_data = new ArrayList<SumtextVO>();
-                                ers = excel.getCsvListData(_fpath);
-                                j = 0;
-                                for(String[] _ers0 : ers){
-                                    if(j>0 && _ers0[0].equals(ty2_f)){
-                                        SumtextVO _elist = new SumtextVO();
-                                        if (_isKey == 99) {
-                                            _elist.setSpeaker(_ers0[3].toString());
-                                            _elist.setText(_ers0[4].toString());
-                                            chapter_data.add(_elist);
-                                            data_cnt++;
-                                        } else if(_isKey == 10){
-                                            for (String ty1_f : ty1) {
-                                                if(_ers0[3].equals(ty1_f)){
-                                                    _elist.setSpeaker(_ers0[3].toString());
-                                                    _elist.setText(_ers0[4].toString());
-                                                    chapter_data.add(_elist);
-                                                    data_cnt++;
-                                                }
-                                            }
-                                        } else if(_isKey == 50){
-                                            for(String dic_key : ty5) {
-                                                if(_ers0[4].contains(dic_key)){
-                                                    _elist.setSpeaker(_ers0[3].toString());
-                                                    _elist.setText(_ers0[4].toString());
-                                                    chapter_data.add(_elist);
-                                                    data_cnt++;
-                                                }
-                                            }
-                                        } else if (_isKey == 0){
-                                            for (String ty5_f : ty5) {
-                                                for (String ty1_f : ty1) {
-                                                    if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
-                                                        _elist.setSpeaker(_ers0[3].toString());
-                                                        _elist.setText(_ers0[4].toString());
-                                                        chapter_data.add(_elist);
-                                                        data_cnt++;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    j++;
-                                }
-                                if(data_cnt>0){
-                                    _totalCount++;
-                                }
-
-                                if(filter_op1>2){
-                                    for (String ty3_f : ty3) { //'화자+필터용 사전키워드'+챕터+서브챕터 요약문
-                                        data_cnt = 0;
-                                        List<SumtextVO> subChap_data = new ArrayList<SumtextVO>();
-                                        SummaryVO params03 = new SummaryVO();
-                                        ers = excel.getCsvListData(_fpath);
-                                        j = 0;
-                                        for(String[] _ers0 : ers){
-                                            if (j>0 && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
-                                                SumtextVO _elist = new SumtextVO();
-                                                if (_isKey == 99) {
-                                                    _elist.setSpeaker(_ers0[3].toString());
-                                                    _elist.setText(_ers0[4].toString());
-                                                    subChap_data.add(_elist);
-                                                    data_cnt++;
-                                                } else if(_isKey == 10){
-                                                    for (String ty1_f : ty1) {
-                                                        if(_ers0[3].equals(ty1_f)){
-                                                            _elist.setSpeaker(_ers0[3].toString());
-                                                            _elist.setText(_ers0[4].toString());
-                                                            subChap_data.add(_elist);
-                                                            data_cnt++;
-                                                        }
-                                                    }
-                                                } else if(_isKey == 50){
-                                                    for(String dic_key : ty5) {
-                                                        if(_ers0[4].contains(dic_key)){
-                                                            _elist.setSpeaker(_ers0[3].toString());
-                                                            _elist.setText(_ers0[4].toString());
-                                                            subChap_data.add(_elist);
-                                                            data_cnt++;
-                                                        }
-                                                    }
-                                                } else if (_isKey == 0){
-                                                    for (String ty5_f : ty5) {
-                                                        for (String ty1_f : ty1) {
-                                                            if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
-                                                                _elist.setSpeaker(_ers0[3].toString());
-                                                                _elist.setText(_ers0[4].toString());
-                                                                chapter_data.add(_elist);
-                                                                data_cnt++;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            j++;
-                                        }
-                                        if(data_cnt>0){
-                                            _totalCount++;
-                                        }
-
-                                        if(filter_op1>3){
-                                            for (String ty4_f : ty4) { //'화자+필터용 사전키워드'+챕터+서브챕터+질문 요약문
-                                                data_cnt = 0;
-                                                List<SumtextVO> quest_data = new ArrayList<SumtextVO>();
-                                                SummaryVO params04 = new SummaryVO();
-                                                ers = excel.getCsvListData(_fpath);
-                                                j = 0;
-                                                for (String[] _ers0 : ers) {
-                                                    if (j>0 && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
-                                                        SumtextVO _elist = new SumtextVO();
-
-                                                        if (_isKey == 99) {
-                                                            _elist.setSpeaker(_ers0[3].toString());
-                                                            _elist.setText(_ers0[4].toString());
-                                                            quest_data.add(_elist);
-                                                            data_cnt++;
-                                                        } else if(_isKey == 10){
-                                                            for (String ty1_f : ty1) {
-                                                                if(_ers0[3].equals(ty1_f)){
-                                                                    _elist.setSpeaker(_ers0[3].toString());
-                                                                    _elist.setText(_ers0[4].toString());
-                                                                    quest_data.add(_elist);
-                                                                    data_cnt++;
-                                                                }
-                                                            }
-                                                        } else if(_isKey == 50){
-                                                            for(String dic_key : ty5) {
-                                                                if(_ers0[4].contains(dic_key)){
-                                                                    _elist.setSpeaker(_ers0[3].toString());
-                                                                    _elist.setText(_ers0[4].toString());
-                                                                    quest_data.add(_elist);
-                                                                    data_cnt++;
-                                                                }
-                                                            }
-                                                        } else if (_isKey == 0){
-                                                            for (String ty5_f : ty5) {
-                                                                for (String ty1_f : ty1) {
-                                                                    if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
-                                                                        _elist.setSpeaker(_ers0[3].toString());
-                                                                        _elist.setText(_ers0[4].toString());
-                                                                        quest_data.add(_elist);
-                                                                        data_cnt++;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    j++;
-                                                }
-                                                if(data_cnt>0){
-                                                    _totalCount++;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        Integer _seq = reportMapper.getReportSeq();
-                        _seq = _seq+1;
-                        String b1 = ("000"+_seq);
-                        String RPID = "R" + b1.substring(b1.length()-4,b1.length());
-                        paramVo.setReport_seq(_seq);
-                        paramVo.setReport_id(RPID);
-                        paramVo.setFilepath(prs0.getFilepath());
-                        paramVo.setFilename(prs0.getFilename()); //리포트만 생성시 0
-                        paramVo.setTitle(filterVO.getReport_name());
-                        paramVo.setD_count_total(_totalCount);
-                        Integer ridx0 = reportMapper.savReport(paramVo);
-
-                        if(ridx0==1){
-                            paramVo.setSummary0(param.getSummary0());
-                            paramVo.setTitle(param.getTitle());
-                            reportMapper.saveReportData(paramVo);
-                            reportMapper.updReportCountUp(paramVo);  // 요약문데이터 저장후 1로 변경
-                            if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
-                                summ_keywords.add(param.getSummary_keywords()); // 추출된 키워드 있으면 키워드 리스트에 저장
-                            }
-                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
-                            savMetadata(paramVo.getIdx_report(), _metalist); // 메타데이터 집계
-                            if(StringUtils.isNotEmpty(_token)){
-                                _msg = "필터 리포트가 생성되었습니다.";
-                            }
-                        }else{
-                            _msg = "리포트 정보 저장을 실패하였습니다.";
-                        }
-                    }else{
-                        _msg = "리포트 생성을 실패하였습니다.";
-                    }
-
+                if(StringUtils.isNotEmpty(param.getTitle())){
                     if(filter_op1>1){ //'화자+필터용 사전키워드'+챕터 요약문
                         for (String ty2_f : ty2) {
                             data_cnt = 0;
                             List<SumtextVO> chapter_data = new ArrayList<SumtextVO>();
-                            SummaryVO params02 = new SummaryVO();
                             ers = excel.getCsvListData(_fpath);
                             j = 0;
                             for(String[] _ers0 : ers){
@@ -566,49 +372,8 @@ public class ProjectService {
                                 }
                                 j++;
                             }
-                            params02.setText(chapter_data);
-
-                            _nlp = new HashMap<String, Object>();
-                            _nlp0 = new HashMap<String, Object>();
-                            _nlp1 = new HashMap<String, Object>();
-                            _nlp2 = new HashMap<String, Object>();
-
                             if(data_cnt>0){
-                                _nlp0.put("enable",true);
-                                _nlp0.put("model","dialogue");
-                                _nlp0.put("outputSizeOption","small");
-                                _nlp.put("summary",_nlp0);
-
-                                _nlp1.put("enable",true);
-                                _nlp1.put("maxCount",30);
-                                _nlp.put("keywordExtraction",_nlp1);
-
-                                _nlp2.put("enable",true);
-                                _nlp.put("sentimentAnalysis",_nlp2);
-
-                                params02.setNlpConfig(_nlp);
-
-                                pp = new Gson().toJson(params02);
-                                param = summary.getSummary(pp, "챕터 [" + ty2_f + "] 요약문");
-
-                                if(StringUtils.isNotEmpty(param.getTitle())){
-                                    paramVo.setSummary0(param.getSummary0());
-                                    paramVo.setTitle(param.getTitle());
-                                    reportMapper.saveReportData(paramVo);
-                                    reportMapper.updReportCountUp(paramVo);     // 리포트 저장 수 올리기
-                                    if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
-                                        summ_keywords.add(param.getSummary_keywords());
-                                    }
-                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
-
-                                    if(StringUtils.isNotEmpty(_token)){
-                                        _msg = "챕터 요약이 생성되었습니다.";
-                                    }
-                                }else{
-                                    _msg = "챕터 요약 생성을 실패하였습니다.";
-                                }
-                            } else {
-                                _msg = "선택한 챕터 필터를 다시 확인해주세요.";
+                                _totalCount++;
                             }
 
                             if(filter_op1>2){
@@ -650,7 +415,7 @@ public class ProjectService {
                                                         if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
                                                             _elist.setSpeaker(_ers0[3].toString());
                                                             _elist.setText(_ers0[4].toString());
-                                                            subChap_data.add(_elist);
+                                                            chapter_data.add(_elist);
                                                             data_cnt++;
                                                         }
                                                     }
@@ -659,52 +424,8 @@ public class ProjectService {
                                         }
                                         j++;
                                     }
-                                    params03.setText(subChap_data);
-
-                                    _nlp = new HashMap<String, Object>();
-                                    _nlp0 = new HashMap<String, Object>();
-                                    _nlp1 = new HashMap<String, Object>();
-                                    _nlp2 = new HashMap<String, Object>();
-
                                     if(data_cnt>0){
-                                        _nlp0.put("enable",true);
-                                        _nlp0.put("model","dialogue");
-                                        _nlp0.put("outputSizeOption","small");
-                                        _nlp.put("summary",_nlp0);
-
-
-                                        _nlp1.put("enable",true);
-                                        _nlp1.put("maxCount",30);
-                                        _nlp.put("keywordExtraction",_nlp1);
-
-
-                                        _nlp2.put("enable",true);
-                                        _nlp.put("sentimentAnalysis",_nlp2);
-
-                                        params02.setNlpConfig(_nlp);
-
-                                        //summaries 추출
-                                        pp = new Gson().toJson(params03);
-                                        param = summary.getSummary(pp, "서브챕터 [" + ty3_f + "] 요약문");
-
-                                        if(StringUtils.isNotEmpty(param.getTitle())){
-                                            paramVo.setSummary0(param.getSummary0());
-                                            paramVo.setTitle(param.getTitle());
-                                            reportMapper.saveReportData(paramVo);
-                                            reportMapper.updReportCountUp(paramVo);     // 리포트 저장 수 올리기
-                                            if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
-                                                summ_keywords.add(param.getSummary_keywords());
-                                            }
-                                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
-
-                                            if(StringUtils.isNotEmpty(_token)){
-                                                _msg = "서브챕터 요약이 생성되었습니다.";
-                                            }
-                                        }else{
-                                            _msg = "서브챕터 요약 생성을 실패하였습니다.";
-                                        }
-                                    } else {
-                                        _msg = "선택한 서브챕터 필터를 다시 확인해주세요.";
+                                        _totalCount++;
                                     }
 
                                     if(filter_op1>3){
@@ -756,66 +477,343 @@ public class ProjectService {
                                                 }
                                                 j++;
                                             }
-                                            params04.setText(quest_data);
-
-                                            _nlp = new HashMap<String, Object>();
-                                            _nlp0 = new HashMap<String, Object>();
-                                            _nlp1 = new HashMap<String, Object>();
-                                            _nlp2 = new HashMap<String, Object>();
-
-                                            if (data_cnt > 0) {
-                                                _nlp0.put("enable", true);
-                                                _nlp0.put("model", "dialogue");
-                                                _nlp0.put("outputSizeOption", "small");
-                                                _nlp.put("summary", _nlp0);
-
-
-                                                _nlp1.put("enable", true);
-                                                _nlp1.put("maxCount", 30);
-                                                _nlp.put("keywordExtraction",_nlp1);
-
-
-                                                _nlp2.put("enable", true);
-                                                _nlp.put("sentimentAnalysis",_nlp2);
-
-                                                params02.setNlpConfig(_nlp);
-
-                                                //summaries 추출
-                                                pp = new Gson().toJson(params04);
-                                                param = summary.getSummary(pp, "질문 [" + ty4_f + "] 요약문");
-
-                                                if(StringUtils.isNotEmpty(param.getTitle())){
-                                                    paramVo.setSummary0(param.getSummary0());
-                                                    paramVo.setTitle(param.getTitle());
-                                                    reportMapper.saveReportData(paramVo);
-                                                    reportMapper.updReportCountUp(paramVo);     // 리포트 저장 수 올리기
-                                                    if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
-                                                        summ_keywords.add(param.getSummary_keywords());
-                                                    }
-                                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
-
-                                                    if(StringUtils.isNotEmpty(_token)){
-                                                        _msg = "질문 요약이 생성되었습니다.";
-                                                    }
-                                                }else{
-                                                    _msg = "질문 요약 생성을 실패하였습니다.";
-                                                }
-                                            } else {
-                                                _msg = "선택한 질문 필터를 다시 확인해주세요.";
+                                            if(data_cnt>0){
+                                                _totalCount++;
                                             }
-                                        } // 질문
+                                        }
                                     }
-                                } // 서브챕터
+                                }
                             }
-                        } // 챕터
+                        }
                     }
-                    ReportFilterKeywordVO option = new ReportFilterKeywordVO();
-                    option.setDic_keywords(ty5);
-                    option.setSpeaker(ty1);
-                    option.setKeytype(_isKey);
-                    option.setFilter(filter_op2);
-                    saveSummaryKeyword(paramVo, summ_keywords, option);
-                } // 전체
+
+                    Integer _seq = reportMapper.getReportSeq();
+                    _seq = _seq+1;
+                    String b1 = ("000"+_seq);
+                    String RPID = "R" + b1.substring(b1.length()-4,b1.length());
+                    paramVo.setReport_seq(_seq);
+                    paramVo.setReport_id(RPID);
+                    paramVo.setTitle(filterVO.getReport_name());
+                    paramVo.setD_count_total(_totalCount);
+                    Integer ridx0 = reportMapper.savReport(paramVo);
+
+                    if(ridx0==1){
+                        paramVo.setSummary0(param.getSummary0());
+                        paramVo.setTitle(param.getTitle());
+                        reportMapper.saveReportData(paramVo);
+                        reportMapper.updReportCountUp(paramVo);  // 요약문데이터 저장후 1로 변경
+                        if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
+                            summ_keywords.add(param.getSummary_keywords()); // 추출된 키워드 있으면 키워드 리스트에 저장
+                        }
+                        statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
+                        savMetadata(paramVo.getIdx_report(), _metalist); // 메타데이터 집계
+                        if(StringUtils.isNotEmpty(_token)){
+                            _msg = "필터 리포트가 생성되었습니다.";
+                        }
+                    }else{
+                        _msg = "리포트 정보 저장을 실패하였습니다.";
+                    }
+                }else{
+                    _msg = "리포트 생성을 실패하였습니다.";
+                }
+
+                if(filter_op1>1){ //'화자+필터용 사전키워드'+챕터 요약문
+                    for (String ty2_f : ty2) {
+                        data_cnt = 0;
+                        List<SumtextVO> chapter_data = new ArrayList<SumtextVO>();
+                        SummaryVO params02 = new SummaryVO();
+                        ers = excel.getCsvListData(_fpath);
+                        j = 0;
+                        for(String[] _ers0 : ers){
+                            if(j>0 && _ers0[0].equals(ty2_f)){
+                                SumtextVO _elist = new SumtextVO();
+                                if (_isKey == 99) {
+                                    _elist.setSpeaker(_ers0[3].toString());
+                                    _elist.setText(_ers0[4].toString());
+                                    chapter_data.add(_elist);
+                                    data_cnt++;
+                                } else if(_isKey == 10){
+                                    for (String ty1_f : ty1) {
+                                        if(_ers0[3].equals(ty1_f)){
+                                            _elist.setSpeaker(_ers0[3].toString());
+                                            _elist.setText(_ers0[4].toString());
+                                            chapter_data.add(_elist);
+                                            data_cnt++;
+                                        }
+                                    }
+                                } else if(_isKey == 50){
+                                    for(String dic_key : ty5) {
+                                        if(_ers0[4].contains(dic_key)){
+                                            _elist.setSpeaker(_ers0[3].toString());
+                                            _elist.setText(_ers0[4].toString());
+                                            chapter_data.add(_elist);
+                                            data_cnt++;
+                                        }
+                                    }
+                                } else if (_isKey == 0){
+                                    for (String ty5_f : ty5) {
+                                        for (String ty1_f : ty1) {
+                                            if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
+                                                _elist.setSpeaker(_ers0[3].toString());
+                                                _elist.setText(_ers0[4].toString());
+                                                chapter_data.add(_elist);
+                                                data_cnt++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            j++;
+                        }
+                        params02.setText(chapter_data);
+
+                        _nlp = new HashMap<String, Object>();
+                        _nlp0 = new HashMap<String, Object>();
+                        _nlp1 = new HashMap<String, Object>();
+                        _nlp2 = new HashMap<String, Object>();
+
+                        if(data_cnt>0){
+                            _nlp0.put("enable",true);
+                            _nlp0.put("model","dialogue");
+                            _nlp0.put("outputSizeOption","small");
+                            _nlp.put("summary",_nlp0);
+
+                            _nlp1.put("enable",true);
+                            _nlp1.put("maxCount",30);
+                            _nlp.put("keywordExtraction",_nlp1);
+
+                            _nlp2.put("enable",true);
+                            _nlp.put("sentimentAnalysis",_nlp2);
+
+                            params02.setNlpConfig(_nlp);
+
+                            pp = new Gson().toJson(params02);
+                            param = summary.getSummary(pp, "챕터 [" + ty2_f + "] 요약문");
+
+                            if(StringUtils.isNotEmpty(param.getTitle())){
+                                paramVo.setSummary0(param.getSummary0());
+                                paramVo.setTitle(param.getTitle());
+                                reportMapper.saveReportData(paramVo);
+                                reportMapper.updReportCountUp(paramVo);     // 리포트 저장 수 올리기
+                                if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
+                                    summ_keywords.add(param.getSummary_keywords());
+                                }
+                                statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+
+                                if(StringUtils.isNotEmpty(_token)){
+                                    _msg = "챕터 요약이 생성되었습니다.";
+                                }
+                            }else{
+                                _msg = "챕터 요약 생성을 실패하였습니다.";
+                            }
+                        } else {
+                            _msg = "선택한 챕터 필터를 다시 확인해주세요.";
+                        }
+
+                        if(filter_op1>2){
+                            for (String ty3_f : ty3) { //'화자+필터용 사전키워드'+챕터+서브챕터 요약문
+                                data_cnt = 0;
+                                List<SumtextVO> subChap_data = new ArrayList<SumtextVO>();
+                                SummaryVO params03 = new SummaryVO();
+                                ers = excel.getCsvListData(_fpath);
+                                j = 0;
+                                for(String[] _ers0 : ers){
+                                    if (j>0 && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f)) {
+                                        SumtextVO _elist = new SumtextVO();
+                                        if (_isKey == 99) {
+                                            _elist.setSpeaker(_ers0[3].toString());
+                                            _elist.setText(_ers0[4].toString());
+                                            subChap_data.add(_elist);
+                                            data_cnt++;
+                                        } else if(_isKey == 10){
+                                            for (String ty1_f : ty1) {
+                                                if(_ers0[3].equals(ty1_f)){
+                                                    _elist.setSpeaker(_ers0[3].toString());
+                                                    _elist.setText(_ers0[4].toString());
+                                                    subChap_data.add(_elist);
+                                                    data_cnt++;
+                                                }
+                                            }
+                                        } else if(_isKey == 50){
+                                            for(String dic_key : ty5) {
+                                                if(_ers0[4].contains(dic_key)){
+                                                    _elist.setSpeaker(_ers0[3].toString());
+                                                    _elist.setText(_ers0[4].toString());
+                                                    subChap_data.add(_elist);
+                                                    data_cnt++;
+                                                }
+                                            }
+                                        } else if (_isKey == 0){
+                                            for (String ty5_f : ty5) {
+                                                for (String ty1_f : ty1) {
+                                                    if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
+                                                        _elist.setSpeaker(_ers0[3].toString());
+                                                        _elist.setText(_ers0[4].toString());
+                                                        subChap_data.add(_elist);
+                                                        data_cnt++;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    j++;
+                                }
+                                params03.setText(subChap_data);
+
+                                _nlp = new HashMap<String, Object>();
+                                _nlp0 = new HashMap<String, Object>();
+                                _nlp1 = new HashMap<String, Object>();
+                                _nlp2 = new HashMap<String, Object>();
+
+                                if(data_cnt>0){
+                                    _nlp0.put("enable",true);
+                                    _nlp0.put("model","dialogue");
+                                    _nlp0.put("outputSizeOption","small");
+                                    _nlp.put("summary",_nlp0);
+
+
+                                    _nlp1.put("enable",true);
+                                    _nlp1.put("maxCount",30);
+                                    _nlp.put("keywordExtraction",_nlp1);
+
+
+                                    _nlp2.put("enable",true);
+                                    _nlp.put("sentimentAnalysis",_nlp2);
+
+                                    params02.setNlpConfig(_nlp);
+
+                                    //summaries 추출
+                                    pp = new Gson().toJson(params03);
+                                    param = summary.getSummary(pp, "서브챕터 [" + ty3_f + "] 요약문");
+
+                                    if(StringUtils.isNotEmpty(param.getTitle())){
+                                        paramVo.setSummary0(param.getSummary0());
+                                        paramVo.setTitle(param.getTitle());
+                                        reportMapper.saveReportData(paramVo);
+                                        reportMapper.updReportCountUp(paramVo);     // 리포트 저장 수 올리기
+                                        if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
+                                            summ_keywords.add(param.getSummary_keywords());
+                                        }
+                                        statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+
+                                        if(StringUtils.isNotEmpty(_token)){
+                                            _msg = "서브챕터 요약이 생성되었습니다.";
+                                        }
+                                    }else{
+                                        _msg = "서브챕터 요약 생성을 실패하였습니다.";
+                                    }
+                                } else {
+                                    _msg = "선택한 서브챕터 필터를 다시 확인해주세요.";
+                                }
+
+                                if(filter_op1>3){
+                                    for (String ty4_f : ty4) { //'화자+필터용 사전키워드'+챕터+서브챕터+질문 요약문
+                                        data_cnt = 0;
+                                        List<SumtextVO> quest_data = new ArrayList<SumtextVO>();
+                                        SummaryVO params04 = new SummaryVO();
+                                        ers = excel.getCsvListData(_fpath);
+                                        j = 0;
+                                        for (String[] _ers0 : ers) {
+                                            if (j>0 && _ers0[0].equals(ty2_f) && _ers0[1].equals(ty3_f) && _ers0[2].equals(ty4_f)) {
+                                                SumtextVO _elist = new SumtextVO();
+
+                                                if (_isKey == 99) {
+                                                    _elist.setSpeaker(_ers0[3].toString());
+                                                    _elist.setText(_ers0[4].toString());
+                                                    quest_data.add(_elist);
+                                                    data_cnt++;
+                                                } else if(_isKey == 10){
+                                                    for (String ty1_f : ty1) {
+                                                        if(_ers0[3].equals(ty1_f)){
+                                                            _elist.setSpeaker(_ers0[3].toString());
+                                                            _elist.setText(_ers0[4].toString());
+                                                            quest_data.add(_elist);
+                                                            data_cnt++;
+                                                        }
+                                                    }
+                                                } else if(_isKey == 50){
+                                                    for(String dic_key : ty5) {
+                                                        if(_ers0[4].contains(dic_key)){
+                                                            _elist.setSpeaker(_ers0[3].toString());
+                                                            _elist.setText(_ers0[4].toString());
+                                                            quest_data.add(_elist);
+                                                            data_cnt++;
+                                                        }
+                                                    }
+                                                } else if (_isKey == 0){
+                                                    for (String ty5_f : ty5) {
+                                                        for (String ty1_f : ty1) {
+                                                            if(_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
+                                                                _elist.setSpeaker(_ers0[3].toString());
+                                                                _elist.setText(_ers0[4].toString());
+                                                                quest_data.add(_elist);
+                                                                data_cnt++;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            j++;
+                                        }
+                                        params04.setText(quest_data);
+
+                                        _nlp = new HashMap<String, Object>();
+                                        _nlp0 = new HashMap<String, Object>();
+                                        _nlp1 = new HashMap<String, Object>();
+                                        _nlp2 = new HashMap<String, Object>();
+
+                                        if (data_cnt > 0) {
+                                            _nlp0.put("enable", true);
+                                            _nlp0.put("model", "dialogue");
+                                            _nlp0.put("outputSizeOption", "small");
+                                            _nlp.put("summary", _nlp0);
+
+
+                                            _nlp1.put("enable", true);
+                                            _nlp1.put("maxCount", 30);
+                                            _nlp.put("keywordExtraction",_nlp1);
+
+
+                                            _nlp2.put("enable", true);
+                                            _nlp.put("sentimentAnalysis",_nlp2);
+
+                                            params02.setNlpConfig(_nlp);
+
+                                            //summaries 추출
+                                            pp = new Gson().toJson(params04);
+                                            param = summary.getSummary(pp, "질문 [" + ty4_f + "] 요약문");
+
+                                            if(StringUtils.isNotEmpty(param.getTitle())){
+                                                paramVo.setSummary0(param.getSummary0());
+                                                paramVo.setTitle(param.getTitle());
+                                                reportMapper.saveReportData(paramVo);
+                                                reportMapper.updReportCountUp(paramVo);     // 리포트 저장 수 올리기
+                                                if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
+                                                    summ_keywords.add(param.getSummary_keywords());
+                                                }
+                                                statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+
+                                                if(StringUtils.isNotEmpty(_token)){
+                                                    _msg = "질문 요약이 생성되었습니다.";
+                                                }
+                                            }else{
+                                                _msg = "질문 요약 생성을 실패하였습니다.";
+                                            }
+                                        } else {
+                                            _msg = "선택한 질문 필터를 다시 확인해주세요.";
+                                        }
+                                    } // 질문
+                                }
+                            } // 서브챕터
+                        }
+                    } // 챕터
+                }
+                ReportFilterKeywordVO option = new ReportFilterKeywordVO();
+                option.setDic_keywords(ty5);
+                option.setSpeaker(ty1);
+                option.setKeytype(_isKey);
+                option.setFilter(filter_op2);
+                saveSummaryKeyword(paramVo, summ_keywords, option);
             } else {
                 _msg = "리포트 필터 옵션을 다시 선택해주세요.";
             }
@@ -863,100 +861,96 @@ public class ProjectService {
      */
     private void saveSummaryKeyword(ProjectVO param, List<String[]> s_keyword, ReportFilterKeywordVO option) throws Exception {
 
-        List<ProjectVO> prs = reportMapper.getReportFileListOne(param);
+        ProjectVO rs0 = projectMapper.getProjectJobProjectid(param);
         int op2 = option.getFilter();
         int _isKey = option.getKeytype();
         String[] ty1 = option.getSpeaker();
         String[] ty5 = option.getDic_keywords();
 
         if(s_keyword.size()>0){
-            for(ProjectVO prs0 : prs) {
-                String _fpath = this.filepath + prs0.getFilepath() + prs0.getFilename();
+            String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
 
-                ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
-                reKeywords.setIdx_report(param.getIdx_report());
-                reKeywords.setKeytype(1); // 임시작성. 명사형용사 향후 추가적용 필요
+            ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
+            reKeywords.setIdx_report(param.getIdx_report());
+            reKeywords.setKeytype(1); // 임시작성. 명사형용사 향후 추가적용 필요
 
-                int total_count = 0;
+            int total_count = 0;
+            for (String[] keywords : s_keyword) {
+                for (String key : keywords) {
+                    if(op2==0 || (op2==1 && key.length()>1)){
+                        reKeywords.setSum_keyword(key);
+                        List<String[]> ers = excel.getCsvListData(_fpath);
 
-                for (String[] keywords : s_keyword) {
-                    for (String key : keywords) {
-                        if(op2==0 || (op2==1 && key.length()>1)){
-                            reKeywords.setSum_keyword(key);
-                            List<String[]> ers = excel.getCsvListData(_fpath);
-
-                            int j = 0;
-                            int count = 0;
-                            for(String[] _ers0 : ers){
-                                if (j > 0) {
-                                    if (_isKey == 99) { // 화자,키워드 필터없을때
-                                        int index = 0;
-                                        while (index >= 0) {
-                                            index = _ers0[4].indexOf(key, index);
-                                            if (index >= 0) {
-                                                count++;
-                                                index += key.length();
+                        int j = 0;
+                        int count = 0;
+                        for(String[] _ers0 : ers){
+                            if (j > 0) {
+                                if (_isKey == 99) { // 화자,키워드 필터없을때
+                                    int index = 0;
+                                    while (index >= 0) {
+                                        index = _ers0[4].indexOf(key, index);
+                                        if (index >= 0) {
+                                            count++;
+                                            index += key.length();
+                                        }
+                                    }
+                                } else if(_isKey == 10){ // 화자 키워드만 지정했을때
+                                    for (String ty1_f : ty1) {
+                                        if(_ers0[3].equals(ty1_f)){
+                                            int index = 0;
+                                            while (index >= 0) {
+                                                index = _ers0[4].indexOf(key, index);
+                                                if (index >= 0) {
+                                                    count++;
+                                                    index += key.length();
+                                                }
                                             }
                                         }
-                                    } else if(_isKey == 10){ // 화자 키워드만 지정했을때
+                                    }
+                                } else if(_isKey == 50){ // 키워드 필터만 지정했을때
+                                    for(String dic_key : ty5) {
+                                        if(_ers0[4].contains(dic_key)){
+                                            int index = 0;
+                                            while (index >= 0) {
+                                                index = _ers0[4].indexOf(key, index);
+                                                if (index >= 0) {
+                                                    count++;
+                                                    index += key.length();
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else if (_isKey == 0) { // 화자,키워드 필터 모두 지정했을때
+                                    for (String ty5_f : ty5) {
                                         for (String ty1_f : ty1) {
-                                            if(_ers0[3].equals(ty1_f)){
+                                            if (_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
                                                 int index = 0;
                                                 while (index >= 0) {
                                                     index = _ers0[4].indexOf(key, index);
                                                     if (index >= 0) {
                                                         count++;
                                                         index += key.length();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } else if(_isKey == 50){ // 키워드 필터만 지정했을때
-                                        for(String dic_key : ty5) {
-                                            if(_ers0[4].contains(dic_key)){
-                                                int index = 0;
-                                                while (index >= 0) {
-                                                    index = _ers0[4].indexOf(key, index);
-                                                    if (index >= 0) {
-                                                        count++;
-                                                        index += key.length();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } else if (_isKey == 0) { // 화자,키워드 필터 모두 지정했을때
-                                        for (String ty5_f : ty5) {
-                                            for (String ty1_f : ty1) {
-                                                if (_ers0[4].contains(ty5_f) && _ers0[3].equals(ty1_f)) {
-                                                    int index = 0;
-                                                    while (index >= 0) {
-                                                        index = _ers0[4].indexOf(key, index);
-                                                        if (index >= 0) {
-                                                            count++;
-                                                            index += key.length();
-                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                j++;
                             }
+                            j++;
+                        }
+                        int _findkey = reportMapper.findReportKeyword(reKeywords);
+                        reKeywords.setKeycount(count);
 
-                            int _findkey = reportMapper.findReportKeyword(reKeywords);
-                            reKeywords.setKeycount(count);
-
-                            if(count>0 && _findkey==0){
-                                int apiUse = reKeywords.getSum_keyword().length() * count;
-                                reportMapper.createReportFilterData(reKeywords); // api 사용량 집계(요약문)
-                                total_count += apiUse;
-                            }
+                        if(count>0 && _findkey==0){
+                            int apiUse = reKeywords.getSum_keyword().length() * count;
+                            reportMapper.createReportFilterData(reKeywords); // api 사용량 집계(요약문)
+                            total_count += apiUse;
                         }
                     }
                 }
-                statisticsService.createAPIUsage(param, 2, total_count);
             }
+            statisticsService.createAPIUsage(param, 2, total_count);
         }
     }
 
@@ -985,33 +979,27 @@ public class ProjectService {
 
         String[] _mergeIdx = paramVo.getProject_merge_idx().split(",");
 
-        int fileCnt = 0;
         for (String mergeIdx : _mergeIdx) {
-
             int lineCnt = 0;
-            ProjectVO m0 = new ProjectVO();
-            m0.setIdx_project(Integer.valueOf(mergeIdx));
+            ProjectVO param = new ProjectVO();
+            param.setIdx_project_job_projectid(Integer.valueOf(mergeIdx));
+            ProjectVO rs0 = projectMapper.getProjectJobProjectid(param);
+            String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
 
-            List<ProjectVO> prs = reportMapper.getReportFileListOne(m0);
+            System.out.println("_fpath = " + _fpath);
+            List<String[]> ers = excel.getCsvListData(_fpath);
 
-            for (ProjectVO pr : prs) {
-                String _fpath = this.filepath + pr.getFilepath() + pr.getFilename();
-
-                List<String[]> ers = excel.getCsvListData(_fpath);
-
-                for (String[] er : ers) {
-                    if(fileCnt==0 || (fileCnt>0 && lineCnt>0)) {
-                        for (String str00 : er) {
-                            String aData = "";
-                            aData = "\""+str00+"\",";
-                            out.write(aData);
-                        }
-                        out.write("\r\n");
+            for (String[] er : ers) {
+                if(lineCnt>0) {
+                    for (String str00 : er) {
+                        String aData = "";
+                        aData = "\""+str00+"\",";
+                        out.write(aData);
                     }
-                    lineCnt++;
+                    out.write("\r\n");
                 }
+                lineCnt++;
             }
-            fileCnt++;
         }
 
         if(out!=null){
