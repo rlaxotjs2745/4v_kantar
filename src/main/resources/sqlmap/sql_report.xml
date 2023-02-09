@@ -57,7 +57,7 @@
     </insert>
 
     <select id="getReportIdx" resultType="com.kantar.vo.ProjectVO">
-        SELECT idx_report FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+        SELECT idx_report FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid} ORDER BY idx_report LIMIT 1
     </select>
 
     <select id="getReportListIdx" resultType="com.kantar.vo.ProjectVO">
