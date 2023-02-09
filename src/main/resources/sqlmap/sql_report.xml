@@ -65,7 +65,7 @@
     </insert>
 
     <select id="getReportIdx" resultType="com.kantar.vo.ProjectVO">
-        SELECT idx_report FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+        SELECT idx_report FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid} ORDER BY idx_report LIMIT 1
     </select>
 
     <select id="getReportListIdx" resultType="com.kantar.vo.ProjectVO">
@@ -145,7 +145,7 @@
     </select>
 
     <insert id="insertMetadata">
-        INSERT INTO KT_REPORT_FILTER_METADATA (idx_report, speaker, chapter, answer_cnt, word_length, create_dt) VALUES (#{idx_report}, #{speaker}, #{chapter}, #{cnt}, #{length}, SYSDATE())
+        INSERT INTO KT_REPORT_FILTER_METADATA (idx_report, speaker, chapter, answer_cnt, word_length, create_dt) VALUES (#{idx_report}, #{speaker}, #{chapter}, 1, #{length}, SYSDATE())
     </insert>
 
     <update id="updateMetadataCnt">

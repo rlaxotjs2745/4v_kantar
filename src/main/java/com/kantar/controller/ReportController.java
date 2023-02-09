@@ -218,6 +218,7 @@ public class ReportController extends BaseController {
                                     param.setTitle(paramVo.getProject_name() + "_기본리포트");
                                     Integer _rs0 = reportMapper.savReport(param);
                                     if(_rs0==1){
+                                        projectMapper.modProjectJobProjectid(paramVo);
                                         projectService.create_report(_token, param, 0);
                                     }
                                     _rdata.put("idx_project",paramVo.getIdx_project());
@@ -498,7 +499,7 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("save_filter_report","프로젝트 정보를 다시 확인해주세요");
             }
 
-            if(StringUtils.isEmpty(filterVO.getTp1()) && StringUtils.isEmpty(filterVO.getTp2()) && StringUtils.isEmpty(filterVO.getTp3()) && StringUtils.isEmpty(filterVO.getTp4())){
+            if(StringUtils.isEmpty(filterVO.getTp1()) && StringUtils.isEmpty(filterVO.getTp2()) && StringUtils.isEmpty(filterVO.getTp3()) && StringUtils.isEmpty(filterVO.getTp4()) && StringUtils.isEmpty(filterVO.getTp5())){
                 return responseService.getFailResult("save_filter_report","필터 데이터가 없습니다.");
             }
 

@@ -77,6 +77,16 @@
         INSERT INTO KT_PROJECT_JOB_PROJECTID (idx_project_job, project_id, project_seq, idx_user) VALUES (#{idx_project_job}, #{project_id}, #{project_seq}, #{idx_user});
     </insert>
 
+    <update id="modProjectJobProjectid">
+        UPDATE KT_PROJECT_JOB_PROJECTID
+            SET filepath=#{filepath}, filename=#{filename}
+            WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+    </update>
+
+    <select id="getProjectJobProjectid" resultType="com.kantar.vo.ProjectVO">
+        SELECT filepath, filename FROM KT_PROJECT_JOB_PROJECTID WHERE idx_project_job_projectid=#{idx_project_job_projectid}
+    </select>
+
     <insert id="savProjectInfo" useGeneratedKeys="true" keyColumn="idx_project" keyProperty="idx_project">
         INSERT INTO KT_PROJECT (idx_project_job_projectid, project_name, project_type, project_status, summary0, idx_user) VALUES (#{idx_project_job_projectid}, #{project_name}, 1, 1, #{summary0}, #{idx_user});
     </insert>

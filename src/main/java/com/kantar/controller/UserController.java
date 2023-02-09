@@ -40,6 +40,22 @@ public class UserController extends BaseController {
     private String clientDomain;
 
     /**
+     * 로그인 체크
+     * @param req
+     * @return CommonResult
+     * @throws Exception
+     */
+    @GetMapping("/loginchk")
+    public CommonResult loginchk(HttpServletRequest req) throws Exception{
+        UserVO uinfo = getChkUserLogin(req);
+        if(uinfo==null){
+            return responseService.getFailResult("loginchk","로그아웃");
+        }else{
+            return responseService.getSuccessResult("loginchk", "로그인");
+        }
+    }
+
+    /**
      * 로그인
      * @param paramVo
      * @return CommonResult

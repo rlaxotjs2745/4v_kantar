@@ -163,31 +163,33 @@ public class ProjectService {
     public List<ProjectViewVO> getCsvParse(List<ProjectViewVO> rlist, String _fPath) throws Exception {
         List<String[]> ers = excel.getCsvListData(_fPath);
         int j = 0;
-        for(String[] _ers0 : ers){  // 줄
-            if(j>0){
-                int i = 0;
-                ProjectViewVO _e = new ProjectViewVO();
-                for(String _ers00 : _ers0){ // 컬럼
-                    if(i==0){
-                        _e.setChapter(_ers00.toString());
+        if(ers != null && ers.size() > 0){
+            for(String[] _ers0 : ers){  // 줄
+                if(j>0){
+                    int i = 0;
+                    ProjectViewVO _e = new ProjectViewVO();
+                    for(String _ers00 : _ers0){ // 컬럼
+                        if(i==0){
+                            _e.setChapter(_ers00.toString());
+                        }
+                        if(i==1){
+                            _e.setSubchapter(_ers00.toString());
+                        }
+                        if(i==2){
+                            _e.setQuestion(_ers00.toString());
+                        }
+                        if(i==3){
+                            _e.setPerson(_ers00.toString());
+                        }
+                        if(i==4){
+                            _e.setAnswer(_ers00.toString());
+                        }
+                        i++;
                     }
-                    if(i==1){
-                        _e.setSubchapter(_ers00.toString());
-                    }
-                    if(i==2){
-                        _e.setQuestion(_ers00.toString());
-                    }
-                    if(i==3){
-                        _e.setPerson(_ers00.toString());
-                    }
-                    if(i==4){
-                        _e.setAnswer(_ers00.toString());
-                    }
-                    i++;
+                    rlist.add(_e);
                 }
-                rlist.add(_e);
+                j++;
             }
-            j++;
         }
         return rlist;
     }
@@ -245,7 +247,6 @@ public class ProjectService {
                     SummaryVO params = new SummaryVO();
                     List<String[]> ers = excel.getCsvListData(_fpath);
                     int j = 0;
-                    int _metaCnt = 0;
                     for(String[] _ers0 : ers){  // 줄
                         if (j > 0) {
                             SumtextVO _elist = new SumtextVO();
@@ -257,6 +258,7 @@ public class ProjectService {
                                 _meta.setSpeaker(_ers0[3].toString());
                                 _meta.setChapter(_ers0[0].toString());
                                 _meta.setLength(_ers0[4].toString().length());
+                                _meta.setCnt(1);
                                 _metalist.add(_meta);
                             } else if(_isKey == 10){
                                 for (String ty1_f : ty1) {

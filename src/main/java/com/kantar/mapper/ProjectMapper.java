@@ -23,6 +23,10 @@ public interface ProjectMapper {
 
     public Integer savProjectJobProjectid(ProjectVO paramVo) throws Exception;
 
+    public Integer modProjectJobProjectid(ProjectVO paramVo) throws Exception;
+
+    public ProjectVO getProjectJobProjectid(ProjectVO paramVo) throws Exception;
+
     public Integer savProjectInfo(ProjectVO paramVo) throws Exception;
 
     public Integer modiProjectInfo(ProjectVO paramVo) throws Exception;
