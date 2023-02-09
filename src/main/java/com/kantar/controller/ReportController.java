@@ -218,6 +218,7 @@ public class ReportController extends BaseController {
                                     param.setTitle(paramVo.getProject_name() + "_기본리포트");
                                     Integer _rs0 = reportMapper.savReport(param);
                                     if(_rs0==1){
+                                        projectMapper.modProjectJobProjectid(paramVo);
                                         projectService.create_report(_token, param, 0);
                                     }
                                     _rdata.put("idx_project",paramVo.getIdx_project());

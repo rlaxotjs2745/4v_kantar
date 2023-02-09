@@ -211,20 +211,22 @@ public class ProjectController extends BaseController {
                 return responseService.getFailResult("login","로그인이 필요합니다.");
             }
             paramVo.setIdx_user(uinfo.getIdx_user());
-            if(StringUtils.isEmpty(paramVo.getIdx_project()+"")){
+            if(StringUtils.isEmpty(paramVo.getIdx_project_job_projectid()+"")){
                 return responseService.getFailResult("project_view","프로젝트 INDEX가 없습니다.");
             }
 
             List<Object> result = new ArrayList<>();
             List<ProjectViewVO> rlist = new ArrayList<ProjectViewVO>();
 
-            List<ProjectVO> rs = reportMapper.getReportFileList(paramVo);
-            for(ProjectVO prs0 : rs){
-                ProjectVO rs0 = projectMapper.getProjectInfoByIdx(paramVo);
-                rlist = projectService.get_projectListView(rlist, prs0);
-                result.add(rs0);
-                result.add(rlist);
-            }
+            // List<ProjectVO> rs = reportMapper.getReportFileList(paramVo);
+            // for(ProjectVO prs0 : rs){
+            //     ProjectVO rs0 = projectMapper.getProjectInfoByIdx(paramVo);
+            //     rlist = projectService.get_projectListView(rlist, prs0);
+            //     result.add(rs0);
+            //     result.add(rlist);
+            // }
+            ProjectVO rs0 = projectMapper.getProjectJobProjectid(paramVo);
+            rlist = projectService.get_projectListView(rlist, rs0);
             if(rlist!=null){
                 return responseService.getSuccessResult(result, "project_view", "프로젝트 정보 성공");
             }else{
