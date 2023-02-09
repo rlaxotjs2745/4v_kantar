@@ -153,4 +153,8 @@
     <select id="getDictDown" resultType="com.kantar.vo.DictionaryVO">
         SELECT DISTINCT filepath, `filename` FROM KT_DICTIONARY WHERE idx_dictionary=#{idx_dictionary}
     </select>
+
+    <update id="updateDicCount">
+        UPDATE KT_DICTIONARY SET dic_count=#{dic_count} WHERE idx_dictionary=#{idx_dictionary}
+    </update>
 </mapper>

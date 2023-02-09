@@ -35,4 +35,6 @@ public interface DictionaryMapper {
     public List<DictionaryDataVO> getBulkDictionaryData(List<Integer> idx_dictionary) throws Exception;
 
     public DictionaryVO getDictDown(DictionaryVO dictionaryVO) throws Exception;
+
+    public void updateDicCount(DictionaryVO dictionaryVO) throws Exception;
 }

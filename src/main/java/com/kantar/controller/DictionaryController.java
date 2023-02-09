@@ -263,6 +263,8 @@ public class DictionaryController extends BaseController {
                 }
             }
             dictionaryMapper.deleteDictionaryData(paramVo);
+            dictionaryVO.setDic_count(dictionaryVO.getDic_count() - 1);
+            dictionaryMapper.updateDicCount(dictionaryVO);
             return responseService.getSuccessResult("delete_dictionary_data", "키워드 그룹 삭제 성공");
         } catch (Exception e) {
             e.printStackTrace();
@@ -292,6 +294,10 @@ public class DictionaryController extends BaseController {
                     return responseService.getFailResult("update_dictionary_data","수정 권한이 없습니다.");
                 }
             }
+
+            dictionaryVO.setDic_count(paramVo.size());
+            dictionaryMapper.updateDicCount(dictionaryVO);
+
 
             for(DictionaryDataVO param: paramVo){
                 if(param.getIdx_dictionary_data() == null || param.getIdx_dictionary_data() == 0){
