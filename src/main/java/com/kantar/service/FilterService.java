@@ -47,6 +47,7 @@ public class FilterService {
 
         FilterVO paramVo = new FilterVO();
         paramVo.setFilter_title(filter.getReport_name()+"filter");
+        paramVo.setIdx_user(filter.getIdx_user());
 
         if(filter.getFilter_op1()<4) {
             filter.setTp4(null);

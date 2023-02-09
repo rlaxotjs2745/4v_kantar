@@ -109,7 +109,7 @@
     <select id="getApiDataByUser" resultType="Double">
         SELECT NVL(ROUND(SUM(data_length + index_length) / 1024 / 1024, 3),0) AS dataUsage
         FROM information_schema.tables A, KT_REPORT B, KT_API_STATISTICS C
-        WHERE (A.table_name = 'KT_REPORT' OR A.table_name = 'KT_REPORT_DATA')
+        WHERE (A.table_name = 'KT_REPORT' OR A.table_name = 'KT_REPORT_DATA' OR A.table_name = 'KT_REPORT_FILTER' OR A.table_name = 'KT_REPORT_FILTER_DATA' OR A.table_name = 'KT_REPORT_FILTER_METADATA' OR A.table_name = 'KT_REPORT_KEYWORD')
           AND C.idx_report = B.idx_report
         <if test="idx_user != null">
           AND B.idx_user = #{idx_user}
