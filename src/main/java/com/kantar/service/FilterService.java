@@ -64,6 +64,7 @@ public class FilterService {
         paramVo.setTp2(filter.getTp2());
         paramVo.setTp3(filter.getTp3());
         paramVo.setTp4(filter.getTp4());
+        paramVo.setTp5(filter.getTp5());
 
         rs0 = filterMapper.createFilter(paramVo);
 
@@ -92,6 +93,13 @@ public class FilterService {
             if(StringUtils.isNotEmpty(paramVo.getTp4())){
                 paramVo.setFilter_type(4);
                 Integer rs1 = create_Filter(paramVo, paramVo.getTp4());
+                if(rs1 == 0){
+                    filterMapper.delFilter(paramVo);
+                }
+            }
+            if(StringUtils.isNotEmpty(paramVo.getTp5())){
+                paramVo.setFilter_type(5);
+                Integer rs1 = create_Filter(paramVo, paramVo.getTp5());
                 if(rs1 == 0){
                     filterMapper.delFilter(paramVo);
                 }
