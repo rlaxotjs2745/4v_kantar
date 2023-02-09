@@ -167,6 +167,8 @@ public class ProjectController extends BaseController {
             }
             paramVo.setRecordCountPerPage(10);
             paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
+            paramVo.setFilter(uinfo.getRole_type());
+            paramVo.setIdx_user(uinfo.getIdx_user());
             Integer tcnt = projectMapper.getProjectListCount(paramVo);
             List<ProjectListVO> rs = projectMapper.getProjectList(paramVo);
             if(rs != null){
@@ -180,6 +182,8 @@ public class ProjectController extends BaseController {
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("tcnt",tcnt);
             _data.put("list",rs);
+            _data.put("uType",uinfo.getRole_type());
+
             Map<String, Object> _data2 = new HashMap<String, Object>();
             _data2.put("link","http://naver.com");
             _data2.put("msg","kafka");
@@ -225,8 +229,12 @@ public class ProjectController extends BaseController {
                 result.add(rs0);
                 result.add(rlist);
             }
+
             if(rlist!=null){
-                return responseService.getSuccessResult(result, "project_view", "프로젝트 정보 성공");
+                Map<String, Object> resultMap = new HashMap<>();
+                resultMap.put("userType", uinfo.getRole_type());
+                resultMap.put("proData", result);
+                return responseService.getSuccessResult(resultMap, "project_view", "프로젝트 정보 성공");
             }else{
                 return responseService.getFailResult("project_view","프로젝트 정보가 없습니다.");
             }

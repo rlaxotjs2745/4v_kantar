@@ -262,11 +262,15 @@ public class ReportController extends BaseController {
             }
             paramVo.setRecordCountPerPage(10);
             paramVo.setFirstIndex((paramVo.getCurrentPage()-1) * 10);
+            paramVo.setFilter(uinfo.getRole_type());
+            paramVo.setIdx_user(uinfo.getIdx_user());
             Integer tcnt = reportMapper.getReportListCount(paramVo);
             List<ProjectVO> rs = reportMapper.getReportList(paramVo);
             Map<String, Object> _data = new HashMap<String, Object>();
             _data.put("tcnt",tcnt);
             _data.put("list",rs);
+            _data.put("uType",uinfo.getRole_type());
+
             if(rs!=null){
                 return responseService.getSuccessResult(_data, "list_report", "리포트 리스팅 성공");
             }else{
@@ -299,6 +303,10 @@ public class ReportController extends BaseController {
             }
 
             ProjectVO rs0 = projectMapper.getProjectView(paramVo); // 프로젝트 기본정보
+            Boolean isOwn = false;
+            if(rs0.getIdx_user() == uinfo.getIdx_user()){
+                isOwn = true;
+            }
             List<ProjectVO> rs1 = reportMapper.getReportDataViewAll(paramVo); // 리포트 기본정보
             List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo); // 키워드
             if(key0.size()>0){
@@ -321,6 +329,8 @@ public class ReportController extends BaseController {
             _data.put("filter",filter0);
             _data.put("metaSpeaker",metaSpeaker);
             _data.put("metaChapter",metaChapter);
+            _data.put("isOwn", isOwn);
+            _data.put("uType", uinfo.getRole_type());
 
             if(rs1!=null){
                 return responseService.getSuccessResult(_data, "report_view", "리포트 정보 성공");
