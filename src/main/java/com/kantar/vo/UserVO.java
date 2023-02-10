@@ -14,6 +14,7 @@ public class UserVO extends BaseVO {
     private String user_phone;
     private Integer user_type;
     private Integer user_status;
+    private String first_code;
     private Integer role_type;
     private Integer exp;
 

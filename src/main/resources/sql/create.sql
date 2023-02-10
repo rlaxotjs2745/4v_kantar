@@ -6,6 +6,7 @@ CREATE TABLE `KT_USER` (
 	`user_phone` VARCHAR(20) NOT NULL COMMENT '전화번호' COLLATE 'utf8mb4_general_ci',
 	`user_type` TINYINT(4) NULL DEFAULT '1' COMMENT '1:일반, 11:일반 관리자, 99:슈퍼 관리자',
 	`user_status` TINYINT(4) NULL DEFAULT '0' COMMENT '0:생성, 1:인증완료(정상), 98:직권 정지, 99:탈퇴',
+	`first_code` VARCHAR(100) NULL DEFAULT NULL COMMENT '회원 가입 인증 코드',
 	`create_dt` DATETIME NULL DEFAULT current_timestamp(),
 	`update_dt` DATETIME NULL DEFAULT NULL ON UPDATE current_timestamp(),
 	PRIMARY KEY (`idx_user`) USING BTREE

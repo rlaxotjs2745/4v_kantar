@@ -178,7 +178,7 @@ public class UserController extends BaseController {
             paramVo.setUser_status(0);
             paramVo.setUser_phone(newPw);
             Integer rs = userMapper.savUserInfo(paramVo);
-            paramVo.setUser_pw(newPw);
+            paramVo.setFirst_code(newPw);
             if(rs==1){
                 mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", "<a href=\"" + clientDomain + "/" + newPw + "\">계정 인증하기</a>");
                 return responseService.getSuccessResult("create","회원 가입이 완료되었습니다.");
@@ -474,6 +474,7 @@ public class UserController extends BaseController {
                 return responseService.getFailResult("first_login","사용자를 찾을 수 없습니다.");
             }
             userInfo.setUser_pw(null);
+            userInfo.setFirst_code(null);
             return responseService.getSuccessResult(userInfo, "first_login", "멤버 불러오기 성공");
         } catch (Exception e){
             e.printStackTrace();
