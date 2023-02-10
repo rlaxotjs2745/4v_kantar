@@ -216,6 +216,7 @@ public class ReportController extends BaseController {
                                     param.setFilepath(path);
                                     param.setProject_name(paramVo.getProject_name());
                                     param.setTitle(paramVo.getProject_name() + "_기본리포트");
+                                    param.setD_count_total(1);
                                     Integer _rs0 = reportMapper.savReport(param);
                                     if(_rs0==1){
                                         projectMapper.modProjectJobProjectid(paramVo);
