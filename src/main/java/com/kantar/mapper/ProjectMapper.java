@@ -42,4 +42,6 @@ public interface ProjectMapper {
     public ProjectVO getProjectDown(ProjectVO paramVo) throws Exception;
 
     public Integer savProjectJobProjectidAndFileInfo(ProjectVO paramVo) throws Exception;
+
+    public ProjectVO getProjectInfoByProJobIdx(ProjectVO paramVo) throws Exception;
 }

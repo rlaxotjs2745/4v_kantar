@@ -227,8 +227,9 @@ public class ProjectController extends BaseController {
             //     ProjectVO rs0 = projectMapper.getProjectInfoByIdx(paramVo);
             //     rlist = projectService.get_projectListView(rlist, prs0);
             // }
-            ProjectVO rs0 = projectMapper.getProjectJobProjectid(paramVo);
+            ProjectVO rs0 = projectMapper.getProjectInfoByProJobIdx(paramVo);
             rlist = projectService.get_projectListView(rlist, rs0);
+
             result.add(rs0);
             result.add(rlist);
             if(rlist!=null){
