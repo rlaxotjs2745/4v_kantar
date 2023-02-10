@@ -105,10 +105,6 @@
         SELECT idx_report_filter, filter_title FROM KT_REPORT_FILTER
     </select>
 
-    <select id="getReportFileListOne" resultType="com.kantar.vo.ProjectVO">
-        SELECT DISTINCT filepath, `filename` FROM KT_REPORT WHERE idx_project=#{idx_project}
-    </select>
-
     <select id="getReportFileByRp" resultType="com.kantar.vo.ProjectVO">
         SELECT filepath, `filename` FROM KT_REPORT WHERE idx_project=#{idx_report}
     </select>

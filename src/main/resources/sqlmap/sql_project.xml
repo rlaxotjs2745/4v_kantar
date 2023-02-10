@@ -77,6 +77,10 @@
         INSERT INTO KT_PROJECT_JOB_PROJECTID (idx_project_job, project_id, project_seq, idx_user) VALUES (#{idx_project_job}, #{project_id}, #{project_seq}, #{idx_user});
     </insert>
 
+    <insert id="savProjectJobProjectidAndFileInfo" useGeneratedKeys="true" keyColumn="idx_project_job_projectid" keyProperty="idx_project_job_projectid">
+        INSERT INTO KT_PROJECT_JOB_PROJECTID (idx_project_job, project_id, project_seq, idx_user, filepath, filename) VALUES (#{idx_project_job}, #{project_id}, #{project_seq}, #{idx_user}, #{filepath}, #{filename});
+    </insert>
+
     <update id="modProjectJobProjectid">
         UPDATE KT_PROJECT_JOB_PROJECTID
             SET filepath=#{filepath}, filename=#{filename}

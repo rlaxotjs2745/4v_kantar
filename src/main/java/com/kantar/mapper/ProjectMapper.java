@@ -40,4 +40,6 @@ public interface ProjectMapper {
     ProjectVO getProjectInfoByIdx(ProjectVO paramVo) throws Exception;
 
     public ProjectVO getProjectDown(ProjectVO paramVo) throws Exception;
+
+    public Integer savProjectJobProjectidAndFileInfo(ProjectVO paramVo) throws Exception;
 }
