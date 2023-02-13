@@ -268,6 +268,8 @@ public class ProjectService {
     @Async
     @Transactional
     public void list_reportfilter(String _token, ReportVO reportVO) throws Exception{
+        Map<String, Object> _kafka = new HashMap<String, Object>();
+        _kafka.put("link","");
 
         ProjectVO paramVo = new ProjectVO();
         paramVo.setIdx_project(reportVO.getIdx_project());
@@ -294,6 +296,7 @@ public class ProjectService {
             List<ReportVO> _data10 = new ArrayList<ReportVO>();
             List<String[]> summ_keywords = new ArrayList<>();
             Integer _totalCount = 0; // 요약문 생성수
+            Integer _nowCount = 0;
             String pp;
             List<ReportMetaDataVO> _metalist = new ArrayList<ReportMetaDataVO>();
 
@@ -467,13 +470,14 @@ public class ProjectService {
                         paramVo.setSummary0(param.getSummary0());
                         paramVo.setTitle(param.getTitle());
                         reportMapper.saveReportData(paramVo);
-                        reportMapper.updReportCountUp(paramVo);  // 요약문 저장 수 올리기
+                        reportMapper.updReportCountUp(paramVo);
+                        _nowCount++;
                         if (param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) {
                             summ_keywords.add(param.getSummary_keywords()); // 추출된 키워드 있으면 키워드 리스트에 저장
                         }
                         statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
                         if (StringUtils.isNotEmpty(_token)) {
-                            _msg = "필터 리포트가 생성되었습니다.";
+                            _msg = "챕터 리포트가 생성되었습니다.";
                         }
                     }
                 }
@@ -521,13 +525,14 @@ public class ProjectService {
                         paramVo.setSummary0(param.getSummary0());
                         paramVo.setTitle(param.getTitle());
                         reportMapper.saveReportData(paramVo);
-                        reportMapper.updReportCountUp(paramVo);  // 요약문 저장 수 올리기
+                        reportMapper.updReportCountUp(paramVo);
+                        _nowCount++;
                         if (param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) {
                             summ_keywords.add(param.getSummary_keywords()); // 추출된 키워드 있으면 키워드 리스트에 저장
                         }
                         statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
                         if (StringUtils.isNotEmpty(_token)) {
-                            _msg = "필터 리포트가 생성되었습니다.";
+                            _msg = "챕터 리포트가 생성되었습니다.";
                         }
                     }
                 }
@@ -545,6 +550,7 @@ public class ProjectService {
                     paramVo.setTitle(param.getTitle());
                     reportMapper.saveReportData(paramVo);
                     reportMapper.updReportCountUp(paramVo);
+                    _nowCount++;
                     if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
                         summ_keywords.add(param.getSummary_keywords());
                     }
@@ -595,6 +601,7 @@ public class ProjectService {
                         paramVo.setTitle(param.getTitle());
                         reportMapper.saveReportData(paramVo);
                         reportMapper.updReportCountUp(paramVo);
+                        _nowCount++;
                         if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
                             summ_keywords.add(param.getSummary_keywords());
                         }
@@ -637,7 +644,8 @@ public class ProjectService {
                         paramVo.setSummary0(param.getSummary0());
                         paramVo.setTitle(param.getTitle());
                         reportMapper.saveReportData(paramVo);
-                        reportMapper.updReportCountUp(paramVo);     // 리포트 저장 수 올리기
+                        reportMapper.updReportCountUp(paramVo);
+                        _nowCount++;
                         if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
                             summ_keywords.add(param.getSummary_keywords());
                         }
@@ -654,11 +662,26 @@ public class ProjectService {
             reportVO.setIdx_report(paramVo.getIdx_report());
             saveSummaryKeyword(_data10, summ_keywords, reportVO); //api 사용량 집계
 
-            }catch (Exception e) {
-                e.printStackTrace();
+            if(paramVo.getIdx_report()>0 && _totalCount==_nowCount){
+                _msg = "리포트가 생성되었습니다.";
+                _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
+            }
+
+            if(StringUtils.isNotEmpty(_token)){
+                _kafka.put("msg",_msg);
+                _kafka.put("roomId",_token);
+                kafkaSender.send("kantar", new Gson().toJson(_kafka));
+            }
+
+            } catch (Exception e) {
+            e.printStackTrace();
             _msg = "리포트 생성을 실패하였습니다.";
             if(StringUtils.isNotEmpty(_token)){
-                // kafkaSender.send(_token, _msg);
+                Map<String, Object> _data2 = new HashMap<String, Object>();
+                _data2.put("link","");
+                _data2.put("msg",_msg);
+                _data2.put("roomId",_token);
+                kafkaSender.send("kantar", new Gson().toJson(_data2));
             }
         }
     }
