@@ -478,36 +478,30 @@ public class ReportController extends BaseController {
 
     @PostMapping("/save_filter_report")
     @Transactional
-    public CommonResult save_filter_report(HttpServletRequest req, @RequestBody ReportFilterDataVO filterVO) throws Exception {
+    public CommonResult save_filter_report(HttpServletRequest req, @RequestBody ReportVO reportVO) throws Exception {
         String _token = tokenJWT.resolveToken(req);
         try {
+            /*
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return responseService.getFailResult("save_filter_report","로그인이 필요합니다.");
             }
 
-            filterVO.setIdx_user(uinfo.getIdx_user());
+            reportVO.setIdx_user(uinfo.getIdx_user());
 
-            if(StringUtils.isEmpty(filterVO.getReport_name())){
+             */
+
+            if(StringUtils.isEmpty(reportVO.getTitle())){
                 return responseService.getFailResult("save_filter_report","리포트 이름을 입력해주세요.");
             }
 
-            if(filterVO.getIdx_project()==null || filterVO.getIdx_project_job_projectid()==null){
+            if(reportVO.getIdx_project()==null || reportVO.getIdx_project_job_projectid()==null){
                 return responseService.getFailResult("save_filter_report","프로젝트 정보를 다시 확인해주세요");
             }
 
-            if(StringUtils.isEmpty(filterVO.getTp1()) && StringUtils.isEmpty(filterVO.getTp2()) && StringUtils.isEmpty(filterVO.getTp3()) && StringUtils.isEmpty(filterVO.getTp4()) && StringUtils.isEmpty(filterVO.getTp5())){
-                return responseService.getFailResult("save_filter_report","필터 데이터가 없습니다.");
-            }
-
-            if(filterVO.getFilter_op2()==null || filterVO.getFilter_op2()>1 || filterVO.getFilter_op2()<0){
-                return responseService.getFailResult("save_filter_report","지정된 키워드 필터 옵션이 올바르지 않습니다.");
-            }
-
-            Integer idx_filter = filterService.createReportFilter(filterVO);
-            filterVO.setIdx_filter(idx_filter);
-            projectService.list_reportfilter(_token, filterVO);
-
+            Integer idx_filter = filterService.createReportFilter(reportVO);
+            reportVO.setIdx_filter(idx_filter);
+            projectService.list_reportfilter(_token, reportVO);
 
             return responseService.getSuccessResult("save_filter_report", "필터 리포트 생성을 시작하였습니다.");
 

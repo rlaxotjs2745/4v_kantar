@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.kantar.vo.ReportFilterDataVO;
+import com.kantar.vo.ReportVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,64 +43,48 @@ public class FilterService {
     /**
      * 조건지정 리포트용 필터 생성
      */
-    public Integer createReportFilter(ReportFilterDataVO filter) throws Exception {
+    public Integer createReportFilter(ReportVO reportVO) throws Exception {
         Integer rs0 = 0;
 
         FilterVO paramVo = new FilterVO();
-        paramVo.setFilter_title(filter.getReport_name()+"filter");
-        paramVo.setIdx_user(filter.getIdx_user());
-
-        if(filter.getFilter_op1()<4) {
-            filter.setTp4(null);
-            if (filter.getFilter_op1() < 3) {
-                filter.setTp3(null);
-                if (filter.getFilter_op1() < 2) {
-                    filter.setTp2(null);
-                }
-            }
-        }
-
-        paramVo.setIdx_project_job_projectid(filter.getIdx_project_job_projectid());
-        paramVo.setTp1(filter.getTp1());
-        paramVo.setTp2(filter.getTp2());
-        paramVo.setTp3(filter.getTp3());
-        paramVo.setTp4(filter.getTp4());
-        paramVo.setTp5(filter.getTp5());
+        paramVo.setFilter_title(reportVO.getTitle() + " filter");
+        paramVo.setIdx_user(reportVO.getIdx_user());
+        paramVo.setIdx_project_job_projectid(reportVO.getIdx_project_job_projectid());
 
         rs0 = filterMapper.createFilter(paramVo);
 
         if(rs0 == 1){
-            if(StringUtils.isNotEmpty(paramVo.getTp1())){
+            if(StringUtils.isNotEmpty(reportVO.getTp1())){
                 paramVo.setFilter_type(1);
-                Integer rs1 = create_Filter(paramVo, paramVo.getTp1());
+                Integer rs1 = create_Filter(paramVo, reportVO.getTp1());
                 if(rs1 == 0){
                     filterMapper.delFilter(paramVo);
                 }
             }
-            if(StringUtils.isNotEmpty(paramVo.getTp2())){
+            if(StringUtils.isNotEmpty(reportVO.getTp2())){
                 paramVo.setFilter_type(2);
-                Integer rs1 = create_Filter(paramVo, paramVo.getTp2());
+                Integer rs1 = create_Filter(paramVo, reportVO.getTp2());
                 if(rs1 == 0){
                     filterMapper.delFilter(paramVo);
                 }
             }
-            if(StringUtils.isNotEmpty(paramVo.getTp3())){
+            if(StringUtils.isNotEmpty(reportVO.getTp3())){
                 paramVo.setFilter_type(3);
-                Integer rs1 = create_Filter(paramVo, paramVo.getTp3());
+                Integer rs1 = create_Filter(paramVo, reportVO.getTp3());
                 if(rs1 == 0){
                     filterMapper.delFilter(paramVo);
                 }
             }
-            if(StringUtils.isNotEmpty(paramVo.getTp4())){
+            if(StringUtils.isNotEmpty(reportVO.getTp4())){
                 paramVo.setFilter_type(4);
-                Integer rs1 = create_Filter(paramVo, paramVo.getTp4());
+                Integer rs1 = create_Filter(paramVo, reportVO.getTp4());
                 if(rs1 == 0){
                     filterMapper.delFilter(paramVo);
                 }
             }
-            if(StringUtils.isNotEmpty(paramVo.getTp5())){
+            if(StringUtils.isNotEmpty(reportVO.getTp5())){
                 paramVo.setFilter_type(5);
-                Integer rs1 = create_Filter(paramVo, paramVo.getTp5());
+                Integer rs1 = create_Filter(paramVo, reportVO.getTp5());
                 if(rs1 == 0){
                     filterMapper.delFilter(paramVo);
                 }
