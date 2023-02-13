@@ -34,8 +34,8 @@ public class ProjectService {
     @Autowired
     private Summary summary;
 
-    // @Autowired
-    // private KafkaSender kafkaSender;
+    @Autowired
+    private KafkaSender kafkaSender;
     
     @Value("${file.upload-dir}")
     public String filepath;
@@ -57,6 +57,9 @@ public class ProjectService {
     public void create_report(String _token, ProjectVO paramVo, Integer _tp) throws Exception{
         String _msg = "";
         try {
+            Map<String, Object> _kafka = new HashMap<String, Object>();
+            _kafka.put("link","");
+
             ProjectVO rs0 = projectMapper.getProjectJobProjectid(paramVo);
 
             String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
@@ -130,6 +133,7 @@ public class ProjectService {
                     statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
                     if(StringUtils.isNotEmpty(_token)){
                         _msg = "리포트가 생성되었습니다.";
+                        _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
                     }
                 }else{
                     _msg = "리포트 생성을 실패하였습니다.";
@@ -138,13 +142,19 @@ public class ProjectService {
                 _msg = "리포트 생성을 실패하였습니다.";
             }
             if(StringUtils.isNotEmpty(_token)){
-                // kafkaSender.send(_token, _msg);
+                _kafka.put("msg",_msg);
+                _kafka.put("roomId",_token);
+                kafkaSender.send("kantar", new Gson().toJson(_kafka));
             }
         } catch (Exception e) {
             e.printStackTrace();
             _msg = "리포트 생성을 실패하였습니다.";
             if(StringUtils.isNotEmpty(_token)){
-                // kafkaSender.send(_token, _msg);
+                Map<String, Object> _data2 = new HashMap<String, Object>();
+                _data2.put("link","");
+                _data2.put("msg",_msg);
+                _data2.put("roomId",_token);
+                kafkaSender.send("kantar", new Gson().toJson(_data2));
             }
         }
     }
