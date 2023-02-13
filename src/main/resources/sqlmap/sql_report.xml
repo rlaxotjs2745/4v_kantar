@@ -114,7 +114,7 @@
     </insert>
 
     <select id="findReportKeyword" resultType="Integer">
-        SELECT count(*) FROM KT_REPORT_KEYWORD WHERE idx_report=#{idx_report} AND keyword = #{keyword}
+        SELECT count(*) FROM KT_REPORT_KEYWORD WHERE idx_report=#{idx_report} AND keyword = #{sum_keyword}
     </select>
 
     <select id="getReportCountByProject" resultType="Integer">

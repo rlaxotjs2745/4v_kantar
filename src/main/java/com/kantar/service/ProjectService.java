@@ -449,6 +449,7 @@ public class ProjectService {
                     }
                     SummaryVO params = new SummaryVO();
                     params.setText(_data9);
+                    params.setNlpConfig(_nlp);
                     pp = new Gson().toJson(params);
                     ProjectVO param = summary.getSummary(pp, "챕터 ["+c+"] 요약문");
 
@@ -502,6 +503,7 @@ public class ProjectService {
                     // 챕터 요약문 생성
                     SummaryVO params = new SummaryVO();
                     params.setText(_data9);
+                    params.setNlpConfig(_nlp);
                     pp = new Gson().toJson(params);
                     ProjectVO param = summary.getSummary(pp, "챕터 ["+c+"] 요약문");
 
@@ -524,6 +526,7 @@ public class ProjectService {
             if(reportVO.getRfil0()==1){ // 전체 요약문
                 SummaryVO params = new SummaryVO();
                 params.setText(_data0);
+                params.setNlpConfig(_nlp);
                 pp = new Gson().toJson(params);
                 ProjectVO param = summary.getSummary(pp, "전체 요약문");
 
@@ -539,17 +542,16 @@ public class ProjectService {
                     if(StringUtils.isNotEmpty(_token)){
                         _msg = "전체 요약이 생성되었습니다.";
                     }
+                    _metalist = new ArrayList<>();
+                    for (ReportVO data : _data10) {
+                        ReportMetaDataVO _meta = new ReportMetaDataVO();
+                        _meta.setSpeaker(data.getTp1());
+                        _meta.setChapter(data.getTp2());
+                        _meta.setLength(data.getTp5().length());
+                        _meta.setCnt(1);
+                        _metalist.add(_meta);
+                    }
                 }else{ _msg = "전체 요약 생성을 실패하였습니다."; }
-
-                _metalist.clear();
-                for (ReportVO data : _data10) {
-                    ReportMetaDataVO _meta = new ReportMetaDataVO();
-                    _meta.setSpeaker(data.getTp1());
-                    _meta.setChapter(data.getTp2());
-                    _meta.setLength(data.getTp5().length());
-                    _meta.setCnt(1);
-                    _metalist.add(_meta);
-                }
             }
 
             _data9 = new ArrayList<SumtextVO>();
@@ -574,6 +576,7 @@ public class ProjectService {
                     }
                     SummaryVO params = new SummaryVO();
                     params.setText(_data0);
+                    params.setNlpConfig(_nlp);
                     pp = new Gson().toJson(params);
                     ProjectVO param = summary.getSummary(pp, "서브챕터 ["+s+"] 요약문");
 
@@ -616,6 +619,7 @@ public class ProjectService {
                     }
                     SummaryVO params = new SummaryVO();
                     params.setText(_data0);
+                    params.setNlpConfig(_nlp);
                     pp = new Gson().toJson(params);
                     ProjectVO param = summary.getSummary(pp, "질문 ["+q+"] 요약문");
 
