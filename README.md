@@ -62,3 +62,5 @@ rm -rf /home/ec2-user/KANTAR_SERVER/bin/*.bat
 
 ### Java Serve Stop
 /home/ec2-user/KANTAR_SERVER/bin/shutdown.sh
+
+자동화 시스템은 서버 관리자에게 일임한다.
