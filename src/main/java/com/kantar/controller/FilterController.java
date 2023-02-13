@@ -133,11 +133,20 @@ public class FilterController extends BaseController {
             }
 
             Integer rs0 = 0;
-            if(StringUtils.isEmpty(paramVo.getTp1()) && StringUtils.isEmpty(paramVo.getTp2()) && StringUtils.isEmpty(paramVo.getTp3()) && StringUtils.isEmpty(paramVo.getTp4())){
-                return responseService.getFailResult("filter_create","필터 데이터가 없습니다.");
-            }else{
-                rs0 = filterMapper.createFilter(paramVo);
+            if(StringUtils.isNotEmpty(paramVo.getTp3()) && StringUtils.isEmpty(paramVo.getTp2()) ){
+                return responseService.getFailResult("filter_create","서브 챕터를 선택했을 때는 챕터 필터 값이 필요합니다.");
             }
+            if(StringUtils.isNotEmpty(paramVo.getTp4()) && (StringUtils.isEmpty(paramVo.getTp2()) || StringUtils.isEmpty(paramVo.getTp3())) ){
+                return responseService.getFailResult("filter_create","질문을 선택했을 때는 챕터와 서브 챕터 필터 값이 필요합니다.");
+            }
+            Integer _chk = 0;
+            if(StringUtils.isNotEmpty(paramVo.getTp1()) || StringUtils.isNotEmpty(paramVo.getTp2()) || StringUtils.isNotEmpty(paramVo.getTp3()) || StringUtils.isNotEmpty(paramVo.getTp4()) || StringUtils.isNotEmpty(paramVo.getTp5())){
+                _chk = 1;
+            }
+            if(_chk==0){
+                return responseService.getFailResult("filter_create","필터를 선택 후 이용해주세요.");
+            }
+            rs0 = filterMapper.createFilter(paramVo);
 
             if(rs0 == 1){
                 if(StringUtils.isNotEmpty(paramVo.getTp1())){
@@ -170,6 +179,14 @@ public class FilterController extends BaseController {
                     if(rs1 == 0){
                         filterMapper.delFilter(paramVo);
                         return responseService.getFailResult("filter_create","질문 필터 데이터를 저장하지 못했습니다.");
+                    }
+                }
+                if(StringUtils.isNotEmpty(paramVo.getTp5())){
+                    paramVo.setFilter_type(5);
+                    Integer rs1 = filterService.create_Filter(paramVo, paramVo.getTp5());
+                    if(rs1 == 0){
+                        filterMapper.delFilter(paramVo);
+                        return responseService.getFailResult("filter_create","키워드 필터 데이터를 저장하지 못했습니다.");
                     }
                 }
                 return responseService.getSuccessResult("filter_create", "필터를 저장하였습니다.");
