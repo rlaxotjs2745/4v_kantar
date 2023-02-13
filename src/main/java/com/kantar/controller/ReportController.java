@@ -481,15 +481,12 @@ public class ReportController extends BaseController {
     public CommonResult save_filter_report(HttpServletRequest req, @RequestBody ReportVO reportVO) throws Exception {
         String _token = tokenJWT.resolveToken(req);
         try {
-            /*
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return responseService.getFailResult("save_filter_report","로그인이 필요합니다.");
             }
 
             reportVO.setIdx_user(uinfo.getIdx_user());
-
-             */
 
             if(StringUtils.isEmpty(reportVO.getTitle())){
                 return responseService.getFailResult("save_filter_report","리포트 이름을 입력해주세요.");
