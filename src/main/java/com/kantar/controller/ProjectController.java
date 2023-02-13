@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
+// import org.springframework.core.io.InputStreamResource;
+// import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +39,7 @@ import com.kantar.vo.ProjectListVO;
 import com.kantar.vo.ProjectVO;
 import com.kantar.vo.ProjectViewVO;
 import com.kantar.vo.UserVO;
+// import com.kantar.util.TokenJWT;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -62,6 +63,9 @@ public class ProjectController extends BaseController {
 
     // @Autowired
     // private KafkaSender kafkaSender;
+
+    // @Autowired
+	// private TokenJWT tokenJWT;
 
     @Value("${file.upload-dir}")
     public String filepath;
@@ -183,12 +187,6 @@ public class ProjectController extends BaseController {
             _data.put("tcnt",tcnt);
             _data.put("list",rs);
             _data.put("uType",uinfo.getRole_type());
-
-            Map<String, Object> _data2 = new HashMap<String, Object>();
-            _data2.put("link","http://naver.com");
-            _data2.put("msg","kafka");
-            // String _msg = new Gson().toJson(_data2);
-            // kafkaSender.send("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlX3R5cGUiOiI5OSIsImlkeF91c2VyIjoxLCJ1c2VyX2lkIjoidGVzdEB0ZXN0LmNvbSIsInVzZXJfc3RhdHVzIjoxLCJzdWIiOiJ1c2VyLWF1dGgiLCJleHAiOjE2NzQ3MTQzNzJ9.UR7a5EF9HIbafRVVxWaphyibSoPMCfcHVlOsPf7rQsk", _msg);
             if(rs!=null){
                 return responseService.getSuccessResult(_data, "list_project", "프로젝트 리스팅 성공");
             }else{
