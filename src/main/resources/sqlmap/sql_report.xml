@@ -137,7 +137,7 @@
     <select id="getMetadataInfoByIdx" resultType="Integer">
         SELECT COUNT(1)
         FROM KT_REPORT_FILTER_METADATA
-        WHERE idx_report=#{idx_report} AND #{speaker} AND #{chapter}
+        WHERE idx_report=#{idx_report} AND speaker=#{speaker} AND chapter=#{chapter}
     </select>
 
     <insert id="insertMetadata">
@@ -148,7 +148,7 @@
         UPDATE KT_REPORT_FILTER_METADATA
         SET answer_cnt= answer_cnt+1,
             word_length = word_length+#{length}
-        WHERE idx_report=#{idx_report} AND #{speaker} AND #{chapter}
+        WHERE idx_report=#{idx_report} AND speaker=#{speaker} AND chapter=#{chapter}
     </update>
 
     <select id="getMetadataInfoSpeaker" resultType="com.kantar.vo.ReportMetaDataVO">
