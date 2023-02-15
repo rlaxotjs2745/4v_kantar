@@ -48,20 +48,6 @@
         INSERT INTO KT_API_STATISTICS (report_status, idx_report, idx_user, summaryUsage, keywordUsage) VALUES (1, #{idx_report}, #{idx_user}, #{summaryUsage}, #{keywordUsage})
     </insert>
 
-    <update id="updateSummaryAPIUsage" parameterType="com.kantar.vo.ProjectVO">
-        UPDATE KT_API_STATISTICS
-        SET summaryUsage = summaryUsage + #{summaryUsage},
-            update_dt = now()
-        WHERE idx_report = #{idx_report}
-    </update>
-
-    <update id="updateKeywordAPIUsage" parameterType="com.kantar.vo.ProjectVO">
-        UPDATE KT_API_STATISTICS
-        SET keywordUsage = keywordUsage + #{keywordUsage},
-            update_dt = now()
-        WHERE idx_report = #{idx_report}
-    </update>
-
     <select id="getPjIdxToReport" resultType="com.kantar.vo.ProjectVO">
         SELECT idx_project
         FROM KT_REPORT
@@ -109,7 +95,7 @@
     <select id="getApiDataByUser" resultType="Double">
         SELECT NVL(ROUND(SUM(data_length + index_length) / 1024 / 1024, 3),0) AS dataUsage
         FROM information_schema.tables A, KT_REPORT B, KT_API_STATISTICS C
-        WHERE (A.table_name = 'KT_REPORT' OR A.table_name = 'KT_REPORT_DATA' OR A.table_name = 'KT_REPORT_FILTER' OR A.table_name = 'KT_REPORT_FILTER_DATA' OR A.table_name = 'KT_REPORT_FILTER_METADATA' OR A.table_name = 'KT_REPORT_KEYWORD')
+        WHERE (A.table_name IN ('KT_REPORT', 'KT_REPORT_DATA', 'KT_REPORT_FILTER', 'KT_REPORT_FILTER_DATA', 'KT_REPORT_FILTER_METADATA', 'KT_REPORT_KEYWORD'))
           AND C.idx_report = B.idx_report
         <if test="idx_user != null">
           AND B.idx_user = #{idx_user}

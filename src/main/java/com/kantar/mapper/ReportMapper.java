@@ -57,11 +57,7 @@ public interface ReportMapper {
 
     public List<ReportMetaDataVO> getMetadataInfoChapter(Integer idx) throws Exception;
 
-    public int updateReportSummary(ProjectVO paramVo) throws Exception;
-
     public int chkReportAuth(ProjectVO paramVo) throws Exception;
-
-    public int chkReportDataAuth(ProjectVO paramVo) throws Exception;
 
     public Integer updReportCountUp(ProjectVO paramVo) throws Exception;
 
