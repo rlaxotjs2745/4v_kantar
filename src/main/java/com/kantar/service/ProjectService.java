@@ -237,7 +237,6 @@ public class ProjectService {
             ProjectVO rs0 = projectMapper.getProjectJobProjectid(param);
             String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
 
-            System.out.println("_fpath = " + _fpath);
             List<String[]> ers = excel.getCsvListData(_fpath);
 
             for (String[] er : ers) {
