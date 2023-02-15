@@ -121,14 +121,15 @@ public class StatisticsController extends BaseController {
 
             Map result = new HashMap();
             double total_data = statisticsMapper.getApiDataByUser();
-            double user_data = statisticsMapper.getApiDataByUser(paramVo);
+            //double user_data = statisticsMapper.getApiDataByUser(paramVo);
             long total_api = statisticsMapper.getApiStatisticsByUser();
             long user_api = statisticsMapper.getApiStatisticsByUser(paramVo);
             long total_keyword = statisticsMapper.getKeywordStatisticsByUser();
             long user_keyword = statisticsMapper.getKeywordStatisticsByUser(paramVo);
 
             result.put("total_data", total_data);
-            result.put("user_data", user_data);
+            //result.put("user_data", user_data);
+            result.put("user_data", 0);
             result.put("total_summary", total_api);
             result.put("user_summary", user_api);
             result.put("total_keyword", total_keyword);
