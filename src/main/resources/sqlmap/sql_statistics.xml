@@ -92,20 +92,24 @@
         </if>
     </select>
 
-    <select id="getApiDataByUser" resultType="Double">
-        SELECT NVL(ROUND(SUM(data_length + index_length) / 1024 / 1024, 3),0) AS dataUsage
-        FROM information_schema.tables A, KT_REPORT B, KT_API_STATISTICS C
-        WHERE (A.table_name IN ('KT_REPORT', 'KT_REPORT_DATA', 'KT_REPORT_FILTER', 'KT_REPORT_FILTER_DATA', 'KT_REPORT_FILTER_METADATA', 'KT_REPORT_KEYWORD'))
-          AND C.idx_report = B.idx_report
-        <if test="idx_user != null">
-          AND B.idx_user = #{idx_user}
-        </if>
-        <if test="startDate != null">
-            AND C.create_dt <![CDATA[>=]]> date_format(#{startDate}, '%Y-%m-%d')
-        </if>
-        <if test="endDate != null">
-            AND C.create_dt <![CDATA[<]]> date_format(date_add(#{endDate}, INTERVAL 1 DAY), '%Y-%m-%d')
-        </if>
+    <select id="getApiDataByUser" resultType="com.kantar.vo.StatisticsVO">
+        SELECT ROUND((SUM(DATA_LENGTH)+SUM(INDEX_LENGTH))/1024/1024, 3) AS 'tableSize',
+                SUM(DATA_LENGTH)/1024/1024 AS 'dataSize',
+                SUM(INDEX_LENGTH)/1024/1024 AS 'indexSize',
+                ROUND((SUM(DATA_LENGTH)+SUM(INDEX_LENGTH))/1024/1024*(SELECT COUNT(*)
+                                                                      FROM KT_REPORT_DATA
+                                                                    <if test="idx_user != null">
+                                                                      WHERE idx_user = #{idx_user}
+                                                                    </if>
+                                                                    <if test="startDate != null">
+                                                                        AND create_dt <![CDATA[>=]]> date_format(#{startDate}, '%Y-%m-%d')
+                                                                    </if>
+                                                                    <if test="endDate != null">
+                                                                        AND create_dt <![CDATA[<]]> date_format(date_add(#{endDate}, INTERVAL 1 DAY), '%Y-%m-%d')
+                                                                    </if>)/(SELECT COUNT(*) FROM KT_REPORT_DATA),3) AS 'PercentageByUser'
+        FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = 'kantar'
+          AND TABLE_NAME IN ('KT_REPORT', 'KT_REPORT_DATA', 'KT_REPORT_FILTER', 'KT_REPORT_FILTER_DATA', 'KT_REPORT_FILTER_METADATA', 'KT_REPORT_KEYWORD')
     </select>
 
 </mapper>

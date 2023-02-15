@@ -23,4 +23,8 @@ public class StatisticsVO extends BaseVO{
     private long keywordUsage; // 키워드 사용량
     private String startDate;
     private String endDate;
+
+    //집계
+    private double tableSize; //전체 사용량
+    private double PercentageByUser; //유저별 사용량
 }
