@@ -13,6 +13,9 @@
           OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=A.idx_user AND user_type IN (11,99))>0
         </if>
         )
+        <if test="title neq null">
+            AND title LIKE '%${title}%'
+        </if>
         ORDER BY A.idx_report DESC
         <if test="currentPage != null">
         LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
