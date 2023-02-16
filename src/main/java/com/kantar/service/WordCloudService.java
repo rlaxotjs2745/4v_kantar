@@ -328,15 +328,17 @@ public class WordCloudService {
                     _msg = "워드클라우드 생성이 완료되었습니다.";
                     _kafka.put("link","/wordcloud_view/" + wc.getIdx_wordcloud());
                 } else {
-                    _msg = "요약 데이터가 짧아 반환된 키워드가 없습니다.";
+                    _msg = "워드 클라우드 생성에 실패했습니다.";
                 }
+            } else {
+                _msg = "요약문 정보가 짧아 워드 클라우드 생성에 실패했습니다.";
+            }
 
-                if(StringUtils.isNotEmpty(_token)){
-                    _kafka.put("link","");
-                    _kafka.put("msg",_msg);
-                    _kafka.put("roomId",_token);
-                    kafkaSender.send("kantar", new Gson().toJson(_kafka));
-                }
+            if(StringUtils.isNotEmpty(_token)){
+                _kafka.put("link","");
+                _kafka.put("msg",_msg);
+                _kafka.put("roomId",_token);
+                kafkaSender.send("kantar", new Gson().toJson(_kafka));
             }
 
         } catch (Exception e) {
