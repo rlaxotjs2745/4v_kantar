@@ -63,7 +63,7 @@
     <select id="getWordCloudListCount" resultType="Integer">
         SELECT COUNT(1)
         FROM KT_WORDCLOUD
-        WHERE idx_user=#{idx_user} AND idx_project_job_projectid=#{idx_project_job_projectid}
+        WHERE idx_project_job_projectid=#{idx_project_job_projectid} AND idx_user=#{idx_user}
     </select>
 
     <select id="getWordCloudDetail" resultType="com.kantar.vo.WordCloudDataVO">
