@@ -8,9 +8,7 @@ import com.kantar.service.DictionaryService;
 import com.kantar.service.FileService;
 import com.kantar.service.ResponseService;
 import com.kantar.util.Excel;
-import com.kantar.vo.DictionaryDataVO;
-import com.kantar.vo.DictionaryVO;
-import com.kantar.vo.UserVO;
+import com.kantar.vo.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -343,13 +341,22 @@ public class DictionaryController extends BaseController {
      * @return ResponseEntity<Resource>
      * @throws Exception
      */
-    @GetMapping("/download")
-    public ResponseEntity<Object> getDictDown(HttpServletRequest req, DictionaryVO paramVo) throws Exception {
+    @Transactional
+    @PostMapping("/download")
+    public ResponseEntity<Object> getDictDown(HttpServletRequest req, @RequestBody DictionaryDownVO param) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return null;
             }
+            CommonResult updateResult = updateDictionaryData(req, param.getDictionaryData());
+
+            if(updateResult.getSuccess() != "1" && updateResult.getMsg() != "이미 존재하는 키워드입니다."){
+                return null;
+            }
+
+            DictionaryVO paramVo = new DictionaryVO();
+            paramVo.setIdx_dictionary(param.getIdx_dictionary());
             paramVo.setIdx_user(uinfo.getIdx_user());
 
             if(StringUtils.isEmpty(paramVo.getIdx_dictionary()+"")){
