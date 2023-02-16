@@ -34,6 +34,9 @@ public class WordCloudService {
     @Value("${file.upload-dir}")
     public String filepath;
 
+    @Autowired
+    private KafkaSender kafkaSender;
+
     public Integer create_Filter(FilterVO paramVo, String _data) throws Exception {
         String[] _data1 = _data.split("//");
         Map<String, Object> _sptd = new HashMap<String, Object>();
@@ -320,7 +323,7 @@ public class WordCloudService {
                     _kafka.put("link","");
                     _kafka.put("msg",_msg);
                     _kafka.put("roomId",_token);
-                    //kafkaSender.send("kantar", new Gson().toJson(_kafka));
+                    kafkaSender.send("kantar", new Gson().toJson(_kafka));
                 }
             }
 
@@ -332,7 +335,7 @@ public class WordCloudService {
                 _data2.put("link","");
                 _data2.put("msg",_msg);
                 _data2.put("roomId",_token);
-                //kafkaSender.send("kantar", new Gson().toJson(_data2));
+                kafkaSender.send("kantar", new Gson().toJson(_data2));
             }
         }
     }

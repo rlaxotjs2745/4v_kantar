@@ -49,6 +49,13 @@ public class WordCloudController extends BaseController {
     public String filepath;
 
 
+    /**
+     * 워드 클라우드 생성하기
+     * @param req
+     * @param wordCloudVO
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/save_word_cloud")
     @Transactional
     public CommonResult save_wordCloud(HttpServletRequest req, @RequestBody WordCloudVO wordCloudVO) throws Exception {
