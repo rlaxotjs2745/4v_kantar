@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kantar.mapper.WordCloudMapper">
+
+    <resultMap id="getFilter" type="com.kantar.vo.FilterVO">
+        <id property="idx_filter" column="idx_word_filter" />
+        <result property="filter_title" column="title" />
+        <result property="idx_filter" column="idx_word_filter" />
+        <result property="create_dt" column="create_dt" />
+        <collection property="filterDataList" resultMap="filterDataList" autoMapping="true"/>
+    </resultMap>
+
+    <resultMap id="filterDataList" type="com.kantar.vo.FilterDataVO">
+        <id property="filter_type" column="filter_type"/>
+        <collection property="filterDataArray" resultMap="filterDataArray"/>
+    </resultMap>
+
+    <resultMap id="filterDataArray" type="com.kantar.vo.FilterDataVO">
+        <result property="filter_data" column="filter_data"/>
+    </resultMap>
+
+
+    <insert id="createWordCloudFilter" useGeneratedKeys="true" keyColumn="idx_filter" keyProperty="idx_filter">
+        INSERT INTO KT_WORDCLOUD_FILTER (idx_project_job_projectid, filter_title, idx_user) VALUES (#{idx_project_job_projectid}, #{filter_title}, #{idx_user})
+    </insert>
+
+    <delete id="delWordCloudFilter">
+        DELETE FROM KT_WORDCLOUD_FILTER WHERE idx_wordcloud=#{idx_filter} AND (idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=#{idx_user} AND user_type IN (11,99))>0)
+    </delete>
+
+    <insert id="createWordCloudFilterData" parameterType="java.util.Map">
+        INSERT INTO KT_WORDCLOUD_FILTER_DATA (idx_word_filter, filter_type, filter_data) VALUES
+        <foreach item="item" collection="list" separator=",">
+            (#{item.idx_filter}, #{item.filter_type}, #{item.filter_data})
+        </foreach>
+    </insert>
+
+    <insert id="saveWordCloud" useGeneratedKeys="true" keyColumn="idx_wordcloud" keyProperty="idx_wordcloud">
+        INSERT INTO KT_WORDCLOUD (idx_project_job_projectid, title, idx_user, idx_word_filter) VALUES (#{idx_project_job_projectid}, #{title}, #{idx_user}, #{idx_word_filter})
+    </insert>
+
+    <select id="findWordCloudKeyword" resultType="Integer">
+        SELECT count(*) FROM KT_WORDCLOUD_KEYWORD WHERE idx_wordcloud=#{idx_report} AND keyword = #{sum_keyword}
+    </select>
+
+    <insert id="createWordCloudKeywordData" parameterType="com.kantar.vo.ReportFilterKeywordVO">
+        INSERT INTO KT_WORDCLOUD_KEYWORD (idx_wordcloud, keyword, keytype, keycount) VALUES (#{idx_report}, #{sum_keyword}, #{keytype}, #{keycount})
+    </insert>
+
+    <select id="getWordCloudList" resultMap="getFilter">
+        SELECT A.idx_wordcloud, A.title, A.create_dt, A.idx_word_filter, B.idx_word_filter_data, B.filter_type, B.filter_data
+        FROM KT_WORDCLOUD A
+            JOIN KT_WORDCLOUD_FILTER_DATA B ON B.idx_word_filter=A.idx_word_filter
+        WHERE A.idx_user=#{idx_user} AND idx_project_job_projectid=#{idx_project_job_projectid}
+        ORDER BY A.create_dt DESC
+        <if test="currentPage != null">
+            LIMIT 10 OFFSET 0
+        </if>
+    </select>
+
+    <select id="getWordCloudListCount" resultType="Integer">
+        SELECT COUNT(1)
+        FROM KT_WORDCLOUD A
+            JOIN KT_WORDCLOUD_FILTER_DATA B ON B.idx_word_filter=A.idx_word_filter
+        WHERE A.idx_user=#{idx_user} AND idx_project_job_projectid=#{idx_project_job_projectid};
+    </select>
+
+</mapper>
