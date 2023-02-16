@@ -3,28 +3,14 @@ package com.kantar.controller;
 import com.kantar.base.BaseController;
 import com.kantar.mapper.*;
 import com.kantar.model.CommonResult;
-import com.kantar.service.DictionaryService;
 import com.kantar.service.ResponseService;
 import com.kantar.service.StatisticsService;
-import com.kantar.util.Excel;
-import com.kantar.util.TokenJWT;
 import com.kantar.vo.*;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
 import java.util.*;
 
 @RestController
@@ -44,9 +30,6 @@ public class StatisticsController extends BaseController {
 
     @Value("${file.upload-dir}")
     public String filepath;
-
-    @Autowired
-    private TokenJWT tokenJWT;
 
     /**
      * 시스템 사용 현황
@@ -119,7 +102,7 @@ public class StatisticsController extends BaseController {
                 return responseService.getFailResult("api_statistics","관리자만 조회 가능한 기능힙니다.");
             }
 
-            Map result = new HashMap();
+            Map<String, Object> result = new HashMap<>();
             StatisticsVO statisticsVO = statisticsMapper.getApiDataByUser(paramVo);
             long total_api = statisticsMapper.getApiStatisticsByUser();
             long user_api = statisticsMapper.getApiStatisticsByUser(paramVo);

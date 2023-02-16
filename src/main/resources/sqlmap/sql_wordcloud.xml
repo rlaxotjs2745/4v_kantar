@@ -52,29 +52,32 @@
     <select id="getWordCloudList" resultMap="getFilter">
         SELECT A.idx_wordcloud, A.title, A.create_dt, A.idx_word_filter, B.idx_word_filter_data, B.filter_type, B.filter_data
         FROM KT_WORDCLOUD A
-            LEFT OUTER JOIN  KT_WORDCLOUD_FILTER_DATA B ON B.idx_word_filter=A.idx_word_filter
-        WHERE A.idx_user=#{idx_user} AND idx_project_job_projectid=#{idx_project_job_projectid}
+        LEFT OUTER JOIN  KT_WORDCLOUD_FILTER_DATA B ON B.idx_word_filter=A.idx_word_filter
+        WHERE idx_project_job_projectid=#{idx_project_job_projectid} AND (A.idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=A.idx_user AND user_type IN (1,99))>0)
         ORDER BY A.create_dt DESC
+        <if test="currentPage != null">
+            LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+        </if>
     </select>
 
     <select id="getWordCloudListCount" resultType="Integer">
         SELECT COUNT(1)
         FROM KT_WORDCLOUD
-        WHERE idx_user=#{idx_user} AND idx_project_job_projectid=#{idx_project_job_projectid}
+        WHERE idx_project_job_projectid=#{idx_project_job_projectid} AND (idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=KT_WORDCLOUD.idx_user AND user_type IN (1,99))>0)
     </select>
 
     <select id="getWordCloudDetail" resultType="com.kantar.vo.WordCloudDataVO">
         SELECT keyword as text, keycount as value
         FROM KT_WORDCLOUD A
             JOIN KT_WORDCLOUD_KEYWORD B ON B.idx_wordcloud=A.idx_wordcloud
-        WHERE B.idx_wordcloud = #{idx_wordcloud};
+        WHERE B.idx_wordcloud = #{idx_wordcloud}
     </select>
 
     <select id="getWordCloudFilterDetail" resultMap="filterDataList">
         SELECT filter_type, filter_data
         FROM KT_WORDCLOUD A
             JOIN KT_WORDCLOUD_FILTER_DATA B ON B.idx_word_filter=A.idx_word_filter
-        WHERE A.idx_wordcloud = #{idx_wordcloud};
+        WHERE A.idx_wordcloud = #{idx_wordcloud}
     </select>
 
 </mapper>

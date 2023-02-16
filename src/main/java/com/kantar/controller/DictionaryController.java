@@ -8,34 +8,23 @@ import com.kantar.service.DictionaryService;
 import com.kantar.service.FileService;
 import com.kantar.service.ResponseService;
 import com.kantar.util.Excel;
-import com.kantar.vo.DictionaryDataVO;
-import com.kantar.vo.DictionaryVO;
-import com.kantar.vo.ProjectVO;
-import com.kantar.vo.UserVO;
+import com.kantar.vo.*;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.*;
-import java.math.BigInteger;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/dict")
 public class DictionaryController extends BaseController {
@@ -51,8 +40,6 @@ public class DictionaryController extends BaseController {
     private FileService fileService;
     @Value("${file.upload-dir}")
     public String filepath;
-    @Autowired
-    private Excel excel;
 
     /**
      * 사전 관리 리스트(페이징)
@@ -354,13 +341,22 @@ public class DictionaryController extends BaseController {
      * @return ResponseEntity<Resource>
      * @throws Exception
      */
-    @GetMapping("/download")
-    public ResponseEntity<Object> getDictDown(HttpServletRequest req, DictionaryVO paramVo) throws Exception {
+    @Transactional
+    @PostMapping("/download")
+    public ResponseEntity<Object> getDictDown(HttpServletRequest req, @RequestBody DictionaryDownVO param) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
                 return null;
             }
+            CommonResult updateResult = updateDictionaryData(req, param.getDictionaryData());
+
+            if(updateResult.getSuccess() != "1" && updateResult.getMsg() != "이미 존재하는 키워드입니다."){
+                return null;
+            }
+
+            DictionaryVO paramVo = new DictionaryVO();
+            paramVo.setIdx_dictionary(param.getIdx_dictionary());
             paramVo.setIdx_user(uinfo.getIdx_user());
 
             if(StringUtils.isEmpty(paramVo.getIdx_dictionary()+"")){
