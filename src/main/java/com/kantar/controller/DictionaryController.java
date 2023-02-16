@@ -360,8 +360,6 @@ public class DictionaryController extends BaseController {
                 return null;
             }
             CommonResult updateResult = updateDictionaryData(req, param.getDictionaryData());
-            System.out.println(updateResult.getSuccess());
-            System.out.println(updateResult.getMsg());
 
             if(updateResult.getSuccess() != "1" && updateResult.getMsg() != "이미 존재하는 키워드입니다."){
                 return null;
