@@ -1,14 +1,14 @@
 srvinfo: dev
 
-# server:
-#   port: 10000
+server:
+  port: 10000
 
 #DataSource
 spring:
   datasource:
-    hikari:
-      max-lifetime: 31000
-      idle-timeout: 30000
+#    hikari:
+#      max-lifetime: 31000
+#      idle-timeout: 30000
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://3.36.125.155:3306/kantar?useUnicode=true&autoReconnect=true&characterEncoding=utf8&allowMultiQueries=true&useSSL=false&serverTimezone=UTC
@@ -31,7 +31,8 @@ spring:
 #업로드 디렉토리는 협의 후 확정
 file:
   # upload-dir: /Users/winmaster/DEV/KANTAR/KANTAR-Serv/upload
-  upload-dir: /home/ec2-user/upload
+#  upload-dir: /home/ec2-user/upload
+  upload-dir: /Users/apple/Desktop/kantar_dw_files/
 
 #개발만 디버그 로그 보이게 하기
 logging:

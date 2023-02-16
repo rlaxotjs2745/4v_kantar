@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -377,6 +377,38 @@ public class DictionaryController extends BaseController {
                     return null;
                 }
                 _fpath += rs.getFilepath() + rs.getFilename();
+
+                String NEWLINE = System.lineSeparator();
+                List<DictionaryDataVO> dictionaryDataVOList = dictionaryMapper.getDictionaryDataList(paramVo);
+
+                try {
+                    File file = new File(_fpath);
+                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+                    bw.write("대표키워드,키워드01,키워드02,키워드03,키워드04,키워드05,키워드06,키워드07,키워드08,키워드09,키워드10");
+
+                    for(DictionaryDataVO dictionaryDataVO : dictionaryDataVOList){
+                        bw.write(NEWLINE);
+
+                        String dictDataLine = dictionaryDataVO.getKeyword();
+                        dictDataLine = dictionaryDataVO.getKeyword01() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword01() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword02() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword02() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword03() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword03() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword04() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword04() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword05() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword05() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword06() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword06() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword07() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword07() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword08() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword08() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword09() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword09() : dictDataLine + ",";
+                        dictDataLine = dictionaryDataVO.getKeyword10() != null ? dictDataLine + "," + dictionaryDataVO.getKeyword10() : dictDataLine + ",";
+
+                        bw.write(dictDataLine);
+                    }
+
+                    bw.flush();
+                    bw.close();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
             }
 
             return fileService.getFileDown(_fpath);

@@ -13,7 +13,7 @@
     </select>
 
     <insert id="savUserInfo">
-        INSERT INTO KT_USER (user_id, user_pw, user_name, user_phone, user_type, user_status) VALUES (#{user_id}, #{user_pw}, #{user_name}, #{user_phone}, #{user_type}, #{user_status})
+        INSERT INTO KT_USER (user_id, user_pw, user_name, first_code, user_type, user_status) VALUES (#{user_id}, #{user_pw}, #{user_name}, #{first_code}, #{user_type}, #{user_status})
     </insert>
 
     <update id="modUserInfo">
@@ -31,6 +31,7 @@
         <if test="user_status != null">
             , user_status=#{user_status}
         </if>
+            , first_code=null
             WHERE idx_user=#{idx_user}
     </update>
 
@@ -54,7 +55,7 @@
     </select>
 
     <select id="getUserInfoByFCode" resultType="com.kantar.vo.UserVO">
-        SELECT * FROM KT_USER WHERE user_phone = #{fCode} AND user_status = 0
+        SELECT * FROM KT_USER WHERE first_code = #{fCode} AND user_status = 0
     </select>
 
     <update id="updateUserPW" parameterType="com.kantar.vo.UserVO">
