@@ -10,32 +10,23 @@ import com.kantar.service.ResponseService;
 import com.kantar.util.Excel;
 import com.kantar.vo.DictionaryDataVO;
 import com.kantar.vo.DictionaryVO;
-import com.kantar.vo.ProjectVO;
 import com.kantar.vo.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.*;
-import java.math.BigInteger;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/dict")
 public class DictionaryController extends BaseController {
@@ -51,8 +42,6 @@ public class DictionaryController extends BaseController {
     private FileService fileService;
     @Value("${file.upload-dir}")
     public String filepath;
-    @Autowired
-    private Excel excel;
 
     /**
      * 사전 관리 리스트(페이징)
