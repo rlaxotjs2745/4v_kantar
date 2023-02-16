@@ -32,6 +32,9 @@
             OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=A.idx_user AND user_type IN (11,99))>0
         </if>
         )
+        <if test="title neq null">
+            AND title LIKE '%${title}%'
+        </if>
     </select>
 
     <select id="getReportView" resultType="com.kantar.vo.ProjectVO">
@@ -117,7 +120,7 @@
     </insert>
 
     <select id="findReportKeyword" resultType="Integer">
-        SELECT count(*) FROM KT_REPORT_KEYWORD WHERE idx_report=#{idx_report} AND keyword = #{sum_keyword}
+        SELECT count(*) FROM KT_REPORT_KEYWORD WHERE idx_report=#{idx_report} AND keyword = #{sum_keyword} AND keytype = #{keytype}
     </select>
 
     <select id="getReportCountByProject" resultType="Integer">

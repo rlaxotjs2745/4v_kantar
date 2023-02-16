@@ -32,11 +32,13 @@ public class ProjectVO extends BaseVO {
     private String report_id;
     private String filter_tp;
     private String keywords;
+    private String adjectives;
     private Integer d_count_total;
     private Integer reportStatus;
     List<ReportVO> reportList;
 
     private String project_merge_idx;
     private String[] summary_keywords;
+    private String[] summary_adjectives;
     private Integer idx_filter;
 }

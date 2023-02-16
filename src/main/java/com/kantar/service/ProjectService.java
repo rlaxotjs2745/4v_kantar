@@ -294,6 +294,7 @@ public class ProjectService {
             List<SumtextVO> _data0 = new ArrayList<SumtextVO>();
             List<ReportVO> _data10 = new ArrayList<ReportVO>();
             List<String[]> summ_keywords = new ArrayList<>();
+            List<String[]> summ_adjectives = new ArrayList<>();
             Integer _totalCount = 0; // 요약문 생성수
             Integer _nowCount = 0;
             String pp;
@@ -308,8 +309,14 @@ public class ProjectService {
             _nlp0.put("model","dialogue");
             _nlp0.put("outputSizeOption","small");
             _nlp.put("summary",_nlp0);
-            _nlp1.put("enable",true);
             _nlp1.put("maxCount",30);
+            _nlp1.put("enable",true);
+            if(reportVO.getRfil5()==1){
+                _nlp1.put("extractAdjectives",false);
+            }
+            if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                _nlp1.put("extractAdjectives",true);
+            }
             _nlp.put("keywordExtraction",_nlp1);
             _nlp2.put("enable",true);
             _nlp.put("sentimentAnalysis",_nlp2);
@@ -471,8 +478,11 @@ public class ProjectService {
                         reportMapper.saveReportData(paramVo);
                         reportMapper.updReportCountUp(paramVo);
                         _nowCount++;
-                        if (param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) {
-                            summ_keywords.add(param.getSummary_keywords()); // 추출된 키워드 있으면 키워드 리스트에 저장
+                        if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                            summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                        }
+                        if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                            summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
                         }
                         statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
                         if (StringUtils.isNotEmpty(_token)) {
@@ -526,8 +536,11 @@ public class ProjectService {
                         reportMapper.saveReportData(paramVo);
                         reportMapper.updReportCountUp(paramVo);
                         _nowCount++;
-                        if (param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) {
-                            summ_keywords.add(param.getSummary_keywords()); // 추출된 키워드 있으면 키워드 리스트에 저장
+                        if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                            summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                        }
+                        if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                            summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
                         }
                         statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
                         if (StringUtils.isNotEmpty(_token)) {
@@ -550,8 +563,11 @@ public class ProjectService {
                     reportMapper.saveReportData(paramVo);
                     reportMapper.updReportCountUp(paramVo);
                     _nowCount++;
-                    if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
-                        summ_keywords.add(param.getSummary_keywords());
+                    if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                    }
+                    if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                        summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
                     }
                     statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
                     if(StringUtils.isNotEmpty(_token)){
@@ -601,8 +617,11 @@ public class ProjectService {
                         reportMapper.saveReportData(paramVo);
                         reportMapper.updReportCountUp(paramVo);
                         _nowCount++;
-                        if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
-                            summ_keywords.add(param.getSummary_keywords());
+                        if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                            summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                        }
+                        if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                            summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
                         }
                         statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
 
@@ -645,8 +664,11 @@ public class ProjectService {
                         reportMapper.saveReportData(paramVo);
                         reportMapper.updReportCountUp(paramVo);
                         _nowCount++;
-                        if(param.getSummary_keywords()!=null && param.getSummary_keywords().length>0){
-                            summ_keywords.add(param.getSummary_keywords());
+                        if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                            summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                        }
+                        if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                            summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
                         }
                         statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
 
@@ -659,7 +681,9 @@ public class ProjectService {
 
             savMetadata(paramVo.getIdx_report(), _metalist); // 메타데이터 집계
             reportVO.setIdx_report(paramVo.getIdx_report());
-            saveSummaryKeyword(_data10, summ_keywords, reportVO); //api 사용량 집계
+
+            Map _km = new HashMap();
+            saveSummaryKeyword(_data10, summ_keywords, summ_adjectives, reportVO); //api 사용량 집계
 
             if(paramVo.getIdx_report()>0 && _totalCount==_nowCount){
                 _msg = "리포트가 생성되었습니다.";
@@ -706,41 +730,79 @@ public class ProjectService {
      * 요약문 키워드 저장
      * @param allList
      * @param s_keyword
+     * @param s_adjectives
      * @param reportVO
      */
-    private void saveSummaryKeyword(List<ReportVO> allList, List<String[]> s_keyword, ReportVO reportVO) throws Exception {
+    private void saveSummaryKeyword(List<ReportVO> allList, List<String[]> s_keyword, List<String[]> s_adjectives, ReportVO reportVO) throws Exception {
 
         ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
         reKeywords.setIdx_report(reportVO.getIdx_report());
-        reKeywords.setKeytype(1); // 임시작성. 명사형용사 향후 추가적용 필요
 
         int total_count = 0;
+
         for (String[] keywords : s_keyword) {
-            for (String key : keywords) {
-                if(reportVO.getRfil4()==0 || (reportVO.getRfil4()==1 && key.length()>1)){
-                    reKeywords.setSum_keyword(key);
-                    int count = 0;
-                    for (ReportVO _r : allList) {
-                        int index = 0;
-                        while (index >= 0) {
-                            index = _r.getTp5().indexOf(key, index);
-                            if (index >= 0) {
-                                count++;
-                                index += key.length();
+            if(keywords!=null && keywords.length>0){
+                for (String key : keywords) {
+                    if(reportVO.getRfil4()==0 || (reportVO.getRfil4()==1 && key.length()>1)){
+                        reKeywords.setSum_keyword(key);
+                        reKeywords.setKeytype(1);
+                        int count = 0;
+                        for (ReportVO _r : allList) {
+                            int index = 0;
+                            while (index >= 0) {
+                                index = _r.getTp5().indexOf(key, index);
+                                if (index >= 0) {
+                                    count++;
+                                    index += key.length();
+                                }
                             }
                         }
-                    }
-                    int _findkey = reportMapper.findReportKeyword(reKeywords);
-                    reKeywords.setKeycount(count);
+                        int _findkey = reportMapper.findReportKeyword(reKeywords);
+                        reKeywords.setKeycount(count);
 
-                    if(count>0 && _findkey==0){
-                        int apiUse = reKeywords.getSum_keyword().length() * count;
-                        reportMapper.createReportFilterData(reKeywords); // 키워드 집계
-                        total_count += apiUse;
+                        if(count>0 && _findkey==0){
+                            int apiUse = reKeywords.getSum_keyword().length() * count;
+                            reportMapper.createReportFilterData(reKeywords); // 키워드 집계
+                            total_count += apiUse;
+                        }
                     }
                 }
             }
         }
+
+        for (String[] adjectives : s_adjectives) { //형용사 집계
+            if(adjectives!=null && adjectives.length>0){
+                for (String adj : adjectives) {
+                    if(reportVO.getRfil4()==0 || (reportVO.getRfil4()==1 && adj.length()>1)){
+                        reKeywords.setSum_keyword(adj);
+                        reKeywords.setKeytype(2);
+                        int count = 0;
+                        for (ReportVO _r : allList) {
+                            int index = 0;
+                            while (index >= 0) {
+                                index = _r.getTp5().indexOf(adj, index);
+                                if (index >= 0) {
+                                    count++;
+                                    index += adj.length();
+                                }
+                            }
+                        }
+                        int _findkey = reportMapper.findReportKeyword(reKeywords);
+                        reKeywords.setKeycount(count);
+
+                        System.out.println("s_adjectives = " + s_adjectives);
+                        System.out.println("count = " + count);
+                        System.out.println("_findkey = " + _findkey);
+                        if(count>0 && _findkey==0){
+                            int apiUse = reKeywords.getSum_keyword().length() * count;
+                            reportMapper.createReportFilterData(reKeywords); // 키워드 집계
+                            total_count += apiUse;
+                        }
+                    }
+                }
+            }
+        }
+
         ProjectVO param = new ProjectVO();
         param.setIdx_report(reKeywords.getIdx_report());
         param.setIdx_user(reportVO.getIdx_user());

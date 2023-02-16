@@ -500,6 +500,10 @@ public class ReportController extends BaseController {
                 return responseService.getFailResult("save_filter_report","프로젝트 정보를 다시 확인해주세요");
             }
 
+            if(StringUtils.isEmpty(reportVO.getRfil5()+"") || reportVO.getRfil5()>3 || reportVO.getRfil5()<1){
+                return responseService.getFailResult("save_filter_report","키워드 품사를 선택해주세요");
+            }
+
             Integer idx_filter = filterService.createReportFilter(reportVO);
             reportVO.setIdx_filter(idx_filter);
             projectService.list_reportfilter(_token, reportVO);
