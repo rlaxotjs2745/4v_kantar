@@ -146,13 +146,13 @@ public class WordCloudController extends BaseController {
             _data.put("filter",filter);
 
             if(!keyword.isEmpty()){
-                return responseService.getSuccessResult(_data, "list_wordcloud", "워드클라우드 리스팅 성공");
+                return responseService.getSuccessResult(_data, "wordcloud_view", "워드클라우드 정보를 불러왔습니다");
             }else{
-                return responseService.getFailResult("list_wordcloud","워드클라우드 리스트가 없습니다.");
+                return responseService.getFailResult("wordcloud_view","일치하는 워드클라우드 리스트가 없습니다.");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return responseService.getFailResult("list_wordcloud","오류가 발생하였습니다.");
+            return responseService.getFailResult("wordcloud_view","오류가 발생하였습니다.");
         }
     }
 
