@@ -24,4 +24,8 @@ public interface WordCloudMapper {
     public Integer getWordCloudListCount(WordCloudVO wc) throws Exception;
 
     public List<FilterVO> getWordCloudList(WordCloudVO wc) throws Exception;
+
+    public List<WordCloudDataVO> getWordCloudDetail(WordCloudVO wc) throws Exception;
+
+    public List<FilterVO> getWordCloudFilterDetail(WordCloudVO wc) throws Exception;
 }

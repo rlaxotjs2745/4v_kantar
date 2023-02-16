@@ -66,4 +66,18 @@
         WHERE A.idx_user=#{idx_user} AND idx_project_job_projectid=#{idx_project_job_projectid};
     </select>
 
+    <select id="getWordCloudDetail" resultType="com.kantar.vo.WordCloudDataVO">
+        SELECT keyword as text, keycount as value
+        FROM KT_WORDCLOUD A
+            JOIN KT_WORDCLOUD_KEYWORD B ON B.idx_wordcloud=A.idx_wordcloud
+        WHERE B.idx_wordcloud = #{idx_wordcloud};
+    </select>
+
+    <select id="getWordCloudFilterDetail" resultMap="filterDataList">
+        SELECT filter_type, filter_data
+        FROM KT_WORDCLOUD A
+            JOIN KT_WORDCLOUD_FILTER_DATA B ON B.idx_word_filter=A.idx_word_filter
+        WHERE A.idx_wordcloud = #{idx_wordcloud};
+    </select>
+
 </mapper>

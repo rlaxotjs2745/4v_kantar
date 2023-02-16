@@ -121,4 +121,39 @@ public class WordCloudController extends BaseController {
         }
     }
 
+
+    /**
+     * 워드클라우드 상세보기
+     * @param req
+     * @param wc
+     * @return CommonResult
+     * @throws Exception
+     */
+    @PostMapping("/wordcloud_view")
+    public CommonResult wordcloud_view(HttpServletRequest req, @RequestBody WordCloudVO wc) throws Exception {
+        try {
+            UserVO uinfo = getChkUserLogin(req);
+            if(uinfo==null){
+                return responseService.getFailResult("login","로그인이 필요합니다.");
+            }
+            wc.setIdx_user(uinfo.getIdx_user());
+
+            List<WordCloudDataVO> keyword = wordCloudMapper.getWordCloudDetail(wc);
+            List<FilterVO> filter = wordCloudMapper.getWordCloudFilterDetail(wc);
+
+            Map<String, Object> _data = new HashMap<String, Object>();
+            _data.put("keyword",keyword);
+            _data.put("filter",filter);
+
+            if(!keyword.isEmpty()){
+                return responseService.getSuccessResult(_data, "list_wordcloud", "워드클라우드 리스팅 성공");
+            }else{
+                return responseService.getFailResult("list_wordcloud","워드클라우드 리스트가 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return responseService.getFailResult("list_wordcloud","오류가 발생하였습니다.");
+        }
+    }
+
 }

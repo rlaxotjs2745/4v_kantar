@@ -125,6 +125,9 @@ public class WordCloudService {
         String _msg = "";
 
         try {
+            Map<String, Object> _kafka = new HashMap<String, Object>();
+            _kafka.put("link","");
+
             //필터링 셋팅
             String[] _speakers = (StringUtils.isNotEmpty(wc.getTp1())) ? wc.getTp1().split("//") : null;
             String[] _chapters = (StringUtils.isNotEmpty(wc.getTp2())) ? wc.getTp2().split("//") : null;
@@ -253,7 +256,7 @@ public class WordCloudService {
             if(StringUtils.isNotEmpty(wc.getTp3())) { // 서브챕터 선택
                 for (String c : _subs) {
                     for (ReportVO data : _data10) {
-                        if(data.getTp2().equals(c)) {
+                        if(data.getTp3().equals(c)) {
                             ReportVO _r = new ReportVO();
                             _r.setTp1(data.getTp1());
                             _r.setTp2(data.getTp2());
@@ -277,7 +280,7 @@ public class WordCloudService {
             if(StringUtils.isNotEmpty(wc.getTp4())) { // 질문 선택
                 for (String c : _questions) {
                     for (ReportVO data : _data10) {
-                        if(data.getTp2().equals(c)) {
+                        if(data.getTp4().equals(c)) {
                             ReportVO _r = new ReportVO();
                             _r.setTp1(data.getTp1());
                             _r.setTp2(data.getTp2());
@@ -307,11 +310,30 @@ public class WordCloudService {
                 if(_r==1){
                     summ_keywords.add(param.getSummary_keywords());
                     saveWordCloudKetword(_data10, summ_keywords, wc);
+                    _msg = "워드클라우드 생성이 완료되었습니다.";
+                    _kafka.put("link","/wordcloud_view/" + wc.getIdx_wordcloud());
+                } else {
+                    _msg = "요약 데이터가 짧아 반환된 키워드가 없습니다.";
+                }
+
+                if(StringUtils.isNotEmpty(_token)){
+                    _kafka.put("link","");
+                    _kafka.put("msg",_msg);
+                    _kafka.put("roomId",_token);
+                    //kafkaSender.send("kantar", new Gson().toJson(_kafka));
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            _msg = "리포트 생성을 실패하였습니다.";
+            if(StringUtils.isNotEmpty(_token)){
+                Map<String, Object> _data2 = new HashMap<String, Object>();
+                _data2.put("link","");
+                _data2.put("msg",_msg);
+                _data2.put("roomId",_token);
+                //kafkaSender.send("kantar", new Gson().toJson(_data2));
+            }
         }
     }
 
