@@ -25,13 +25,14 @@ tar xvf ./kafka_2.13-3.4.0.tgz
 /home/ec2-user/kafka_2.13-3.4.0/bin/zookeeper-server-stop.sh
 
 ### Kafka server start
-/home/ec2-user/kafka_2.12-3.3.2/bin/kafka-server-start.sh -daemon /home/ec2-user/kafka_2.12-3.3.2/config/server.properties
+/home/ec2-user/kafka_2.13-3.4.0/bin/kafka-server-start.sh -daemon /home/ec2-user/kafka_2.13-3.4.0/config/server.properties
 
 ### Kafka server stop
-/home/ec2-user/kafka_2.12-3.3.2/bin/kafka-server-stop.sh
+/home/ec2-user/kafka_2.13-3.4.0/bin/kafka-server-stop.sh
 
 ### create to Kafka topic
-/home/ec2-user/kafka_2.12-3.3.2/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --topic kantar
+/home/ec2-user/kafka_2.13-3.4.0/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --topic kantar
+
 
 
 ## Java Server
