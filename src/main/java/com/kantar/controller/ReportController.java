@@ -188,7 +188,9 @@ public class ReportController extends BaseController {
                         String PRID = "P" + a1.substring(a1.length()-4,a1.length());
                         paramVo.setProject_seq(prseq);
                         paramVo.setProject_id(PRID);
-                        Integer pridrs = projectMapper.savProjectJobProjectid(paramVo);
+                        paramVo.setFilepath(path);
+                        paramVo.setFilename(originFileName);
+                        Integer pridrs = projectMapper.savProjectJobProjectidAndFileInfo(paramVo);
                         if(pridrs>0){
                             Integer rs = projectMapper.savProjectInfo(paramVo);
                             if(rs == 0){
@@ -197,8 +199,8 @@ public class ReportController extends BaseController {
                                 if(paramVo.getIdx_project()==0 || paramVo.getIdx_project() == null){
                                     return responseService.getFailResult("create_report","저장에 실패하였습니다.");
                                 }else{
-                                    paramVo.setFilepath(path);
-                                    paramVo.setFilename(originFileName);
+                                    //paramVo.setFilepath(path);
+                                    //paramVo.setFilename(originFileName);
                                     statisticsService.createProjectInfo(paramVo);// 프로젝트 생성시 사용량 누적
 
                                     // 요청 사항 : 2023.01.06 회의때 프로젝트 저장 시 리포트 생성까지 같이 되도록 요청
@@ -212,8 +214,8 @@ public class ReportController extends BaseController {
                                     param.setIdx_user(paramVo.getIdx_user());
                                     param.setIdx_project(paramVo.getIdx_project());
                                     param.setIdx_project_job_projectid(paramVo.getIdx_project_job_projectid());
-                                    param.setFilename(originFileName);
-                                    param.setFilepath(path);
+                                    //param.setFilename(originFileName);
+                                    //param.setFilepath(path);
                                     param.setProject_name(paramVo.getProject_name());
                                     param.setTitle(paramVo.getProject_name() + "_기본리포트");
                                     param.setD_count_total(1);

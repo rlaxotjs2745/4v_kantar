@@ -27,7 +27,7 @@
 
     <select id="getProjectList" resultType="com.kantar.vo.ProjectListVO">
         SELECT A.idx_project_job_projectid, B.job_no, A.project_id, C.user_name, E.project_name, IF(E.project_type=1, 'RAW DATA', '병합') AS project_type_str, E.idx_project, LEFT(REPLACE(E.create_dt,'-','.'),16) AS create_dt
-        , (SELECT filename FROM KT_REPORT WHERE idx_project_job_projectid=A.idx_project_job_projectid ORDER BY idx_report LIMIT 1) AS filename
+        , A.filename
         FROM KT_PROJECT_JOB_PROJECTID A
         JOIN KT_PROJECT_JOB B ON B.idx_project_job=A.idx_project_job
         JOIN KT_PROJECT E ON E.idx_project_job_projectid=A.idx_project_job_projectid
