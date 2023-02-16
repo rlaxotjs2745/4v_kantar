@@ -24,4 +24,5 @@ public interface UserMapper {
 
     public List<UserVO>  getApiUserList(UserVO userInfo) throws Exception;
 
+    public Integer savLoginHistory(UserVO paramVo) throws Exception;
 }

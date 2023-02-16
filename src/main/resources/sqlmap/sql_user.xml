@@ -75,4 +75,8 @@
             OR idx_user = #{idx_user})
         </if>
     </select>
+
+    <insert id="savLoginHistory">
+        INSERT INTO KT_USER_HISTORY (idx_user, remote_ip) VALUES (#{idx_user}, #{remoteip})
+    </insert>
 </mapper>

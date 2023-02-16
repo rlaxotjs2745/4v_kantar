@@ -81,10 +81,14 @@ public class UserController extends BaseController {
                     param.put("idx_user",rs.getIdx_user());
                     param.put("user_id",rs.getUser_id());
                     param.put("user_status", rs.getUser_status());
+                    
+                    // 로그인 히스토리 추가
+                    paramVo.setIdx_user(rs.getIdx_user());
+                    paramVo.setRemoteip(getClientIP(req));
+                    userMapper.savLoginHistory(paramVo);
                     String _token = tokenJWT.createToken(param, rs.getUser_type()+"");
                     Map<String, Object> param0 = new HashMap<String, Object>();
                     param0.put("token",_token);
-                    // kafkaSender.send("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlX3R5cGUiOiIwIiwidXNlcl9pZCI6InRlc3QiLCJ1c2VyX3N0YXR1cyI6MCwiZXhwIjoxNjcyOTM1NTI3fQ._R0SrutcbfTHumtM6LJ0G3pLcb1jRtMWiqD-Xwn9tWE", "login complete");
                     return responseService.getSuccessResult(param0, "login","로그인 성공");
                 }else{
                     return responseService.getFailResult("login","회원 가입 후에 이용해주세요.");
