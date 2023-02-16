@@ -52,12 +52,9 @@
     <select id="getWordCloudList" resultMap="getFilter">
         SELECT A.idx_wordcloud, A.title, A.create_dt, A.idx_word_filter, B.idx_word_filter_data, B.filter_type, B.filter_data
         FROM KT_WORDCLOUD A
-            JOIN KT_WORDCLOUD_FILTER_DATA B ON B.idx_word_filter=A.idx_word_filter
+            LEFT OUTER JOIN  KT_WORDCLOUD_FILTER_DATA B ON B.idx_word_filter=A.idx_word_filter
         WHERE A.idx_user=#{idx_user} AND idx_project_job_projectid=#{idx_project_job_projectid}
         ORDER BY A.create_dt DESC
-        <if test="currentPage != null">
-            LIMIT 10 OFFSET 0
-        </if>
     </select>
 
     <select id="getWordCloudListCount" resultType="Integer">
