@@ -7,6 +7,7 @@
         <id property="idx_filter" column="idx_word_filter" />
         <result property="filter_title" column="title" />
         <result property="idx_filter" column="idx_word_filter" />
+        <result property="idx" column="idx_wordcloud" />
         <result property="create_dt" column="create_dt" />
         <collection property="filterDataList" resultMap="filterDataList" autoMapping="true"/>
     </resultMap>

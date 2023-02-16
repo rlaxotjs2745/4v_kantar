@@ -590,7 +590,7 @@ public class ProjectService {
                         }
                     }
                     SummaryVO params = new SummaryVO();
-                    params.setText(_data0);
+                    params.setText(_data9);
                     params.setNlpConfig(_nlp);
                     pp = new Gson().toJson(params);
                     ProjectVO param = summary.getSummary(pp, "서브챕터 ["+s+"] 요약문");
@@ -634,7 +634,7 @@ public class ProjectService {
                         }
                     }
                     SummaryVO params = new SummaryVO();
-                    params.setText(_data0);
+                    params.setText(_data9);
                     params.setNlpConfig(_nlp);
                     pp = new Gson().toJson(params);
                     ProjectVO param = summary.getSummary(pp, "질문 ["+q+"] 요약문");
