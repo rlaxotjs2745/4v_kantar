@@ -1,6 +1,7 @@
 package com.kantar.service;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.io.FileInputStream;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.util.UriUtils;
 
 import com.kantar.vo.ProjectVO;
 
@@ -97,15 +99,17 @@ public class FileService {
             }
 
             String _fileName = file.getName();
+            String outputFileName = UriUtils.encode(_fileName, StandardCharsets.UTF_8.toString());
             // String ext = _fileName.substring(_fileName.lastIndexOf(".") + 1);
             HttpHeaders header = new HttpHeaders();
 
-            header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+_fileName);
+            // header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+_fileName);
+            header.add("Content-Disposition", "attachment;filename*=UTF-8''"+ outputFileName);
             header.add("Cache-Control", "no-cache, no-store, must-revalidate");
             header.add("Pragma", "no-cache");
             header.add("Expires", "0");
             
-            InputStreamResource resource3 = new InputStreamResource(new FileInputStream(file));
+            InputStreamResource resource3 = new InputStreamResource(new FileInputStream(file), StandardCharsets.UTF_8.toString());
             
             return ResponseEntity.ok()
                     .headers(header)

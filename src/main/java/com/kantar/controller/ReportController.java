@@ -21,10 +21,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
+// import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,7 +47,7 @@ import com.kantar.util.TokenJWT;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.net.URLEncoder;
+// import java.net.URLEncoder;
 
 @RestController
 @RequestMapping("/api/report")
@@ -524,25 +525,27 @@ public class ReportController extends BaseController {
      * @throws Exception
      */
     @GetMapping("/download")
+    // @CrossOrigin(value = {"*"}, exposedHeaders = {"Content-Disposition"})
     public void getReportDown(HttpServletResponse response, HttpServletRequest req, ProjectVO paramVo) throws Exception {
+        UserVO uinfo = getChkUserLogin(req);
+        if(uinfo==null){
+            return;
+        }
+        paramVo.setIdx_user(uinfo.getIdx_user());
+
+        Workbook wb = new HSSFWorkbook();
+
+        if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
+            wb.close();
+            return;
+        }
         try {
-            // UserVO uinfo = getChkUserLogin(req);
-            // if(uinfo==null){
-            //     return;
-            // }
-            paramVo.setIdx_user(1);
-
-            if(StringUtils.isEmpty(paramVo.getIdx_report()+"")){
-                return;
-            }
-
             paramVo.setIdx(paramVo.getIdx_report());
             ProjectVO rs0 = projectMapper.getProjectView(paramVo);
             List<FilterDataVO> filter0 = filterMapper.getReportFilter(paramVo.getIdx());
             List<ProjectVO> reportarr = reportMapper.getReportDataViewAll(paramVo);
             List<ReportFilterKeywordVO> key0 = reportMapper.getReportKeywordView(paramVo);
 
-            Workbook wb = new HSSFWorkbook();
             Sheet sheet = wb.createSheet("REPORT_" + rs0.getProject_name());
 
             // 타이틀 스타일
@@ -848,13 +851,20 @@ public class ReportController extends BaseController {
             String _fName = "REPORT_" + rs0.getProject_name() +".xls";
             String outputFileName = UriUtils.encode(_fName, StandardCharsets.UTF_8.toString());
             response.setContentType("ms-vnd/excel");
+            // response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''"+ outputFileName);
             // response.setHeader( "Content-Transfer-Encoding", "binary" );
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
             wb.write(response.getOutputStream());
             // wb.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            wb.close();
         }
+    
     }
 
     /**

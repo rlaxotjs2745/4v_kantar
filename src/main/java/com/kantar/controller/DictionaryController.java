@@ -344,6 +344,8 @@ public class DictionaryController extends BaseController {
     @Transactional
     @PostMapping("/download")
     public ResponseEntity<Object> getDictDown(HttpServletRequest req, @RequestBody DictionaryDownVO param) throws Exception {
+        File file = null;
+        BufferedWriter bw = null;
         try {
             UserVO uinfo = getChkUserLogin(req);
             if(uinfo==null){
@@ -378,8 +380,14 @@ public class DictionaryController extends BaseController {
                 List<DictionaryDataVO> dictionaryDataVOList = dictionaryMapper.getDictionaryDataList(paramVo);
 
                 try {
-                    File file = new File(_fpath);
-                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+                    String fullpath = this.filepath + rs.getFilepath();
+                    File fileDir = new File(fullpath);
+                    if (!fileDir.exists()) {
+                        fileDir.mkdirs();
+                    }
+
+                    file = new File(_fpath);
+                    bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
                     bw.write("대표키워드,키워드01,키워드02,키워드03,키워드04,키워드05,키워드06,키워드07,키워드08,키워드09,키워드10");
 
                     for(DictionaryDataVO dictionaryDataVO : dictionaryDataVOList){
