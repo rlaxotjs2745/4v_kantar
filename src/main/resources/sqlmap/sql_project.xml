@@ -44,10 +44,6 @@
         </if>
     </select>
 
-    <select id="getProjectInfoByIdx" resultType="com.kantar.vo.ProjectVO">
-        SELECT idx_project, idx_project_job_projectid, project_name FROM KT_PROJECT WHERE idx_project=#{idx_project}
-    </select>
-
     <select id="getProjectInfoByProJobIdx" resultType="com.kantar.vo.ProjectVO">
         SELECT A.idx_project, A.idx_project_job_projectid, A.project_name, B.filepath, B.filename
         FROM KT_PROJECT A

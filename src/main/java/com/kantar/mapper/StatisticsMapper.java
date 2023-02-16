@@ -25,10 +25,6 @@ public interface StatisticsMapper {
 
     void setKeywordAPIUsage(StatisticsVO statisticsVO) throws Exception;
 
-    void updateSummaryAPIUsage(StatisticsVO statisticsVO) throws Exception;
-
-    void updateKeywordAPIUsage(StatisticsVO statisticsVO) throws Exception;
-
     ProjectVO getPjIdxToReport(StatisticsVO satisticsVO) throws Exception;
 
     void setSummaryAPIUsageAdd(StatisticsVO statisticsVO) throws Exception;
@@ -41,7 +37,7 @@ public interface StatisticsMapper {
 
     double getApiDataByUser() throws Exception;
 
-    double getApiDataByUser(StatisticsVO userInfo) throws Exception;
+    StatisticsVO getApiDataByUser(StatisticsVO userInfo) throws Exception;
 
     long getKeywordStatisticsByUser() throws Exception;
 
