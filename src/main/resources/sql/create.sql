@@ -209,57 +209,49 @@ CREATE TABLE `KT_FILE_STATISTICS` (
   PRIMARY KEY (`idx_file_statistics`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='시스템 사용 현황';
 
+
 CREATE TABLE `KT_WORDCLOUD` (
-   `idx_wordcloud` INT(11) NOT NULL AUTO_INCREMENT,
-   `idx_project_job_projectid` INT(11) NOT NULL,
-   `title` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
-   `idx_user` INT(11) NOT NULL DEFAULT '0',
-   `idx_word_filter` INT(11) NOT NULL,
-   `create_dt` DATETIME NULL DEFAULT current_timestamp(),
-   `update_dt` DATETIME NULL DEFAULT NULL ON UPDATE current_timestamp(),
-   PRIMARY KEY (`idx_wordcloud`) USING BTREE,
-   INDEX `idx_project_job_projectid` (`idx_project_job_projectid`) USING BTREE
-)
-    COLLATE='utf8mb4_general_ci'
-    ENGINE=InnoDB
-;
+  `idx_wordcloud` int(11) NOT NULL AUTO_INCREMENT COMMENT '인덱스',
+  `idx_project_job_projectid` int(11) NOT NULL COMMENT 'KT_PROJECT_JOB_PROJECTID 인덱스',
+  `title` varchar(100) NOT NULL COMMENT '워드클라우드명',
+  `idx_word_filter` int(11) NOT NULL COMMENT 'KT_WORDCLOUD_FILTER 인덱스',
+  `idx_user` int(11) NOT NULL DEFAULT 0 COMMENT '등록자 인덱스',
+  `create_dt` datetime DEFAULT current_timestamp() COMMENT '등록 일시정보',
+  `update_dt` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '업데이트 일시정보',
+  PRIMARY KEY (`idx_wordcloud`) USING BTREE,
+  KEY `idx_project_job_projectid` (`idx_project_job_projectid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='워드 클라우드';
+
 
 CREATE TABLE `KT_WORDCLOUD_KEYWORD` (
-   `idx_wordcloud_keyword` BIGINT(20) NOT NULL AUTO_INCREMENT,
-   `idx_wordcloud` BIGINT(20) NOT NULL,
-   `keyword` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
-   `keytype` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_general_ci',
-   `keycount` INT(11) NULL DEFAULT '0',
-   `create_dt` DATETIME NULL DEFAULT current_timestamp(),
-   `update_dt` DATETIME NULL DEFAULT NULL ON UPDATE current_timestamp(),
-    PRIMARY KEY (`idx_wordcloud_keyword`) USING BTREE
-)
-    COLLATE='utf8mb4_general_ci'
-    ENGINE=InnoDB
-;
+  `idx_wordcloud_keyword` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '인덱스',
+  `idx_wordcloud` bigint(20) NOT NULL COMMENT 'KT_WORDCLOUD 인덱스',
+  `keyword` varchar(100) NOT NULL COMMENT '키워드',
+  `keytype` varchar(100) NOT NULL COMMENT '키워드 형식',
+  `keycount` int(11) DEFAULT 0 COMMENT '키워드 빈도수',
+  `create_dt` datetime DEFAULT current_timestamp() COMMENT '등록 일시정보',
+  `update_dt` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '업데이트 일시정보',
+  PRIMARY KEY (`idx_wordcloud_keyword`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='워드 클라우드 키워드 정보';
+
 
 CREATE TABLE `KT_WORDCLOUD_FILTER` (
-    `idx_word_filter` INT(11) NOT NULL AUTO_INCREMENT,
-    `idx_project_job_projectid` INT(11) NOT NULL,
-    `filter_title` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
-    `idx_user` INT(11) NOT NULL DEFAULT '0',
-    `create_dt` DATETIME NULL DEFAULT current_timestamp(),
-    `update_dt` DATETIME NULL DEFAULT NULL ON UPDATE current_timestamp(),
-    PRIMARY KEY (`idx_word_filter`) USING BTREE
-)
-    COLLATE='utf8mb4_general_ci'
-    ENGINE=InnoDB
-;
+  `idx_word_filter` int(11) NOT NULL AUTO_INCREMENT COMMENT '인덱스',
+  `idx_project_job_projectid` int(11) NOT NULL COMMENT 'KT_PROJECT_JOB_PROJECTID 인덱스',
+  `filter_title` varchar(50) NOT NULL COMMENT '필터명',
+  `idx_user` int(11) NOT NULL DEFAULT 0 COMMENT '등록자 인덱스',
+  `create_dt` datetime DEFAULT current_timestamp() COMMENT '등록 일시정보',
+  `update_dt` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT '업데이트 일시정보',
+  PRIMARY KEY (`idx_word_filter`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='워드 클라우드 필터 정보';
+
 
 CREATE TABLE `KT_WORDCLOUD_FILTER_DATA` (
-    `idx_word_filter_data` INT(11) NOT NULL AUTO_INCREMENT,
-    `idx_word_filter` INT(11) NOT NULL,
-    `filter_type` TINYINT(4) NULL DEFAULT '0' COMMENT '0:없음,1:화자,2:챕터,3:서브챕터,4:질문,5:키워드',
-    `filter_data` VARCHAR(4000) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
-    PRIMARY KEY (`idx_word_filter_data`) USING BTREE,
-    INDEX `FK_KT_WORDCLOUD_FILTER_DATA_KT_WORDCLOUD_FILTER` (`idx_word_filter`) USING BTREE,
-    CONSTRAINT `FK_KT_WORDCLOUD_FILTER_DATA_KT_WORDCLOUD_FILTER` FOREIGN KEY (`idx_word_filter`) REFERENCES `KT_WORDCLOUD_FILTER` (`idx_word_filter`) ON UPDATE NO ACTION ON DELETE CASCADE
-)
-    COLLATE='utf8mb4_general_ci'
-    ENGINE=InnoDB
-;
+  `idx_word_filter_data` int(11) NOT NULL AUTO_INCREMENT COMMENT '인덱스',
+  `idx_word_filter` int(11) NOT NULL COMMENT 'KT_WORDCLOUD_FILTER 인덱스',
+  `filter_type` tinyint(4) DEFAULT 0 COMMENT '필터 형식 (0:없음,1:화자,2:챕터,3:서브챕터,4:질문,5:키워드)',
+  `filter_data` varchar(4000) DEFAULT NULL COMMENT '필터 데이터',
+  PRIMARY KEY (`idx_word_filter_data`) USING BTREE,
+  KEY `FK_KT_WORDCLOUD_FILTER_DATA_KT_WORDCLOUD_FILTER` (`idx_word_filter`) USING BTREE,
+  CONSTRAINT `FK_KT_WORDCLOUD_FILTER_DATA_KT_WORDCLOUD_FILTER` FOREIGN KEY (`idx_word_filter`) REFERENCES `KT_WORDCLOUD_FILTER` (`idx_word_filter`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='워드 클라우드 필터 데이터';
