@@ -790,9 +790,6 @@ public class ProjectService {
                         int _findkey = reportMapper.findReportKeyword(reKeywords);
                         reKeywords.setKeycount(count);
 
-                        System.out.println("s_adjectives = " + s_adjectives);
-                        System.out.println("count = " + count);
-                        System.out.println("_findkey = " + _findkey);
                         if(count>0 && _findkey==0){
                             int apiUse = reKeywords.getSum_keyword().length() * count;
                             reportMapper.createReportFilterData(reKeywords); // 키워드 집계

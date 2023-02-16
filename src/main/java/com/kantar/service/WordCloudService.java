@@ -147,6 +147,7 @@ public class WordCloudService {
             List<SumtextVO> _data0 = new ArrayList<SumtextVO>();
             List<ReportVO> _data10 = new ArrayList<ReportVO>();
             List<String[]> summ_keywords = new ArrayList<>();
+            List<String[]> summ_adjectives = new ArrayList<>();
             String pp;
 
             //요약문 설정 셋팅
@@ -160,6 +161,12 @@ public class WordCloudService {
             _nlp.put("summary",_nlp0);
             _nlp1.put("enable",true);
             _nlp1.put("maxCount",30);
+            if(wc.getKeyType()==1){
+                _nlp1.put("extractAdjectives",false);
+            }
+            if(wc.getKeyType()==2 || wc.getKeyType()==3){
+                _nlp1.put("extractAdjectives",true);
+            }
             _nlp.put("keywordExtraction",_nlp1);
             _nlp2.put("enable",true);
             _nlp.put("sentimentAnalysis",_nlp2);
@@ -308,11 +315,16 @@ public class WordCloudService {
             pp = new Gson().toJson(params);
             ProjectVO param = summary.getSummary(pp, wc.getTitle());
 
-            if(param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) {
+            if((param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) || (param.getSummary_adjectives() != null && param.getSummary_adjectives().length > 0)) {
                 int _r = wordCloudMapper.saveWordCloud(wc);
                 if(_r==1){
-                    summ_keywords.add(param.getSummary_keywords());
-                    saveWordCloudKetword(_data10, summ_keywords, wc);
+                    if(wc.getKeyType()==1 || wc.getKeyType()==3){
+                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                    }
+                    if(wc.getKeyType()==2 || wc.getKeyType()==3){
+                        summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
+                    }
+                    saveWordCloudKetword(_data10, summ_keywords, summ_adjectives, wc);
                     _msg = "워드클라우드 생성이 완료되었습니다.";
                     _kafka.put("link","/wordcloud_view/" + wc.getIdx_wordcloud());
                 } else {
@@ -343,34 +355,63 @@ public class WordCloudService {
     /**
      * 워드클라우드 키워드 저장
      */
-    private void saveWordCloudKetword(List<ReportVO> allList, List<String[]> s_keyword, WordCloudVO wc) throws Exception {
+    private void saveWordCloudKetword(List<ReportVO> allList, List<String[]> s_keyword, List<String[]> s_adjectives, WordCloudVO wc) throws Exception {
 
         ReportFilterKeywordVO reKeywords = new ReportFilterKeywordVO();
         reKeywords.setIdx_report(wc.getIdx_wordcloud());
-        reKeywords.setKeytype(1); // 임시작성. 명사형용사 향후 추가적용 필요
 
         for (String[] keywords : s_keyword) {
-            for (String key : keywords) {
-                reKeywords.setSum_keyword(key);
-                int count = 0;
-                for (ReportVO _r : allList) {
-                    int index = 0;
-                    while (index >= 0) {
-                        index = _r.getTp5().indexOf(key, index);
-                        if (index >= 0) {
-                            count++;
-                            index += key.length();
+            if(keywords!=null && keywords.length>0){
+                for (String key : keywords) {
+                    reKeywords.setSum_keyword(key);
+                    reKeywords.setKeytype(1);
+                    int count = 0;
+                    for (ReportVO _r : allList) {
+                        int index = 0;
+                        while (index >= 0) {
+                            index = _r.getTp5().indexOf(key, index);
+                            if (index >= 0) {
+                                count++;
+                                index += key.length();
+                            }
                         }
                     }
-                }
-                int _findkey = wordCloudMapper.findWordCloudKeyword(reKeywords);
-                reKeywords.setKeycount(count);
+                    int _findkey = wordCloudMapper.findWordCloudKeyword(reKeywords);
+                    reKeywords.setKeycount(count);
 
-                if(count>0 && _findkey==0){
-                    wordCloudMapper.createWordCloudKeywordData(reKeywords); // 키워드 집계
+                    if(count>0 && _findkey==0){
+                        wordCloudMapper.createWordCloudKeywordData(reKeywords); // 키워드 집계
+                    }
                 }
             }
         }
+
+        for (String[] adjectives : s_adjectives) { //형용사 집계
+            if(adjectives!=null && adjectives.length>0){
+                for (String adj : adjectives) {
+                    reKeywords.setSum_keyword(adj);
+                    reKeywords.setKeytype(2);
+                    int count = 0;
+                    for (ReportVO _r : allList) {
+                        int index = 0;
+                        while (index >= 0) {
+                            index = _r.getTp5().indexOf(adj, index);
+                            if (index >= 0) {
+                                count++;
+                                index += adj.length();
+                            }
+                        }
+                    }
+                    int _findkey = wordCloudMapper.findWordCloudKeyword(reKeywords);
+                    reKeywords.setKeycount(count);
+
+                    if(count>0 && _findkey==0){
+                        wordCloudMapper.createWordCloudKeywordData(reKeywords); // 키워드 집계
+                    }
+                }
+            }
+        }
+
     }
 
 

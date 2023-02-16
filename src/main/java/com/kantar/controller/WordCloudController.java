@@ -76,6 +76,10 @@ public class WordCloudController extends BaseController {
                 return responseService.getFailResult("save_word_cloud","프로젝트 정보를 다시 확인해주세요");
             }
 
+            if(wordCloudVO.getKeyType()==null){
+                wordCloudVO.setKeyType(3); // 1:명사만 추출 / 2:형용사만 추출 / 3:둘다 추출(디폴트)
+            }
+
             Integer idx_filter = wordCloudService.createWordCloudFilter(wordCloudVO);
             wordCloudVO.setIdx_word_filter(idx_filter);
             wordCloudService.createWordCloud(_token, wordCloudVO);
