@@ -161,12 +161,14 @@ public class WordCloudService {
             _nlp.put("summary",_nlp0);
             _nlp1.put("enable",true);
             _nlp1.put("maxCount",30);
+            /*
             if(wc.getKeyType()==1){
                 _nlp1.put("extractAdjectives",false);
             }
             if(wc.getKeyType()==2 || wc.getKeyType()==3){
                 _nlp1.put("extractAdjectives",true);
             }
+             */
             _nlp.put("keywordExtraction",_nlp1);
             _nlp2.put("enable",true);
             _nlp.put("sentimentAnalysis",_nlp2);
@@ -318,12 +320,15 @@ public class WordCloudService {
             if((param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) || (param.getSummary_adjectives() != null && param.getSummary_adjectives().length > 0)) {
                 int _r = wordCloudMapper.saveWordCloud(wc);
                 if(_r==1){
+                    summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                    /*
                     if(wc.getKeyType()==1 || wc.getKeyType()==3){
                         summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
                     }
                     if(wc.getKeyType()==2 || wc.getKeyType()==3){
                         summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
                     }
+                    */
                     saveWordCloudKetword(_data10, summ_keywords, summ_adjectives, wc);
                     _msg = "워드클라우드 생성이 완료되었습니다.";
                     _kafka.put("link","/wordcloud_view/" + wc.getIdx_wordcloud());

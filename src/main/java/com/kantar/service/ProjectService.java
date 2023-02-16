@@ -311,12 +311,14 @@ public class ProjectService {
             _nlp.put("summary",_nlp0);
             _nlp1.put("maxCount",30);
             _nlp1.put("enable",true);
+            /*
             if(reportVO.getRfil5()==1){
                 _nlp1.put("extractAdjectives",false);
             }
             if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
                 _nlp1.put("extractAdjectives",true);
             }
+             */
             _nlp.put("keywordExtraction",_nlp1);
             _nlp2.put("enable",true);
             _nlp.put("sentimentAnalysis",_nlp2);
