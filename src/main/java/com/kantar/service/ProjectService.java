@@ -443,6 +443,41 @@ public class ProjectService {
                 Integer ridx0 = reportMapper.savReport(paramVo);
             }
 
+            if(reportVO.getRfil0()==1){ // 전체 요약문
+                SummaryVO params = new SummaryVO();
+                params.setText(_data0);
+                params.setNlpConfig(_nlp);
+                pp = new Gson().toJson(params);
+                ProjectVO param = summary.getSummary(pp, "전체 요약문");
+
+                if(StringUtils.isNotEmpty(param.getTitle())){
+                    paramVo.setSummary0(param.getSummary0());
+                    paramVo.setTitle(param.getTitle());
+                    reportMapper.saveReportData(paramVo);
+                    reportMapper.updReportCountUp(paramVo);
+                    _nowCount++;
+                    if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                    }
+                    if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                        summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
+                    }
+                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+                    if(StringUtils.isNotEmpty(_token)){
+                        _msg = "전체 요약이 생성되었습니다.";
+                    }
+                    _metalist = new ArrayList<>();
+                    for (ReportVO data : _data10) {
+                        ReportMetaDataVO _meta = new ReportMetaDataVO();
+                        _meta.setSpeaker(data.getTp1());
+                        _meta.setChapter(data.getTp2());
+                        _meta.setLength(data.getTp5().length());
+                        _meta.setCnt(1);
+                        _metalist.add(_meta);
+                    }
+                }else{ _msg = "전체 요약 생성을 실패하였습니다."; }
+            }
+
             _data9 = new ArrayList<SumtextVO>();
             _data99 = new ArrayList<ReportVO>();
             if(reportVO.getRfil1()==1 && StringUtils.isNotEmpty(reportVO.getTp2())) { // 챕터 선택
@@ -550,41 +585,6 @@ public class ProjectService {
                         }
                     }
                 }
-            }
-
-            if(reportVO.getRfil0()==1){ // 전체 요약문
-                SummaryVO params = new SummaryVO();
-                params.setText(_data0);
-                params.setNlpConfig(_nlp);
-                pp = new Gson().toJson(params);
-                ProjectVO param = summary.getSummary(pp, "전체 요약문");
-
-                if(StringUtils.isNotEmpty(param.getTitle())){
-                    paramVo.setSummary0(param.getSummary0());
-                    paramVo.setTitle(param.getTitle());
-                    reportMapper.saveReportData(paramVo);
-                    reportMapper.updReportCountUp(paramVo);
-                    _nowCount++;
-                    if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
-                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
-                    }
-                    if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
-                        summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
-                    }
-                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
-                    if(StringUtils.isNotEmpty(_token)){
-                        _msg = "전체 요약이 생성되었습니다.";
-                    }
-                    _metalist = new ArrayList<>();
-                    for (ReportVO data : _data10) {
-                        ReportMetaDataVO _meta = new ReportMetaDataVO();
-                        _meta.setSpeaker(data.getTp1());
-                        _meta.setChapter(data.getTp2());
-                        _meta.setLength(data.getTp5().length());
-                        _meta.setCnt(1);
-                        _metalist.add(_meta);
-                    }
-                }else{ _msg = "전체 요약 생성을 실패하였습니다."; }
             }
 
             _data9 = new ArrayList<SumtextVO>();
