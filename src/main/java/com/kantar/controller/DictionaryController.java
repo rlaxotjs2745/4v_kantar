@@ -351,25 +351,25 @@ public class DictionaryController extends BaseController {
             if(uinfo==null){
                 return null;
             }
-            CommonResult updateResult = updateDictionaryData(req, param.getDictionaryData());
-
-            if(updateResult.getSuccess() != "1" && updateResult.getMsg() != "이미 존재하는 키워드입니다."){
-                return null;
-            }
-
-            DictionaryVO paramVo = new DictionaryVO();
-            paramVo.setIdx_dictionary(param.getIdx_dictionary());
-            paramVo.setIdx_user(uinfo.getIdx_user());
-
-            if(StringUtils.isEmpty(paramVo.getIdx_dictionary()+"")){
-                return null;
-            }
 
             String _fpath = this.filepath;
-
-            if(paramVo.getDic_type() != null && paramVo.getDic_type() == 11111){
+            if(param.getDic_type() != null && param.getDic_type() == 11111){
                 _fpath += "/dictionary/sample_kantar.csv";
             } else {
+                CommonResult updateResult = updateDictionaryData(req, param.getDictionaryData());
+
+                if(updateResult.getSuccess() != "1" && updateResult.getMsg() != "이미 존재하는 키워드입니다."){
+                    return null;
+                }
+
+                DictionaryVO paramVo = new DictionaryVO();
+                paramVo.setIdx_dictionary(param.getIdx_dictionary());
+                paramVo.setIdx_user(uinfo.getIdx_user());
+
+                if(StringUtils.isEmpty(paramVo.getIdx_dictionary()+"")){
+                    return null;
+                }
+
                 DictionaryVO rs = dictionaryMapper.getDictDown(paramVo);
                 if(rs==null){
                     return null;
