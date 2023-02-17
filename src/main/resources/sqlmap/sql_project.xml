@@ -127,6 +127,6 @@
     </select>
 
     <select id="getProjectDown" resultType="com.kantar.vo.ProjectVO">
-        SELECT DISTINCT filepath, `filename` FROM KT_REPORT WHERE idx_project_job_projectid=#{idx_project_job_projectid} AND (idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=#{idx_user} AND user_type IN (11,99))>0)
+        SELECT DISTINCT filepath, `filename` FROM KT_PROJECT_JOB_PROJECTID WHERE idx_project_job_projectid=#{idx_project_job_projectid} AND (idx_user=#{idx_user} OR (SELECT COUNT(1) FROM KT_USER WHERE idx_user=#{idx_user} AND user_type IN (11,99))>0)
     </select>
 </mapper>

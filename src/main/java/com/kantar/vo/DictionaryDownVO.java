@@ -8,4 +8,5 @@ import java.util.List;
 public class DictionaryDownVO {
     private Integer idx_dictionary;
     private List<DictionaryDataVO> dictionaryData;
+    private Integer dic_type;
 }
