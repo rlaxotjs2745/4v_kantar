@@ -7,15 +7,15 @@
     </select>
 
     <select id="getAllFileWordCnt" resultType="long">
-        SELECT sum(word_length) FROM KT_FILE_STATISTICS
+        SELECT IFNULL(sum(word_length),0) FROM KT_FILE_STATISTICS
     </select>
 
     <select id="getAllFileSize" resultType="Double">
-        SELECT sum(file_size) FROM KT_FILE_STATISTICS
+        SELECT IFNULL(sum(file_size),0) FROM KT_FILE_STATISTICS
     </select>
 
     <select id="getReportCount" resultType="long">
-        SELECT sum(report_cnt) FROM KT_FILE_STATISTICS
+        SELECT IFNULL(sum(report_cnt),0) FROM KT_FILE_STATISTICS
     </select>
 
     <insert id="setProjectStatistics" parameterType="com.kantar.vo.StatisticsVO">
@@ -63,7 +63,7 @@
     </update>
 
     <select id="getApiStatisticsByUser" resultType="long">
-        SELECT NVL(sum(summaryUsage),0) as summaryUsage
+        SELECT IFNULL(sum(summaryUsage),0) as summaryUsage
         FROM KT_API_STATISTICS
         WHERE report_status != 99
         <if test="idx_user != null">
@@ -78,7 +78,7 @@
     </select>
 
     <select id="getKeywordStatisticsByUser" resultType="long">
-        SELECT NVL(sum(keywordUsage),0) as keywordUsage
+        SELECT IFNULL(sum(keywordUsage),0) as keywordUsage
         FROM KT_API_STATISTICS
         WHERE report_status != 99
         <if test="idx_user != null">
@@ -93,9 +93,9 @@
     </select>
 
     <select id="getApiDataByUser" resultType="com.kantar.vo.StatisticsVO">
-        SELECT ROUND((SUM(DATA_LENGTH)+SUM(INDEX_LENGTH))/1024/1024, 3) AS 'tableSize',
-                SUM(DATA_LENGTH)/1024/1024 AS 'dataSize',
-                SUM(INDEX_LENGTH)/1024/1024 AS 'indexSize',
+        SELECT IFNULL(ROUND((SUM(DATA_LENGTH)+SUM(INDEX_LENGTH))/1024/1024, 3),0) AS 'tableSize',
+            IFNULL(SUM(DATA_LENGTH)/1024/1024, 0) AS 'dataSize',
+            IFNULL(SUM(INDEX_LENGTH)/1024/1024, 0) AS 'indexSize',
                 ROUND((SUM(DATA_LENGTH)+SUM(INDEX_LENGTH))/1024/1024*(SELECT COUNT(*)
                                                                       FROM KT_REPORT_DATA
                                                                       WHERE summary0 != null
