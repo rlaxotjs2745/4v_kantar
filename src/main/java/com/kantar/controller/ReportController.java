@@ -639,7 +639,7 @@ public class ReportController extends BaseController {
             cell.setCellValue("키워드");
             cell.setCellStyle(style);
             
-            if(filter0.size()>0){
+            if(filter0 != null && filter0.size()>0){
                 List<String> cv0 = new ArrayList<String>();
                 List<String> cv1 = new ArrayList<String>();
                 List<String> cv2 = new ArrayList<String>();
@@ -648,20 +648,22 @@ public class ReportController extends BaseController {
 
                 Integer cvcnt = 0;
                 for(FilterDataVO _rs : filter0) {
-                    if(_rs.getFilter_type() == 1){
-                        cv0.add(_rs.getFilter_data());
-                    }
-                    if(_rs.getFilter_type() == 2){
-                        cv1.add(_rs.getFilter_data());
-                    }
-                    if(_rs.getFilter_type() == 3){
-                        cv2.add(_rs.getFilter_data());
-                    }
-                    if(_rs.getFilter_type() == 4){
-                        cv3.add(_rs.getFilter_data());
-                    }
-                    if(_rs.getFilter_type() == 5){
-                        cv4.add(_rs.getFilter_data());
+                    if(_rs!=null){
+                        if(_rs.getFilter_type() == 1){
+                            cv0.add(_rs.getFilter_data());
+                        }
+                        if(_rs.getFilter_type() == 2){
+                            cv1.add(_rs.getFilter_data());
+                        }
+                        if(_rs.getFilter_type() == 3){
+                            cv2.add(_rs.getFilter_data());
+                        }
+                        if(_rs.getFilter_type() == 4){
+                            cv3.add(_rs.getFilter_data());
+                        }
+                        if(_rs.getFilter_type() == 5){
+                            cv4.add(_rs.getFilter_data());
+                        }
                     }
                 }
                 cvcnt = cv0.size();
@@ -724,8 +726,7 @@ public class ReportController extends BaseController {
             cell.setCellValue("03. 요약문");
             cell.setCellStyle(style);
 
-
-            if(reportarr.size()>0){
+            if(reportarr != null && reportarr.size()>0){
                 List<String> rpsum0 = new ArrayList<String>();
                 List<String> rpsum1 = new ArrayList<String>();
 
@@ -768,19 +769,21 @@ public class ReportController extends BaseController {
             cell.setCellValue("건수");
             cell.setCellStyle(style);
 
-            for(ReportFilterKeywordVO _rs : key0){
-                row = sheet.createRow(rowNum++);
-                cell = row.createCell(0);
-                cell.setCellValue(_rs.getSum_keyword());
-                cell.setCellStyle(style2);
+            if(key0!=null){
+                for(ReportFilterKeywordVO _rs : key0){
+                    row = sheet.createRow(rowNum++);
+                    cell = row.createCell(0);
+                    cell.setCellValue(_rs.getSum_keyword());
+                    cell.setCellStyle(style2);
 
-                cell = row.createCell(1);
-                cell.setCellValue(_rs.getKeytype());
-                cell.setCellStyle(style2);
+                    cell = row.createCell(1);
+                    cell.setCellValue(_rs.getKeytype());
+                    cell.setCellStyle(style2);
 
-                cell = row.createCell(2);
-                cell.setCellValue(_rs.getKeycount());
-                cell.setCellStyle(style2);
+                    cell = row.createCell(2);
+                    cell.setCellValue(_rs.getKeycount());
+                    cell.setCellStyle(style2);
+                }
             }
 
             rowNum++;
