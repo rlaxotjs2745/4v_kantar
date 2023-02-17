@@ -230,6 +230,7 @@ public class ProjectService {
 
         String[] _mergeIdx = paramVo.getProject_merge_idx().split(",");
 
+        int fileCnt = 1;
         for (String mergeIdx : _mergeIdx) {
             int lineCnt = 0;
             ProjectVO param = new ProjectVO();
@@ -240,7 +241,7 @@ public class ProjectService {
             List<String[]> ers = excel.getCsvListData(_fpath);
 
             for (String[] er : ers) {
-                if(lineCnt>0) {
+                if(fileCnt==1 || (fileCnt>1&&lineCnt>0)) {
                     for (String str00 : er) {
                         String aData = "";
                         aData = "\""+str00+"\",";
@@ -250,6 +251,7 @@ public class ProjectService {
                 }
                 lineCnt++;
             }
+            fileCnt++;
         }
 
         if(out!=null){
