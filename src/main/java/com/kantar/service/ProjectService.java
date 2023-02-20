@@ -73,6 +73,8 @@ public class ProjectService {
             SummaryVO params = new SummaryVO();
             List<String[]> ers = excel.getCsvListData(_fpath);
             int j = 0;
+
+            String _lengthchk = "";
             for(String[] _ers0 : ers){  // 줄
                 if(j>0){
                     int i = 0;
@@ -83,6 +85,7 @@ public class ProjectService {
                         }
                         if(i==4){
                             _elist.setText(_ers00.toString());
+                            _lengthchk += _ers00.toString();
                         }
                         i++;
                     }
@@ -91,55 +94,59 @@ public class ProjectService {
                 j++;
             }
 
-            params.setText(_data);
+            if(_lengthchk.length()>50000){
+                _msg = "50000자가 넘으면 리포트를 생성할 수 없습니다.";
+            }else{
+                params.setText(_data);
 
-            _nlp0.put("enable",true);
-            _nlp0.put("model","dialogue");
-            _nlp0.put("outputSizeOption","small");
+                _nlp0.put("enable",true);
+                _nlp0.put("model","dialogue");
+                _nlp0.put("outputSizeOption","small");
 
-            _nlp1.put("enable",true);
-            _nlp1.put("maxCount","30");
+                _nlp1.put("enable",true);
+                _nlp1.put("maxCount","30");
 
-            _nlp2.put("enable",true);
+                _nlp2.put("enable",true);
 
-            _nlp.put("summary",_nlp0);
-            // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
-            // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
-            params.setNlpConfig(_nlp);
-            String pp = new Gson().toJson(params);
-            ProjectVO param = summary.getSummary(pp, "전체 요약문");
-            if(StringUtils.isNotEmpty(param.getTitle())){
-                ProjectVO ridx = reportMapper.getReportIdx(paramVo);
-                Integer ridx0 = 0;
-                if(ridx==null){
-                    Integer _seq = reportMapper.getReportSeq();
-                    _seq = _seq+1;
-                    String b1 = ("000"+_seq);
-                    String RPID = "R" + b1.substring(b1.length()-4,b1.length());
-                    paramVo.setReport_seq(_seq);
-                    paramVo.setReport_id(RPID);
-                    paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
-                    paramVo.setD_count_total(1);
-                    ridx0 = reportMapper.savReport(paramVo);
-                }else{
-                    paramVo.setIdx_report(ridx.getIdx_report());
-                    ridx0 = 1;
-                }
-                if(ridx0==1){
-                    paramVo.setTitle(param.getTitle());
-                    paramVo.setSummary0(param.getSummary0());
-                    reportMapper.saveReportData(paramVo);
-                    reportMapper.updReportCountUp(paramVo);
-                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
-                    if(StringUtils.isNotEmpty(_token)){
-                        _msg = "리포트가 생성되었습니다.";
-                        _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
+                _nlp.put("summary",_nlp0);
+                // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                params.setNlpConfig(_nlp);
+                String pp = new Gson().toJson(params);
+                ProjectVO param = summary.getSummary(pp, "전체 요약문");
+                if(StringUtils.isNotEmpty(param.getTitle())){
+                    ProjectVO ridx = reportMapper.getReportIdx(paramVo);
+                    Integer ridx0 = 0;
+                    if(ridx==null){
+                        Integer _seq = reportMapper.getReportSeq();
+                        _seq = _seq+1;
+                        String b1 = ("000"+_seq);
+                        String RPID = "R" + b1.substring(b1.length()-4,b1.length());
+                        paramVo.setReport_seq(_seq);
+                        paramVo.setReport_id(RPID);
+                        paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
+                        paramVo.setD_count_total(1);
+                        ridx0 = reportMapper.savReport(paramVo);
+                    }else{
+                        paramVo.setIdx_report(ridx.getIdx_report());
+                        ridx0 = 1;
+                    }
+                    if(ridx0==1){
+                        paramVo.setTitle(param.getTitle());
+                        paramVo.setSummary0(param.getSummary0());
+                        reportMapper.saveReportData(paramVo);
+                        reportMapper.updReportCountUp(paramVo);
+                        statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+                        if(StringUtils.isNotEmpty(_token)){
+                            _msg = "리포트가 생성되었습니다.";
+                            _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
+                        }
+                    }else{
+                        _msg = "리포트 생성을 실패하였습니다.";
                     }
                 }else{
                     _msg = "리포트 생성을 실패하였습니다.";
                 }
-            }else{
-                _msg = "리포트 생성을 실패하였습니다.";
             }
             if(StringUtils.isNotEmpty(_token)){
                 _kafka.put("msg",_msg);

@@ -1,14 +1,14 @@
 package com.kantar.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -19,31 +19,28 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 @Component
 public class Excel {
 	public List<String[]> getCsvListData(String file) throws Exception{
-		List<String[]> allRows = null;
-		try{
-			CsvParserSettings settings = new CsvParserSettings();
-			settings.getFormat().setLineSeparator("\n");
-			settings.setMaxColumns(65535);
-			settings.setMaxCharsPerColumn(65535);
-			
-			CsvParser parser = new CsvParser(settings);
-			File _f = new File(file);
-			if(!_f.exists()){
-				return allRows;
-			}
-			Reader inputReader = new InputStreamReader(new FileInputStream(new File(file)), "UTF-8");
-			if(inputReader!=null){
-				allRows = parser.parseAll(inputReader);
+		List<String[]> allRows = new ArrayList<>();
+		File targetFile = new File(file);
+
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(targetFile))) {
+			CSVParser parser = CSVFormat.EXCEL.withFirstRecordAsHeader().withQuote('"').parse(bufferedReader); //엑셀타입 & 쌍따옴표 escape처리
+			for (CSVRecord record : parser.getRecords()) {
+				String[] line = new String[record.size()];
+				for (int i = 0; i < line.length; i++) {
+				  line[i] = record.get(i);
+				}
+				allRows.add(line);
 			}
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		if(allRows.size()>7000){
+			allRows = null;
 		}
 		return allRows;
 	}

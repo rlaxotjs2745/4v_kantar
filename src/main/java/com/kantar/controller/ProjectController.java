@@ -140,8 +140,10 @@ public class ProjectController extends BaseController {
                             )
                         )
                     );
+                    return responseService.getSuccessResult(_ers, "csv_view", "csv 파일 정보를 가져왔습니다.");
+                }else{
+                    return responseService.getFailResult("csv_view","csv 내용을 불러 올 수 없습니다.");
                 }
-                return responseService.getSuccessResult(_ers, "csv_view", "csv 파일 정보를 가져왔습니다.");
             }else{
                 return responseService.getFailResult("csv_view",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
             }
