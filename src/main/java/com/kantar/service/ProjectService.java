@@ -82,6 +82,7 @@ public class ProjectService {
                     for(String _ers00 : _ers0){ // 컬럼
                         if(i==3){
                             _elist.setSpeaker(_ers00.toString());
+                            _lengthchk += _ers00.toString();
                         }
                         if(i==4){
                             _elist.setText(_ers00.toString());
