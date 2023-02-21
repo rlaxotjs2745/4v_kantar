@@ -41,4 +41,5 @@ public class ProjectVO extends BaseVO {
     private String[] summary_keywords;
     private String[] summary_adjectives;
     private Integer idx_filter;
+    private Integer dagloerr;
 }

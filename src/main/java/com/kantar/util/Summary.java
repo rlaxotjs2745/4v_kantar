@@ -38,11 +38,13 @@ public class Summary {
 			} else {
 				paramVo.setAdjectives("");
 			}
+			paramVo.setDagloerr(0);
 		}else{
 			paramVo.setTitle("");
 			paramVo.setSummary0("");
 			paramVo.setKeywords("");
 			paramVo.setAdjectives("");
+			paramVo.setDagloerr(1);
 		}
 		return paramVo;
 	}

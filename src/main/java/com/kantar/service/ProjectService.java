@@ -119,38 +119,42 @@ public class ProjectService {
                     params.setNlpConfig(_nlp);
                     String pp = new Gson().toJson(params);
                     ProjectVO param = summary.getSummary(pp, "전체 요약문");
-                    if(StringUtils.isNotEmpty(param.getTitle())){
-                        ProjectVO ridx = reportMapper.getReportIdx(paramVo);
-                        Integer ridx0 = 0;
-                        if(ridx==null){
-                            Integer _seq = reportMapper.getReportSeq();
-                            _seq = _seq+1;
-                            String b1 = ("000"+_seq);
-                            String RPID = "R" + b1.substring(b1.length()-4,b1.length());
-                            paramVo.setReport_seq(_seq);
-                            paramVo.setReport_id(RPID);
-                            paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
-                            paramVo.setD_count_total(1);
-                            ridx0 = reportMapper.savReport(paramVo);
-                        }else{
-                            paramVo.setIdx_report(ridx.getIdx_report());
-                            ridx0 = 1;
-                        }
-                        if(ridx0==1){
-                            paramVo.setTitle(param.getTitle());
-                            paramVo.setSummary0(param.getSummary0());
-                            reportMapper.saveReportData(paramVo);
-                            reportMapper.updReportCountUp(paramVo);
-                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
-                            if(StringUtils.isNotEmpty(_token)){
-                                _msg = "리포트가 생성되었습니다.";
-                                _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
+                    if(param.getDagloerr() == 0){
+                        if(StringUtils.isNotEmpty(param.getTitle())){
+                            ProjectVO ridx = reportMapper.getReportIdx(paramVo);
+                            Integer ridx0 = 0;
+                            if(ridx==null){
+                                Integer _seq = reportMapper.getReportSeq();
+                                _seq = _seq+1;
+                                String b1 = ("000"+_seq);
+                                String RPID = "R" + b1.substring(b1.length()-4,b1.length());
+                                paramVo.setReport_seq(_seq);
+                                paramVo.setReport_id(RPID);
+                                paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
+                                paramVo.setD_count_total(1);
+                                ridx0 = reportMapper.savReport(paramVo);
+                            }else{
+                                paramVo.setIdx_report(ridx.getIdx_report());
+                                ridx0 = 1;
+                            }
+                            if(ridx0==1){
+                                paramVo.setTitle(param.getTitle());
+                                paramVo.setSummary0(param.getSummary0());
+                                reportMapper.saveReportData(paramVo);
+                                reportMapper.updReportCountUp(paramVo);
+                                statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+                                if(StringUtils.isNotEmpty(_token)){
+                                    _msg = "리포트가 생성되었습니다.";
+                                    _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
+                                }
+                            }else{
+                                _msg = "리포트 생성을 실패하였습니다.";
                             }
                         }else{
                             _msg = "리포트 생성을 실패하였습니다.";
                         }
                     }else{
-                        _msg = "리포트 생성을 실패하였습니다.";
+                        _msg = "daglo 서비스 오류로 리포트 생성을 중단합니다.";
                     }
                 }
             }

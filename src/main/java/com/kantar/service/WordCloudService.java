@@ -318,29 +318,32 @@ public class WordCloudService {
                 pp = new Gson().toJson(params);
                 ProjectVO param = summary.getSummary(pp, wc.getTitle());
 
-                if((param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) || (param.getSummary_adjectives() != null && param.getSummary_adjectives().length > 0)) {
-                    int _r = wordCloudMapper.saveWordCloud(wc);
-                    if(_r==1){
-                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
-                        if(wc.getKeyType()==1 || wc.getKeyType()==3){
+                if(param.getDagloerr() == 0){
+                    if((param.getSummary_keywords() != null && param.getSummary_keywords().length > 0) || (param.getSummary_adjectives() != null && param.getSummary_adjectives().length > 0)) {
+                        int _r = wordCloudMapper.saveWordCloud(wc);
+                        if(_r==1){
                             summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                            if(wc.getKeyType()==1 || wc.getKeyType()==3){
+                                summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                            }
+                            if(wc.getKeyType()==2 || wc.getKeyType()==3){
+                                summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
+                            }
+                            saveWordCloudKetword(_data10, summ_keywords, summ_adjectives, wc);
+                            _msg = "워드클라우드 생성이 완료되었습니다.";
+                            _kafka.put("link","/wordcloud_view/" + wc.getIdx_wordcloud());
+                        } else {
+                            _msg = "워드 클라우드 생성에 실패했습니다.";
                         }
-                        if(wc.getKeyType()==2 || wc.getKeyType()==3){
-                            summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
-                        }
-                        saveWordCloudKetword(_data10, summ_keywords, summ_adjectives, wc);
-                        _msg = "워드클라우드 생성이 완료되었습니다.";
-                        _kafka.put("link","/wordcloud_view/" + wc.getIdx_wordcloud());
                     } else {
-                        _msg = "워드 클라우드 생성에 실패했습니다.";
+                        _msg = "추출된 키워드가 없어서 워드 클라우드 생성을 중단합니다.";
                     }
-                } else {
-                    _msg = "요약문 정보가 짧아 워드 클라우드 생성에 실패했습니다.";
+                }else{
+                    _msg = "daglo 서비스 오류로 워드 클라우드 생성을 중단합니다.";
                 }
             }
 
             if(StringUtils.isNotEmpty(_token)){
-                _kafka.put("link","");
                 _kafka.put("msg",_msg);
                 _kafka.put("roomId",_token);
                 kafkaSender.send("kantar", new Gson().toJson(_kafka));
