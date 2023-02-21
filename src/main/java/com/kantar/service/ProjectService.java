@@ -74,79 +74,84 @@ public class ProjectService {
             List<String[]> ers = excel.getCsvListData(_fpath);
             int j = 0;
 
-            String _lengthchk = "";
-            for(String[] _ers0 : ers){  // 줄
-                if(j>0){
-                    int i = 0;
-                    SumtextVO _elist = new SumtextVO();
-                    for(String _ers00 : _ers0){ // 컬럼
-                        if(i==3){
-                            _elist.setSpeaker(_ers00.toString());
-                            _lengthchk += _ers00.toString();
-                        }
-                        if(i==4){
-                            _elist.setText(_ers00.toString());
-                            _lengthchk += _ers00.toString();
-                        }
-                        i++;
-                    }
-                    _data.add(_elist);
-                }
-                j++;
-            }
-
-            if(_lengthchk.length()>50000){
-                _msg = "50000자가 넘으면 리포트를 생성할 수 없습니다.";
+            if(ers.size() > 7000){
+                _msg = "7000줄 이상은 처리할 수 없습니다.";
             }else{
-                params.setText(_data);
-
-                _nlp0.put("enable",true);
-                _nlp0.put("model","dialogue");
-                _nlp0.put("outputSizeOption","small");
-
-                _nlp1.put("enable",true);
-                _nlp1.put("maxCount","30");
-
-                _nlp2.put("enable",true);
-
-                _nlp.put("summary",_nlp0);
-                // _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
-                // _nlp.put("sentimentAnalysis",_nlp2);     // default : true
-                params.setNlpConfig(_nlp);
-                String pp = new Gson().toJson(params);
-                ProjectVO param = summary.getSummary(pp, "전체 요약문");
-                if(StringUtils.isNotEmpty(param.getTitle())){
-                    ProjectVO ridx = reportMapper.getReportIdx(paramVo);
-                    Integer ridx0 = 0;
-                    if(ridx==null){
-                        Integer _seq = reportMapper.getReportSeq();
-                        _seq = _seq+1;
-                        String b1 = ("000"+_seq);
-                        String RPID = "R" + b1.substring(b1.length()-4,b1.length());
-                        paramVo.setReport_seq(_seq);
-                        paramVo.setReport_id(RPID);
-                        paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
-                        paramVo.setD_count_total(1);
-                        ridx0 = reportMapper.savReport(paramVo);
-                    }else{
-                        paramVo.setIdx_report(ridx.getIdx_report());
-                        ridx0 = 1;
+                String _lengthchk = "";
+                for(String[] _ers0 : ers){  // 줄
+                    if(j>0){
+                        int i = 0;
+                        SumtextVO _elist = new SumtextVO();
+                        for(String _ers00 : _ers0){ // 컬럼
+                            if(i==3){
+                                _elist.setSpeaker(_ers00.toString());
+                                _lengthchk += _ers00.toString();
+                            }
+                            if(i==4){
+                                _elist.setText(_ers00.toString());
+                                _lengthchk += _ers00.toString();
+                            }
+                            i++;
+                        }
+                        _data.add(_elist);
                     }
-                    if(ridx0==1){
-                        paramVo.setTitle(param.getTitle());
-                        paramVo.setSummary0(param.getSummary0());
-                        reportMapper.saveReportData(paramVo);
-                        reportMapper.updReportCountUp(paramVo);
-                        statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
-                        if(StringUtils.isNotEmpty(_token)){
-                            _msg = "리포트가 생성되었습니다.";
-                            _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
+                    j++;
+                }
+
+                if(_lengthchk.length()>50000){
+                    _msg = "50000자가 넘으면 리포트를 생성할 수 없습니다.";
+                }else{
+                    params.setText(_data);
+
+                    _nlp0.put("enable",true);
+                    _nlp0.put("model","dialogue");
+                    _nlp0.put("maxCharsPerParagraph",6000);
+                    _nlp0.put("outputSizeOption","small");
+
+                    _nlp1.put("enable",false);
+                    _nlp1.put("maxCount","30");
+
+                    _nlp2.put("enable",false);
+
+                    _nlp.put("summary",_nlp0);
+                    _nlp.put("keywordExtraction",_nlp1);     // 키워드 추출하기
+                    _nlp.put("sentimentAnalysis",_nlp2);     // default : true
+                    params.setNlpConfig(_nlp);
+                    String pp = new Gson().toJson(params);
+                    ProjectVO param = summary.getSummary(pp, "전체 요약문");
+                    if(StringUtils.isNotEmpty(param.getTitle())){
+                        ProjectVO ridx = reportMapper.getReportIdx(paramVo);
+                        Integer ridx0 = 0;
+                        if(ridx==null){
+                            Integer _seq = reportMapper.getReportSeq();
+                            _seq = _seq+1;
+                            String b1 = ("000"+_seq);
+                            String RPID = "R" + b1.substring(b1.length()-4,b1.length());
+                            paramVo.setReport_seq(_seq);
+                            paramVo.setReport_id(RPID);
+                            paramVo.setTitle(paramVo.getProject_name() + "_기본리포트");
+                            paramVo.setD_count_total(1);
+                            ridx0 = reportMapper.savReport(paramVo);
+                        }else{
+                            paramVo.setIdx_report(ridx.getIdx_report());
+                            ridx0 = 1;
+                        }
+                        if(ridx0==1){
+                            paramVo.setTitle(param.getTitle());
+                            paramVo.setSummary0(param.getSummary0());
+                            reportMapper.saveReportData(paramVo);
+                            reportMapper.updReportCountUp(paramVo);
+                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); //리포트 생성시 api사용량 누적
+                            if(StringUtils.isNotEmpty(_token)){
+                                _msg = "리포트가 생성되었습니다.";
+                                _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
+                            }
+                        }else{
+                            _msg = "리포트 생성을 실패하였습니다.";
                         }
                     }else{
                         _msg = "리포트 생성을 실패하였습니다.";
                     }
-                }else{
-                    _msg = "리포트 생성을 실패하였습니다.";
                 }
             }
             if(StringUtils.isNotEmpty(_token)){
@@ -299,207 +304,267 @@ public class ProjectService {
             ProjectVO rs0 = projectMapper.getProjectJobProjectid(paramVo);
             String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
             List<String[]> ers = excel.getCsvListData(_fpath);
+            if(ers.size() > 7000){
+                _msg = "7000줄 이상은 처리할 수 없습니다.";
+            }else{
+                //리스트 및 생성시 필요변수 셋틍
+                List<SumtextVO> _data0 = new ArrayList<SumtextVO>();
+                List<ReportVO> _data10 = new ArrayList<ReportVO>();
+                List<String[]> summ_keywords = new ArrayList<>();
+                List<String[]> summ_adjectives = new ArrayList<>();
+                Integer _totalCount = 0; // 요약문 생성수
+                Integer _nowCount = 0;
+                String pp;
+                List<ReportMetaDataVO> _metalist = new ArrayList<ReportMetaDataVO>();
 
-            //리스트 및 생성시 필요변수 셋틍
-            List<SumtextVO> _data0 = new ArrayList<SumtextVO>();
-            List<ReportVO> _data10 = new ArrayList<ReportVO>();
-            List<String[]> summ_keywords = new ArrayList<>();
-            List<String[]> summ_adjectives = new ArrayList<>();
-            Integer _totalCount = 0; // 요약문 생성수
-            Integer _nowCount = 0;
-            String pp;
-            List<ReportMetaDataVO> _metalist = new ArrayList<ReportMetaDataVO>();
-
-            //요약문 설정 셋팅
-            Map<String, Object> _nlp = new HashMap<String, Object>();
-            Map<String, Object> _nlp0 = new HashMap<String, Object>();
-            Map<String, Object> _nlp1 = new HashMap<String, Object>();
-            Map<String, Object> _nlp2 = new HashMap<String, Object>();
-            _nlp0.put("enable",true);
-            _nlp0.put("model","dialogue");
-            _nlp0.put("outputSizeOption","small");
-            _nlp.put("summary",_nlp0);
-            _nlp1.put("maxCount",30);
-            _nlp1.put("enable",true);
-            if(reportVO.getRfil5()==1){
-                _nlp1.put("extractAdjectives",false);
-            }
-            if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
-                _nlp1.put("extractAdjectives",true);
-            }
-            _nlp.put("keywordExtraction",_nlp1);
-            _nlp2.put("enable",true);
-            _nlp.put("sentimentAnalysis",_nlp2);
-
-            int j = 0;
-            String _lengthchk = "";
-            for(String[] _ers0 : ers) {  // 전체 리스트
-                if (j > 0) {
-                    SumtextVO _elist = new SumtextVO();
-                    _elist.setSpeaker(_ers0[3].toString());
-                    _elist.setText(_ers0[4].toString());
-                    _data0.add(_elist);
-                    ReportVO _rlist = new ReportVO();
-                    _rlist.setTp1(_ers0[3].toString()); // 화자
-                    _rlist.setTp2(_ers0[0].toString()); // 챕터
-                    _rlist.setTp3(_ers0[1].toString()); // 서브챕터
-                    _rlist.setTp4(_ers0[2].toString()); // 질문
-                    _rlist.setTp5(_ers0[4].toString()); // 답변
-                    _data10.add(_rlist);
-                    _lengthchk += _ers0[3].toString() + _ers0[4].toString();
+                //요약문 설정 셋팅
+                Map<String, Object> _nlp = new HashMap<String, Object>();
+                Map<String, Object> _nlp0 = new HashMap<String, Object>();
+                Map<String, Object> _nlp1 = new HashMap<String, Object>();
+                Map<String, Object> _nlp2 = new HashMap<String, Object>();
+                _nlp0.put("enable",true);
+                _nlp0.put("model","dialogue");
+                _nlp0.put("outputSizeOption","small");
+                _nlp.put("summary",_nlp0);
+                _nlp1.put("maxCount",30);
+                _nlp1.put("enable",true);
+                if(reportVO.getRfil5()==1){
+                    _nlp1.put("extractAdjectives",false);
                 }
-                j++;
-            }
+                if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                    _nlp1.put("extractAdjectives",true);
+                }
+                _nlp.put("keywordExtraction",_nlp1);
+                _nlp2.put("enable",true);
+                _nlp.put("sentimentAnalysis",_nlp2);
 
-            List<SumtextVO> _data9 = new ArrayList<SumtextVO>();
-            List<ReportVO> _data99 = new ArrayList<ReportVO>();
-            if(StringUtils.isNotEmpty(reportVO.getTp1())) { // 화자
-                _lengthchk = "";
-                for (String s : _speakers) {
-                    for (ReportVO data : _data10) {
-                        if(data.getTp1().equals(s)) {
-                            ReportVO _r = new ReportVO();
-                            _r.setTp1(data.getTp1());
-                            _r.setTp2(data.getTp2());
-                            _r.setTp3(data.getTp3());
-                            _r.setTp4(data.getTp4());
-                            _r.setTp5(data.getTp5());
-                            _data99.add(_r);
-                            SumtextVO _s = new SumtextVO();
-                            _s.setSpeaker(data.getTp1());
-                            _s.setText(_r.getTp5());
-                            _data9.add(_s);
-                            _lengthchk += data.getTp1() + _r.getTp5();
+                int j = 0;
+                String _lengthchk = "";
+                for(String[] _ers0 : ers) {  // 전체 리스트
+                    if (j > 0) {
+                        SumtextVO _elist = new SumtextVO();
+                        _elist.setSpeaker(_ers0[3].toString());
+                        _elist.setText(_ers0[4].toString());
+                        _data0.add(_elist);
+                        ReportVO _rlist = new ReportVO();
+                        _rlist.setTp1(_ers0[3].toString()); // 화자
+                        _rlist.setTp2(_ers0[0].toString()); // 챕터
+                        _rlist.setTp3(_ers0[1].toString()); // 서브챕터
+                        _rlist.setTp4(_ers0[2].toString()); // 질문
+                        _rlist.setTp5(_ers0[4].toString()); // 답변
+                        _data10.add(_rlist);
+                        _lengthchk += _ers0[3].toString() + _ers0[4].toString();
+                    }
+                    j++;
+                }
+
+                List<SumtextVO> _data9 = new ArrayList<SumtextVO>();
+                List<ReportVO> _data99 = new ArrayList<ReportVO>();
+                if(StringUtils.isNotEmpty(reportVO.getTp1())) { // 화자
+                    _lengthchk = "";
+                    for (String s : _speakers) {
+                        for (ReportVO data : _data10) {
+                            if(data.getTp1().equals(s)) {
+                                ReportVO _r = new ReportVO();
+                                _r.setTp1(data.getTp1());
+                                _r.setTp2(data.getTp2());
+                                _r.setTp3(data.getTp3());
+                                _r.setTp4(data.getTp4());
+                                _r.setTp5(data.getTp5());
+                                _data99.add(_r);
+                                SumtextVO _s = new SumtextVO();
+                                _s.setSpeaker(data.getTp1());
+                                _s.setText(_r.getTp5());
+                                _data9.add(_s);
+                                _lengthchk += data.getTp1() + _r.getTp5();
+                            }
                         }
                     }
+                    _data0 = _data9;
+                    _data10 = _data99;
                 }
-                _data0 = _data9;
-                _data10 = _data99;
-            }
 
-            _data9 = new ArrayList<SumtextVO>();
-            _data99 = new ArrayList<ReportVO>();
-            if(StringUtils.isNotEmpty(reportVO.getTp5())) { // 키워드
-                _lengthchk = "";
-                for (String k : _keywords) {
-                    for (ReportVO data : _data10) {
-                        if(data.getTp5().contains(k)) {
-                            ReportVO _r = new ReportVO();
-                            _r.setTp1(data.getTp1());
-                            _r.setTp2(data.getTp2());
-                            _r.setTp3(data.getTp3());
-                            _r.setTp4(data.getTp4());
-                            _r.setTp5(data.getTp5());
-                            _data99.add(_r);
-                            SumtextVO _s = new SumtextVO();
-                            _s.setSpeaker(data.getTp1());
-                            _s.setText(_r.getTp5());
-                            _data9.add(_s);
-                            _lengthchk += data.getTp1() + _r.getTp5();
+                _data9 = new ArrayList<SumtextVO>();
+                _data99 = new ArrayList<ReportVO>();
+                if(StringUtils.isNotEmpty(reportVO.getTp5())) { // 키워드
+                    _lengthchk = "";
+                    for (String k : _keywords) {
+                        for (ReportVO data : _data10) {
+                            if(data.getTp5().contains(k)) {
+                                ReportVO _r = new ReportVO();
+                                _r.setTp1(data.getTp1());
+                                _r.setTp2(data.getTp2());
+                                _r.setTp3(data.getTp3());
+                                _r.setTp4(data.getTp4());
+                                _r.setTp5(data.getTp5());
+                                _data99.add(_r);
+                                SumtextVO _s = new SumtextVO();
+                                _s.setSpeaker(data.getTp1());
+                                _s.setText(_r.getTp5());
+                                _data9.add(_s);
+                                _lengthchk += data.getTp1() + _r.getTp5();
+                            }
                         }
                     }
+                    _data0 = _data9;
+                    _data10 = _data99;
                 }
-                _data0 = _data9;
-                _data10 = _data99;
-            }
 
-            //totalCount 집계
-            Integer dataCnt = 0;
-            if(reportVO.getRfil1()==1 && StringUtils.isNotEmpty(reportVO.getTp2())) {
-                for (String c : _chapters) {
-                    for (ReportVO data : _data10) {
-                        if(data.getTp2().equals(c)) { dataCnt++; }
-                    } if(dataCnt>0){ _totalCount++; }
-                }
-            }
-            if(reportVO.getRfil1()==1 && StringUtils.isEmpty(reportVO.getTp2())) {
-                Map<String, List<ReportVO>> grouped = new HashMap<>();
-                for (ReportVO _d : _data10) {
-                    String key = _d.getTp2();
-                    if (!grouped.containsKey(key)) {
-                        grouped.put(key, new ArrayList<>());
+                //totalCount 집계
+                Integer dataCnt = 0;
+                if(reportVO.getRfil1()==1 && StringUtils.isNotEmpty(reportVO.getTp2())) {
+                    for (String c : _chapters) {
+                        for (ReportVO data : _data10) {
+                            if(data.getTp2().equals(c)) { dataCnt++; }
+                        } if(dataCnt>0){ _totalCount++; }
                     }
-                    grouped.get(key).add(_d);
                 }
-                for (String c : grouped.keySet()) {
-                    List<ReportVO> _chapReport = grouped.get(c);
-                    for (ReportVO data : _chapReport) { dataCnt++; }
-                    if(dataCnt>0){ _totalCount++; }
-                }
-            }
-            if(reportVO.getRfil0()==1){ // 전체 요약문
-                _totalCount++;
-            }
-            if(reportVO.getRfil2()==1 && StringUtils.isNotEmpty(reportVO.getTp3())) {
-                for (String s : _subs) {
-                    for (ReportVO data : _data10) {
-                        if(data.getTp3().equals(s)) { dataCnt++; }
-                    } if(dataCnt>0){ _totalCount++; }
-                }
-            }
-            if(reportVO.getRfil3()==1 && StringUtils.isNotEmpty(reportVO.getTp4())) {
-                for (String q : _questions) {
-                    for (ReportVO data : _data10) {
-                        if(data.getTp4().equals(q)) { dataCnt++; }
-                    } if(dataCnt>0){ _totalCount++; }
-                }
-            }
-
-            if(_totalCount != 0){ //리포트 생성
-                if(_lengthchk.length() > 50000){
-                    _msg = "50000자가 넘으면 리포트를 생성할 수 없습니다.";
-                } else {
-                    Integer _seq = reportMapper.getReportSeq();
-                    _seq = _seq+1;
-                    String b1 = ("000"+_seq);
-                    String RPID = "R" + b1.substring(b1.length()-4,b1.length());
-                    paramVo.setReport_seq(_seq);
-                    paramVo.setReport_id(RPID);
-                    paramVo.setTitle(reportVO.getTitle());
-                    paramVo.setD_count_total(_totalCount); // 요약문 데이터 총 갯수
-                    Integer ridx0 = reportMapper.savReport(paramVo);
-
-                    if(reportVO.getRfil0()==1){ // 전체 요약문
-                        SummaryVO params = new SummaryVO();
-                        params.setText(_data0);
-                        params.setNlpConfig(_nlp);
-                        pp = new Gson().toJson(params);
-                        ProjectVO param = summary.getSummary(pp, "전체 요약문");
-
-                        if(StringUtils.isNotEmpty(param.getTitle())){
-                            paramVo.setSummary0(param.getSummary0());
-                            paramVo.setTitle(param.getTitle());
-                            reportMapper.saveReportData(paramVo);
-                            reportMapper.updReportCountUp(paramVo);
-                            _nowCount++;
-                            if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
-                                summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
-                            }
-                            if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
-                                summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
-                            }
-                            statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
-                            if(StringUtils.isNotEmpty(_token)){
-                                _msg = "전체 요약이 생성되었습니다.";
-                            }
-                            _metalist = new ArrayList<>();
-                            for (ReportVO data : _data10) {
-                                ReportMetaDataVO _meta = new ReportMetaDataVO();
-                                _meta.setSpeaker(data.getTp1());
-                                _meta.setChapter(data.getTp2());
-                                _meta.setLength(data.getTp5().length());
-                                _meta.setCnt(1);
-                                _metalist.add(_meta);
-                            }
-                        }else{ _msg = "전체 요약 생성을 실패하였습니다."; }
+                if(reportVO.getRfil1()==1 && StringUtils.isEmpty(reportVO.getTp2())) {
+                    Map<String, List<ReportVO>> grouped = new HashMap<>();
+                    for (ReportVO _d : _data10) {
+                        String key = _d.getTp2();
+                        if (!grouped.containsKey(key)) {
+                            grouped.put(key, new ArrayList<>());
+                        }
+                        grouped.get(key).add(_d);
                     }
+                    for (String c : grouped.keySet()) {
+                        List<ReportVO> _chapReport = grouped.get(c);
+                        for (ReportVO data : _chapReport) { dataCnt++; }
+                        if(dataCnt>0){ _totalCount++; }
+                    }
+                }
+                if(reportVO.getRfil0()==1){ // 전체 요약문
+                    _totalCount++;
+                }
+                if(reportVO.getRfil2()==1 && StringUtils.isNotEmpty(reportVO.getTp3())) {
+                    for (String s : _subs) {
+                        for (ReportVO data : _data10) {
+                            if(data.getTp3().equals(s)) { dataCnt++; }
+                        } if(dataCnt>0){ _totalCount++; }
+                    }
+                }
+                if(reportVO.getRfil3()==1 && StringUtils.isNotEmpty(reportVO.getTp4())) {
+                    for (String q : _questions) {
+                        for (ReportVO data : _data10) {
+                            if(data.getTp4().equals(q)) { dataCnt++; }
+                        } if(dataCnt>0){ _totalCount++; }
+                    }
+                }
 
-                    _data9 = new ArrayList<SumtextVO>();
-                    _data99 = new ArrayList<ReportVO>();
-                    if(reportVO.getRfil1()==1 && StringUtils.isNotEmpty(reportVO.getTp2())) { // 챕터 선택
-                        for (String c : _chapters) {
-                            for (ReportVO data : _data10) {
-                                if(data.getTp2().equals(c)) {
+                if(_totalCount != 0){ //리포트 생성
+                    if(_lengthchk.length() > 50000){
+                        _msg = "50000자가 넘으면 리포트를 생성할 수 없습니다.";
+                    } else {
+                        Integer _seq = reportMapper.getReportSeq();
+                        _seq = _seq+1;
+                        String b1 = ("000"+_seq);
+                        String RPID = "R" + b1.substring(b1.length()-4,b1.length());
+                        paramVo.setReport_seq(_seq);
+                        paramVo.setReport_id(RPID);
+                        paramVo.setTitle(reportVO.getTitle());
+                        paramVo.setD_count_total(_totalCount); // 요약문 데이터 총 갯수
+                        Integer ridx0 = reportMapper.savReport(paramVo);
+
+                        if(reportVO.getRfil0()==1){ // 전체 요약문
+                            SummaryVO params = new SummaryVO();
+                            params.setText(_data0);
+                            params.setNlpConfig(_nlp);
+                            pp = new Gson().toJson(params);
+                            ProjectVO param = summary.getSummary(pp, "전체 요약문");
+
+                            if(StringUtils.isNotEmpty(param.getTitle())){
+                                paramVo.setSummary0(param.getSummary0());
+                                paramVo.setTitle(param.getTitle());
+                                reportMapper.saveReportData(paramVo);
+                                reportMapper.updReportCountUp(paramVo);
+                                _nowCount++;
+                                if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                                    summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                                }
+                                if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                                    summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
+                                }
+                                statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+                                if(StringUtils.isNotEmpty(_token)){
+                                    _msg = "전체 요약이 생성되었습니다.";
+                                }
+                                _metalist = new ArrayList<>();
+                                for (ReportVO data : _data10) {
+                                    ReportMetaDataVO _meta = new ReportMetaDataVO();
+                                    _meta.setSpeaker(data.getTp1());
+                                    _meta.setChapter(data.getTp2());
+                                    _meta.setLength(data.getTp5().length());
+                                    _meta.setCnt(1);
+                                    _metalist.add(_meta);
+                                }
+                            }else{ _msg = "전체 요약 생성을 실패하였습니다."; }
+                        }
+
+                        _data9 = new ArrayList<SumtextVO>();
+                        _data99 = new ArrayList<ReportVO>();
+                        if(reportVO.getRfil1()==1 && StringUtils.isNotEmpty(reportVO.getTp2())) { // 챕터 선택
+                            for (String c : _chapters) {
+                                for (ReportVO data : _data10) {
+                                    if(data.getTp2().equals(c)) {
+                                        ReportVO _r = new ReportVO();
+                                        _r.setTp1(data.getTp1()); // 화자
+                                        _r.setTp2(data.getTp2()); // 챕터
+                                        _r.setTp3(data.getTp3()); // 서브챕터
+                                        _r.setTp4(data.getTp4()); // 질문
+                                        _r.setTp5(data.getTp5()); // 답변
+                                        _data99.add(_r);
+                                        SumtextVO _s = new SumtextVO();
+                                        _s.setSpeaker(data.getTp1());
+                                        _s.setText(_r.getTp5());
+                                        _data9.add(_s);
+                                        ReportMetaDataVO _meta = new ReportMetaDataVO();
+                                        _meta.setSpeaker(data.getTp1());
+                                        _meta.setChapter(data.getTp2());
+                                        _meta.setLength(data.getTp5().length());
+                                        _meta.setCnt(1);
+                                        _metalist.add(_meta);
+                                    }
+                                }
+                                SummaryVO params = new SummaryVO();
+                                params.setText(_data9);
+                                params.setNlpConfig(_nlp);
+                                pp = new Gson().toJson(params);
+                                ProjectVO param = summary.getSummary(pp, "챕터 ["+c+"] 요약문");
+
+                                if(StringUtils.isNotEmpty(param.getTitle())) {
+                                    paramVo.setSummary0(param.getSummary0());
+                                    paramVo.setTitle(param.getTitle());
+                                    reportMapper.saveReportData(paramVo);
+                                    reportMapper.updReportCountUp(paramVo);
+                                    _nowCount++;
+                                    if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                                    }
+                                    if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                                        summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
+                                    }
+                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
+                                    if (StringUtils.isNotEmpty(_token)) {
+                                        _msg = "챕터 리포트가 생성되었습니다.";
+                                    }
+                                }
+                            }
+                        }
+
+                        if(reportVO.getRfil1()==1 && StringUtils.isEmpty(reportVO.getTp2())) { // 챕터 미선택
+                            Map<String, List<ReportVO>> grouped = new HashMap<>();
+                            for (ReportVO _d : _data10) {
+                                String key = _d.getTp2();
+                                if (!grouped.containsKey(key)) {
+                                    grouped.put(key, new ArrayList<>());
+                                }
+                                grouped.get(key).add(_d);
+                            }
+
+                            for (String c : grouped.keySet()) {
+                                List<ReportVO> _chapReport = grouped.get(c);
+                                for (ReportVO data : _chapReport) {
                                     ReportVO _r = new ReportVO();
                                     _r.setTp1(data.getTp1()); // 화자
                                     _r.setTp2(data.getTp2()); // 챕터
@@ -518,198 +583,141 @@ public class ProjectService {
                                     _meta.setCnt(1);
                                     _metalist.add(_meta);
                                 }
-                            }
-                            SummaryVO params = new SummaryVO();
-                            params.setText(_data9);
-                            params.setNlpConfig(_nlp);
-                            pp = new Gson().toJson(params);
-                            ProjectVO param = summary.getSummary(pp, "챕터 ["+c+"] 요약문");
+                                // 챕터 요약문 생성
+                                SummaryVO params = new SummaryVO();
+                                params.setText(_data9);
+                                params.setNlpConfig(_nlp);
+                                pp = new Gson().toJson(params);
+                                ProjectVO param = summary.getSummary(pp, "챕터 ["+c+"] 요약문");
 
-                            if(StringUtils.isNotEmpty(param.getTitle())) {
-                                paramVo.setSummary0(param.getSummary0());
-                                paramVo.setTitle(param.getTitle());
-                                reportMapper.saveReportData(paramVo);
-                                reportMapper.updReportCountUp(paramVo);
-                                _nowCount++;
-                                if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
-                                    summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
-                                }
-                                if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
-                                    summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
-                                }
-                                statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
-                                if (StringUtils.isNotEmpty(_token)) {
-                                    _msg = "챕터 리포트가 생성되었습니다.";
-                                }
-                            }
-                        }
-                    }
-
-                    if(reportVO.getRfil1()==1 && StringUtils.isEmpty(reportVO.getTp2())) { // 챕터 미선택
-                        Map<String, List<ReportVO>> grouped = new HashMap<>();
-                        for (ReportVO _d : _data10) {
-                            String key = _d.getTp2();
-                            if (!grouped.containsKey(key)) {
-                                grouped.put(key, new ArrayList<>());
-                            }
-                            grouped.get(key).add(_d);
-                        }
-
-                        for (String c : grouped.keySet()) {
-                            List<ReportVO> _chapReport = grouped.get(c);
-                            for (ReportVO data : _chapReport) {
-                                ReportVO _r = new ReportVO();
-                                _r.setTp1(data.getTp1()); // 화자
-                                _r.setTp2(data.getTp2()); // 챕터
-                                _r.setTp3(data.getTp3()); // 서브챕터
-                                _r.setTp4(data.getTp4()); // 질문
-                                _r.setTp5(data.getTp5()); // 답변
-                                _data99.add(_r);
-                                SumtextVO _s = new SumtextVO();
-                                _s.setSpeaker(data.getTp1());
-                                _s.setText(_r.getTp5());
-                                _data9.add(_s);
-                                ReportMetaDataVO _meta = new ReportMetaDataVO();
-                                _meta.setSpeaker(data.getTp1());
-                                _meta.setChapter(data.getTp2());
-                                _meta.setLength(data.getTp5().length());
-                                _meta.setCnt(1);
-                                _metalist.add(_meta);
-                            }
-                            // 챕터 요약문 생성
-                            SummaryVO params = new SummaryVO();
-                            params.setText(_data9);
-                            params.setNlpConfig(_nlp);
-                            pp = new Gson().toJson(params);
-                            ProjectVO param = summary.getSummary(pp, "챕터 ["+c+"] 요약문");
-
-                            if(StringUtils.isNotEmpty(param.getTitle())) {
-                                paramVo.setSummary0(param.getSummary0());
-                                paramVo.setTitle(param.getTitle());
-                                reportMapper.saveReportData(paramVo);
-                                reportMapper.updReportCountUp(paramVo);
-                                _nowCount++;
-                                if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
-                                    summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
-                                }
-                                if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
-                                    summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
-                                }
-                                statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
-                                if (StringUtils.isNotEmpty(_token)) {
-                                    _msg = "챕터 리포트가 생성되었습니다.";
+                                if(StringUtils.isNotEmpty(param.getTitle())) {
+                                    paramVo.setSummary0(param.getSummary0());
+                                    paramVo.setTitle(param.getTitle());
+                                    reportMapper.saveReportData(paramVo);
+                                    reportMapper.updReportCountUp(paramVo);
+                                    _nowCount++;
+                                    if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                                    }
+                                    if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                                        summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
+                                    }
+                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0()); // api 사용량 집계(요약문)
+                                    if (StringUtils.isNotEmpty(_token)) {
+                                        _msg = "챕터 리포트가 생성되었습니다.";
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    _data9 = new ArrayList<SumtextVO>();
-                    _data99 = new ArrayList<ReportVO>();
-                    if(reportVO.getRfil2()==1 && StringUtils.isNotEmpty(reportVO.getTp3())) { // 서브챕터 요약문
-                        for (String s : _subs) {
-                            for (ReportVO data : _data10) {
-                                if(data.getTp3().equals(s)) {
-                                    ReportVO _r = new ReportVO();
-                                    _r.setTp1(data.getTp1()); // 화자
-                                    _r.setTp2(data.getTp2()); // 챕터
-                                    _r.setTp3(data.getTp3()); // 서브챕터
-                                    _r.setTp4(data.getTp4()); // 질문
-                                    _r.setTp5(data.getTp5()); // 답변
-                                    _data99.add(_r);
+                        _data9 = new ArrayList<SumtextVO>();
+                        _data99 = new ArrayList<ReportVO>();
+                        if(reportVO.getRfil2()==1 && StringUtils.isNotEmpty(reportVO.getTp3())) { // 서브챕터 요약문
+                            for (String s : _subs) {
+                                for (ReportVO data : _data10) {
+                                    if(data.getTp3().equals(s)) {
+                                        ReportVO _r = new ReportVO();
+                                        _r.setTp1(data.getTp1()); // 화자
+                                        _r.setTp2(data.getTp2()); // 챕터
+                                        _r.setTp3(data.getTp3()); // 서브챕터
+                                        _r.setTp4(data.getTp4()); // 질문
+                                        _r.setTp5(data.getTp5()); // 답변
+                                        _data99.add(_r);
 
-                                    SumtextVO _s = new SumtextVO();
-                                    _s.setSpeaker(data.getTp1());
-                                    _s.setText(_r.getTp5());
-                                    _data9.add(_s);
+                                        SumtextVO _s = new SumtextVO();
+                                        _s.setSpeaker(data.getTp1());
+                                        _s.setText(_r.getTp5());
+                                        _data9.add(_s);
+                                    }
                                 }
+                                SummaryVO params = new SummaryVO();
+                                params.setText(_data9);
+                                params.setNlpConfig(_nlp);
+                                pp = new Gson().toJson(params);
+                                ProjectVO param = summary.getSummary(pp, "서브챕터 ["+s+"] 요약문");
+
+                                if(StringUtils.isNotEmpty(param.getTitle())){
+                                    paramVo.setSummary0(param.getSummary0());
+                                    paramVo.setTitle(param.getTitle());
+                                    reportMapper.saveReportData(paramVo);
+                                    reportMapper.updReportCountUp(paramVo);
+                                    _nowCount++;
+                                    if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                                    }
+                                    if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                                        summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
+                                    }
+                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+
+                                    if(StringUtils.isNotEmpty(_token)){
+                                        _msg = "서브챕터 요약이 생성되었습니다.";
+                                    }
+                                }else{ _msg = "서브챕터 요약 생성을 실패하였습니다."; }
                             }
-                            SummaryVO params = new SummaryVO();
-                            params.setText(_data9);
-                            params.setNlpConfig(_nlp);
-                            pp = new Gson().toJson(params);
-                            ProjectVO param = summary.getSummary(pp, "서브챕터 ["+s+"] 요약문");
+                        }
 
-                            if(StringUtils.isNotEmpty(param.getTitle())){
-                                paramVo.setSummary0(param.getSummary0());
-                                paramVo.setTitle(param.getTitle());
-                                reportMapper.saveReportData(paramVo);
-                                reportMapper.updReportCountUp(paramVo);
-                                _nowCount++;
-                                if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
-                                    summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
-                                }
-                                if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
-                                    summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
-                                }
-                                statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+                        _data9 = new ArrayList<SumtextVO>();
+                        _data99 = new ArrayList<ReportVO>();
+                        if(reportVO.getRfil3()==1 && StringUtils.isNotEmpty(reportVO.getTp4())) { // 질문 요약문
+                            for (String q : _questions) {
+                                for (ReportVO data : _data10) {
+                                    if(data.getTp4().equals(q)) {
+                                        ReportVO _r = new ReportVO();
+                                        _r.setTp1(data.getTp1()); // 화자
+                                        _r.setTp2(data.getTp2()); // 챕터
+                                        _r.setTp3(data.getTp3()); // 서브챕터
+                                        _r.setTp4(data.getTp4()); // 질문
+                                        _r.setTp5(data.getTp5()); // 답변
+                                        _data99.add(_r);
 
-                                if(StringUtils.isNotEmpty(_token)){
-                                    _msg = "서브챕터 요약이 생성되었습니다.";
+                                        SumtextVO _s = new SumtextVO();
+                                        _s.setSpeaker(data.getTp1());
+                                        _s.setText(_r.getTp5());
+                                        _data9.add(_s);
+                                    }
                                 }
-                            }else{ _msg = "서브챕터 요약 생성을 실패하였습니다."; }
+                                SummaryVO params = new SummaryVO();
+                                params.setText(_data9);
+                                params.setNlpConfig(_nlp);
+                                pp = new Gson().toJson(params);
+                                ProjectVO param = summary.getSummary(pp, "질문 ["+q+"] 요약문");
+
+                                if(StringUtils.isNotEmpty(param.getTitle())){
+                                    paramVo.setSummary0(param.getSummary0());
+                                    paramVo.setTitle(param.getTitle());
+                                    reportMapper.saveReportData(paramVo);
+                                    reportMapper.updReportCountUp(paramVo);
+                                    _nowCount++;
+                                    if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
+                                        summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
+                                    }
+                                    if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
+                                        summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
+                                    }
+                                    statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
+
+                                    if(StringUtils.isNotEmpty(_token)){
+                                        _msg = "질문 요약이 생성되었습니다.";
+                                    }
+                                }else{ _msg = "질문 요약 생성을 실패하였습니다."; }
+                            }
+                        }
+
+                        savMetadata(paramVo.getIdx_report(), _metalist); // 메타데이터 집계
+                        reportVO.setIdx_report(paramVo.getIdx_report());
+
+                        Map _km = new HashMap();
+                        saveSummaryKeyword(_data10, summ_keywords, summ_adjectives, reportVO); //api 사용량 집계
+
+                        if(paramVo.getIdx_report()>0 && _totalCount==_nowCount){
+                            _msg = "리포트가 생성되었습니다.";
+                            _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
                         }
                     }
-
-                    _data9 = new ArrayList<SumtextVO>();
-                    _data99 = new ArrayList<ReportVO>();
-                    if(reportVO.getRfil3()==1 && StringUtils.isNotEmpty(reportVO.getTp4())) { // 질문 요약문
-                        for (String q : _questions) {
-                            for (ReportVO data : _data10) {
-                                if(data.getTp4().equals(q)) {
-                                    ReportVO _r = new ReportVO();
-                                    _r.setTp1(data.getTp1()); // 화자
-                                    _r.setTp2(data.getTp2()); // 챕터
-                                    _r.setTp3(data.getTp3()); // 서브챕터
-                                    _r.setTp4(data.getTp4()); // 질문
-                                    _r.setTp5(data.getTp5()); // 답변
-                                    _data99.add(_r);
-
-                                    SumtextVO _s = new SumtextVO();
-                                    _s.setSpeaker(data.getTp1());
-                                    _s.setText(_r.getTp5());
-                                    _data9.add(_s);
-                                }
-                            }
-                            SummaryVO params = new SummaryVO();
-                            params.setText(_data9);
-                            params.setNlpConfig(_nlp);
-                            pp = new Gson().toJson(params);
-                            ProjectVO param = summary.getSummary(pp, "질문 ["+q+"] 요약문");
-
-                            if(StringUtils.isNotEmpty(param.getTitle())){
-                                paramVo.setSummary0(param.getSummary0());
-                                paramVo.setTitle(param.getTitle());
-                                reportMapper.saveReportData(paramVo);
-                                reportMapper.updReportCountUp(paramVo);
-                                _nowCount++;
-                                if(reportVO.getRfil5()==1 || reportVO.getRfil5()==3){
-                                    summ_keywords.add(param.getSummary_keywords()); // 추출된 명사 있으면 명사 리스트에 저장
-                                }
-                                if(reportVO.getRfil5()==2 || reportVO.getRfil5()==3){
-                                    summ_adjectives.add(param.getSummary_adjectives()); // 추출된 형용사 있으면 형용사 리스트에 저장
-                                }
-                                statisticsService.createAPIUsage(paramVo, 1, paramVo.getSummary0());
-
-                                if(StringUtils.isNotEmpty(_token)){
-                                    _msg = "질문 요약이 생성되었습니다.";
-                                }
-                            }else{ _msg = "질문 요약 생성을 실패하였습니다."; }
-                        }
-                    }
-
-                    savMetadata(paramVo.getIdx_report(), _metalist); // 메타데이터 집계
-                    reportVO.setIdx_report(paramVo.getIdx_report());
-
-                    Map _km = new HashMap();
-                    saveSummaryKeyword(_data10, summ_keywords, summ_adjectives, reportVO); //api 사용량 집계
-
-                    if(paramVo.getIdx_report()>0 && _totalCount==_nowCount){
-                        _msg = "리포트가 생성되었습니다.";
-                        _kafka.put("link","/report_detail/" + paramVo.getIdx_report());
-                    }
+                } else {
+                    _msg = "조건에 해당되는 열이 존재하지 않습니다.";
                 }
-            } else {
-                _msg = "조건에 해당되는 열이 존재하지 않습니다.";
             }
 
             if(StringUtils.isNotEmpty(_token)){
