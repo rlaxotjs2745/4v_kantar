@@ -40,6 +40,7 @@ public class Summary {
 			}
 			paramVo.setDagloerr(0);
 		}else{
+			System.out.println("DAGLO : " + _rs.toString());
 			paramVo.setTitle("");
 			paramVo.setSummary0("");
 			paramVo.setKeywords("");

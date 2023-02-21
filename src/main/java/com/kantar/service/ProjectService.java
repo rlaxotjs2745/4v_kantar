@@ -109,7 +109,8 @@ public class ProjectService {
                     _nlp0.put("outputSizeOption","small");
 
                     _nlp1.put("enable",false);
-                    _nlp1.put("maxCount","30");
+                    _nlp1.put("maxCount",30);
+                    _nlp1.put("extractAdjectives",false);
 
                     _nlp2.put("enable",false);
 
@@ -154,6 +155,7 @@ public class ProjectService {
                             _msg = "리포트 생성을 실패하였습니다.";
                         }
                     }else{
+                        System.out.println("PP : " + pp.toString());
                         _msg = "텍스트 분석 시스템 오류로 리포트 생성을 중단합니다. 잠시후 다시 시도해주세요.";
                     }
                 }
