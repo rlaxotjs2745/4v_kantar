@@ -230,51 +230,59 @@ public class ProjectService {
      * @throws Exception
      */
     public File merge_csv(ProjectVO paramVo) throws Exception{
-
         String path = "/report/" + paramVo.getJob_no() + "/";
         String fullpath = this.filepath + path;
         File fileDir = new File(fullpath);
         if (!fileDir.exists()) {
             fileDir.mkdirs();
         }
-
-        File mergeCsv = new File(fullpath, (paramVo.getProject_name() + ".csv"));
-        OutputStreamWriter out = null;
-        FileOutputStream fos = null;
-        fos = new FileOutputStream(mergeCsv, true);
-        out = new OutputStreamWriter(fos);
-        out.write("\ufeff");
-
+        BufferedReader input = null;
+        BufferedOutputStream out = null;
+        String line = null;
+        byte[] data = null;
         String[] _mergeIdx = paramVo.getProject_merge_idx().split(",");
 
-        int fileCnt = 1;
-        for (String mergeIdx : _mergeIdx) {
-            int lineCnt = 0;
-            ProjectVO param = new ProjectVO();
-            param.setIdx_project_job_projectid(Integer.valueOf(mergeIdx));
-            ProjectVO rs0 = projectMapper.getProjectJobProjectid(param);
-            String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
-
-            List<String[]> ers = excel.getCsvListData(_fpath);
-
-            for (String[] er : ers) {
-                if(fileCnt==1 || (fileCnt>1&&lineCnt>0)) {
-                    for (String str00 : er) {
-                        String aData = "";
-                        aData = "\""+str00+"\",";
-                        out.write(aData);
+        try{
+            out = new BufferedOutputStream(new FileOutputStream(fullpath + (paramVo.getProject_name() + ".csv")));
+            int fileCnt = 1;
+            for (String mergeIdx : _mergeIdx) {
+                int lineCnt = 0;
+                ProjectVO param = new ProjectVO();
+                param.setIdx_project_job_projectid(Integer.valueOf(mergeIdx));
+                ProjectVO rs0 = projectMapper.getProjectJobProjectid(param);
+                String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
+                File _fpath0 = new File(_fpath);
+                if(_fpath0.exists()){
+                    input = new BufferedReader(new InputStreamReader(new FileInputStream(_fpath0)));
+                    while( (line = input.readLine()) != null){
+                        if(fileCnt==1 || (fileCnt>1&&lineCnt>0)) {
+                            data = line.getBytes();
+                            out.write(data);
+                            out.write(System.lineSeparator().getBytes());
+                        }
+                        lineCnt++;
                     }
-                    out.write("\r\n");
+                    fileCnt++;
                 }
-                lineCnt++;
             }
-            fileCnt++;
+        }finally{
+            if(input!=null){
+                try{
+                    input.close();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+            if(out!=null){
+                try{
+                    out.flush();
+                    out.close();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
         }
-
-        if(out!=null){
-            out.flush();
-            out.close();
-        }
+        File mergeCsv = new File(fullpath + (paramVo.getProject_name() + ".csv"));
         return mergeCsv;
     }
 
