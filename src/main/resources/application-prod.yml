@@ -32,7 +32,7 @@ logging:
     com:
       eura: debug
   file:
-    path: classpath:/logs
+    path: /home/ec2-user/KANTAR_SERVER/logs
     max-history: 7
 
 log4jdbc:
@@ -47,4 +47,4 @@ log4jdbc:
         drivers: false
 
 domain: https://api.kantar.com
-w3domain: https://kantar.com
+w3domain: http://43.201.14.108

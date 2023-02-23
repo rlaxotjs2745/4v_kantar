@@ -28,23 +28,12 @@ spring:
     secret: cMtNfCZTjYL6w9oDKNqwEkndAyiTK5FJAMZc
   smr:
     token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJlbnRfaWQiOiJmMjc0YTVhYy01ZGYxLTZhMTItYjVhNy0zNzQ4YjI4NjkyNDYiLCJncm91cCI6IkthbnRhciBkZXYyIiwiY3VzdG9tIjoiQ3JlYXRlZCBieSBLYW5nd29vaywgZm9yIEthbnRhciBrb3JlYSB0ZXN0aW5nLiBleHBpcmVkIG9uIDIwMjMtMDEtMzEiLCJpYXQiOjE2NzA1NjM3OTUsImV4cCI6MTY3NzU5NzExN30.MjGIQ9xnNIMWmPWvU-ni-iIGUghzW0HkO0b36N6KeIM
-  # mail:
-  #   protocol: smtp
-  #   host: smtp.gmail.com
-  #   port: 587
-  #   username: seeshow202106@gmail.com
-  #   password: gcyqljnhdzyascpg
-  #   properties:
-  #     mail:
-  #       smtp:
-  #         auth: true
-  #         starttls:
-  #           enable: true
-  #         ssl:
-  #           protocols: TLSv1.2
+  main:
+    allow-bean-definition-overriding: true
 
 mail:
-  passwd: Kantardev1!
+  userid: kantardev01@gmail.com
+  passwd: mskvyfttzkatvhps
 
 server:
   tomcat:

@@ -3,6 +3,7 @@ package com.kantar.util;
 import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import jakarta.mail.*;
@@ -10,15 +11,18 @@ import jakarta.mail.internet.*;
 
 @Component
 public class MailSender {
+    @Value("${mail.userid}")
+    private String mailuserid;
+
     @Value("${mail.passwd}")
     private String mailpasswd;
 
     private String FROM = "kantar@kantar.co.kr";
     private String FROMNAME = "KANTAR";
-    private String SMTP_USERNAME = "kantardev01@gmail.com";
     private String HOST = "smtp.gmail.com";
     private int PORT = 587;
 
+    @Async
     public void sender(String To, String Subject, String Body) throws Exception {
         Properties props = System.getProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -29,7 +33,13 @@ public class MailSender {
         props.put("mail.smtp.ssl.trust", HOST);
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 
-        Session session = Session.getDefaultInstance(props);
+        Session session = Session.getDefaultInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(mailuserid, mailpasswd);
+            }
+        });
+        // session.setDebug(true);
         MimeMessage msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(FROM, FROMNAME));
         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(To));
@@ -38,7 +48,7 @@ public class MailSender {
 
         Transport transport = session.getTransport();
         try {
-            transport.connect(HOST, SMTP_USERNAME, mailpasswd);
+            transport.connect(HOST, mailuserid, mailpasswd);
             transport.sendMessage(msg, msg.getAllRecipients());
         } catch (Exception ex) {
             ex.printStackTrace();

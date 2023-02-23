@@ -144,8 +144,8 @@ public class UserController extends BaseController {
      * @return CommonResult
      * @throws Exception
      */
+    // @Transactional
     @PostMapping("/create")
-    @Transactional
     public CommonResult create(HttpServletRequest req, @RequestBody UserVO paramVo) throws Exception {
         try {
             UserVO uinfo = getChkUserLogin(req);
@@ -180,11 +180,11 @@ public class UserController extends BaseController {
             String hashedPassword = passwordEncoder.encode(new Date().toString());
             paramVo.setUser_pw(hashedPassword);
             paramVo.setUser_status(0);
-            paramVo.setUser_phone(newPw);
-            Integer rs = userMapper.savUserInfo(paramVo);
+            // paramVo.setUser_phone(newPw);
             paramVo.setFirst_code(newPw);
+            Integer rs = userMapper.savUserInfo(paramVo);
             if(rs==1){
-                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", "<a href=\"" + clientDomain + "/" + newPw + "\">계정 인증하기</a>");
+                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", "<a href=\"" + clientDomain + "/firstlogin/" + newPw + "\">계정 인증하기</a>");
                 return responseService.getSuccessResult("create","회원 가입이 완료되었습니다.");
             } else {
                 return responseService.getFailResult("create","회원 가입 후에 이용해주세요.");
