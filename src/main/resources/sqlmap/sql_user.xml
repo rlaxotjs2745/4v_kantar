@@ -55,7 +55,7 @@
     </select>
 
     <select id="getUserInfoByFCode" resultType="com.kantar.vo.UserVO">
-        SELECT * FROM KT_USER WHERE first_code = #{fCode} AND user_status = 0
+        SELECT * FROM KT_USER WHERE user_id=#{user_id} AND first_code = #{first_code} AND user_status = 0
     </select>
 
     <update id="updateUserPW" parameterType="com.kantar.vo.UserVO">

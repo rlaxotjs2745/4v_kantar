@@ -471,9 +471,12 @@ public class UserController extends BaseController {
     }
 
     @GetMapping("/first_login")
-    public CommonResult firstLogin(HttpServletRequest req, @RequestParam("fCode") String firstCode) throws Exception {
+    public CommonResult firstLogin(HttpServletRequest req, @RequestParam("uid") String user_id, @RequestParam("fCode") String firstCode) throws Exception {
         try {
-            UserVO userInfo = userMapper.getUserInfoByFCode(firstCode);
+            UserVO paramVo = new UserVO();
+            paramVo.setUser_id(user_id);
+            paramVo.setFirst_code(firstCode);
+            UserVO userInfo = userMapper.getUserInfoByFCode(paramVo);
             if(userInfo == null){
                 return responseService.getFailResult("first_login","사용자를 찾을 수 없습니다.");
             }
