@@ -184,7 +184,7 @@ public class UserController extends BaseController {
             paramVo.setFirst_code(newPw);
             Integer rs = userMapper.savUserInfo(paramVo);
             if(rs==1){
-                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", "<a href=\"" + clientDomain + "/firstlogin/" + newPw + "\">계정 인증하기</a>");
+                mailSender.sender(paramVo.getUser_id(), "[KANTAR] 회원가입 안내", "<a href=\"" + clientDomain + "/firstlogin/"+paramVo.getUser_id()+"/" + newPw + "\">계정 인증하기</a>");
                 return responseService.getSuccessResult("create","회원 가입이 완료되었습니다.");
             } else {
                 return responseService.getFailResult("create","회원 가입 후에 이용해주세요.");
