@@ -1,35 +1,19 @@
 package com.kantar.service;
 
-import com.google.gson.Gson;
-import com.kantar.mapper.ProjectMapper;
-import com.kantar.mapper.ReportMapper;
 import com.kantar.mapper.StatisticsMapper;
 import com.kantar.util.Excel;
-import com.kantar.util.Summary;
-import com.kantar.util.TokenJWT;
 import com.kantar.vo.*;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
 public class StatisticsService {
-
-    @Autowired
-    private ReportMapper reportMapper;
-
     @Autowired
     private final StatisticsMapper statisticsMapper;
 

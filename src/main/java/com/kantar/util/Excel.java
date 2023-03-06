@@ -39,9 +39,6 @@ public class Excel {
 				allRows.add(line);
 			}
 		}
-		if(allRows.size()>7000){
-			allRows = null;
-		}
 		return allRows;
 	}
 

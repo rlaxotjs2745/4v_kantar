@@ -71,7 +71,7 @@ public class TokenJWT {
 
             claimMap = claims;
         } catch (ExpiredJwtException e) { // 토큰이 만료되었을 경우
-            System.out.println(token);
+            // System.out.println(token);
             System.out.println("token expired");
         } catch (Exception e) { // 그외 에러났을 경우
             System.err.println(e);

@@ -91,10 +91,10 @@ public class UserController extends BaseController {
                     param0.put("token",_token);
                     return responseService.getSuccessResult(param0, "login","로그인 성공");
                 }else{
-                    return responseService.getFailResult("login","입력 정보를 다시 확인해주세요.");
+                    return responseService.getFailResult("login","아이디 및 비밀번호를 다시 확인해주세요.");
                 }
             }else{
-                return responseService.getFailResult("login","회원 가입 후에 이용해주세요.");
+                return responseService.getFailResult("login","아이디 및 비밀번호를 다시 확인해주세요.");
             }
         } catch (Exception e) {
             e.printStackTrace();

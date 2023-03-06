@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.kantar.mapper.FilterMapper;
-// import com.kantar.service.FileService;
 import com.kantar.service.FilterService;
 import com.kantar.service.StatisticsService;
 import com.kantar.vo.*;
@@ -21,11 +20,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
-// import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,12 +39,12 @@ import com.kantar.mapper.ReportMapper;
 import com.kantar.model.CommonResult;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
+import com.kantar.util.FileEncode;
 import com.kantar.util.TokenJWT;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-// import java.net.URLEncoder;
 
 @RestController
 @RequestMapping("/api/report")
@@ -72,9 +69,6 @@ public class ReportController extends BaseController {
 
     @Autowired
     private FilterMapper filterMapper;
-
-    // @Autowired
-    // private FileService fileService;
 
     @Autowired
     private TokenJWT tokenJWT;
@@ -150,10 +144,14 @@ public class ReportController extends BaseController {
                         String ext = FilenameUtils.getExtension(fname);
                         String contentType = mf.getContentType();
                         if (!ext.equals("csv")) {
-                            return responseService.getFailResult("create_report",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                            return responseService.getFailResult("create_report",".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
                         }
                         if(contentType != null && !contentType.equals("text/csv")) {
-                            return responseService.getFailResult("create_report",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                            return responseService.getFailResult("create_report",".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                        }
+                        String _encode = FileEncode.findFileEncoding(mf);
+                        if(_encode!="UTF-8"){
+                            return responseService.getFailResult("csv_view", ".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
                         }
                     }
                 }
@@ -200,8 +198,6 @@ public class ReportController extends BaseController {
                                 if(paramVo.getIdx_project()==0 || paramVo.getIdx_project() == null){
                                     return responseService.getFailResult("create_report","저장에 실패하였습니다.");
                                 }else{
-                                    //paramVo.setFilepath(path);
-                                    //paramVo.setFilename(originFileName);
                                     statisticsService.createProjectInfo(paramVo);// 프로젝트 생성시 사용량 누적
 
                                     // 요청 사항 : 2023.01.06 회의때 프로젝트 저장 시 리포트 생성까지 같이 되도록 요청
@@ -215,8 +211,6 @@ public class ReportController extends BaseController {
                                     param.setIdx_user(paramVo.getIdx_user());
                                     param.setIdx_project(paramVo.getIdx_project());
                                     param.setIdx_project_job_projectid(paramVo.getIdx_project_job_projectid());
-                                    //param.setFilename(originFileName);
-                                    //param.setFilepath(path);
                                     param.setProject_name(paramVo.getProject_name());
                                     param.setTitle(paramVo.getProject_name() + "_기본리포트");
                                     param.setD_count_total(1);
@@ -239,7 +233,7 @@ public class ReportController extends BaseController {
                 _rdata.put("xlsdata",_elist);
                 return responseService.getSuccessResult(_rdata, "create_report", "기본 리포트 생성을 시작하였습니다.");
             }else{
-                return responseService.getFailResult("create_report",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                return responseService.getFailResult("create_report",".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -375,9 +369,6 @@ public class ReportController extends BaseController {
             return responseService.getFailResult("report_view","오류가 발생하였습니다.");
         }
     }
-
-
-
 
     /**
      * 병합 리포트 생성 : CSV 파일 병합
@@ -524,7 +515,6 @@ public class ReportController extends BaseController {
      * @throws Exception
      */
     @GetMapping("/download")
-    // @CrossOrigin(value = {"*"}, exposedHeaders = {"Content-Disposition"})
     public void getReportDown(HttpServletResponse response, HttpServletRequest req, ProjectVO paramVo) throws Exception {
         UserVO uinfo = getChkUserLogin(req);
         if(uinfo==null){
@@ -554,7 +544,6 @@ public class ReportController extends BaseController {
             font.setFontName("맑은 고딕");
             style.setWrapText(true); //문자열을 입력할때 \n 같은 개행을 인식해준다.
             style.setVerticalAlignment(VerticalAlignment.CENTER);
-            // style.setAlignment(HorizontalAlignment.CENTER);
             style.setFont(font);
 
             // 내용 스타일
@@ -567,13 +556,9 @@ public class ReportController extends BaseController {
             style2.setFont(font2);
 
             Integer rowNum = 0;
-            // rowNum++;
             Row row = sheet.createRow(rowNum++); // 타이틀행을 생성한다. 첫번째줄이기때문에 createRow(0)
             Cell cell = row.createCell(0); // 첫번째행의 첫번째열을 지정한다. 
             cell.setCellValue("01. 기본정보"); // setCellValue 셀에 값넣기.
-            // titleRow.setHeight((short)920); // Row에서 setHeight를 하면 행 높이가 조정된다. 
-            // sheet.addMergedRegion(new CellRangeAddress(0,0,0,9)); // 셀 병합  첫번째줄~아홉번째 열까지 병합 
-            // new CellRangeAddress(시작 row, 끝 row, 시작 col, 끝 col) 
             cell.setCellStyle(style);
             
             row = sheet.createRow(rowNum++);
@@ -853,14 +838,11 @@ public class ReportController extends BaseController {
             String _fName = "REPORT_" + rs0.getProject_name() +".xls";
             String outputFileName = UriUtils.encode(_fName, StandardCharsets.UTF_8.toString());
             response.setContentType("ms-vnd/excel");
-            // response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''"+ outputFileName);
-            // response.setHeader( "Content-Transfer-Encoding", "binary" );
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
             response.setHeader("Pragma", "no-cache");
             response.setHeader("Expires", "0");
             wb.write(response.getOutputStream());
-            // wb.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

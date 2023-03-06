@@ -1,7 +1,6 @@
 package com.kantar.controller;
 
 import java.io.File;
-// import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,8 +12,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.core.io.InputStreamResource;
-// import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,21 +22,19 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 
-// import com.google.gson.Gson;
 import com.kantar.base.BaseController;
 import com.kantar.mapper.ProjectMapper;
 import com.kantar.mapper.ReportMapper;
 import com.kantar.model.CommonResult;
 import com.kantar.service.FileService;
-// import com.kantar.service.KafkaSender;
 import com.kantar.service.ProjectService;
 import com.kantar.service.ResponseService;
+import com.kantar.util.FileEncode;
 import com.kantar.vo.ReportListVO;
 import com.kantar.vo.ProjectListVO;
 import com.kantar.vo.ProjectVO;
 import com.kantar.vo.ProjectViewVO;
 import com.kantar.vo.UserVO;
-// import com.kantar.util.TokenJWT;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -60,12 +55,6 @@ public class ProjectController extends BaseController {
 
     @Autowired
     private FileService fileService;
-
-    // @Autowired
-    // private KafkaSender kafkaSender;
-
-    // @Autowired
-	// private TokenJWT tokenJWT;
 
     @Value("${file.upload-dir}")
     public String filepath;
@@ -95,10 +84,14 @@ public class ProjectController extends BaseController {
                         String ext = FilenameUtils.getExtension(fname);
                         String contentType = mf.getContentType();
                         if (!ext.equals("csv")) {
-                            return responseService.getFailResult("csv_view",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                            return responseService.getFailResult("csv_view",".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
                         }
                         if(!contentType.equals("text/csv")) {
-                            return responseService.getFailResult("csv_view",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                            return responseService.getFailResult("csv_view",".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                        }
+                        String _encode = FileEncode.findFileEncoding(mf);
+                        if(_encode!="UTF-8"){
+                            return responseService.getFailResult("csv_view", ".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
                         }
                     }
                 }
@@ -145,7 +138,7 @@ public class ProjectController extends BaseController {
                     return responseService.getFailResult("csv_view","csv 내용을 불러 올 수 없습니다.");
                 }
             }else{
-                return responseService.getFailResult("csv_view",".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                return responseService.getFailResult("csv_view",".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -222,11 +215,6 @@ public class ProjectController extends BaseController {
             List<Object> result = new ArrayList<>();
             List<ProjectViewVO> rlist = new ArrayList<ProjectViewVO>();
 
-            // List<ProjectVO> rs = reportMapper.getReportFileList(paramVo);
-            // for(ProjectVO prs0 : rs){
-            //     ProjectVO rs0 = projectMapper.getProjectInfoByIdx(paramVo);
-            //     rlist = projectService.get_projectListView(rlist, prs0);
-            // }
             ProjectVO rs0 = projectMapper.getProjectInfoByProJobIdx(paramVo);
             rlist = projectService.get_projectListView(rlist, rs0);
 
@@ -271,7 +259,7 @@ public class ProjectController extends BaseController {
                 return null;
             }
             String _fpath = this.filepath + rs.getFilepath() + rs.getFilename();
-            return fileService.getFileDown(_fpath);
+            return fileService.getFileDown(_fpath, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
         }

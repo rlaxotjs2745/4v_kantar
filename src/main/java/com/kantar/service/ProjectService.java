@@ -155,7 +155,6 @@ public class ProjectService {
                             _msg = "리포트 생성을 실패하였습니다.";
                         }
                     }else{
-                        System.out.println("PP : " + pp.toString());
                         _msg = "텍스트 분석 시스템 오류로 리포트 생성을 중단합니다. 잠시후 다시 시도해주세요.";
                     }
                 }
@@ -255,7 +254,7 @@ public class ProjectService {
                 String _fpath = this.filepath + rs0.getFilepath() + rs0.getFilename();
                 File _fpath0 = new File(_fpath);
                 if(_fpath0.exists()){
-                    input = new BufferedReader(new InputStreamReader(new FileInputStream(_fpath0)));
+                    input = new BufferedReader(new InputStreamReader(new FileInputStream(_fpath0), "UTF-8"));
                     while( (line = input.readLine()) != null){
                         if(fileCnt==1 || (fileCnt>1&&lineCnt>0)) {
                             data = line.getBytes();
@@ -478,7 +477,7 @@ public class ProjectService {
                         paramVo.setReport_id(RPID);
                         paramVo.setTitle(reportVO.getTitle());
                         paramVo.setD_count_total(_totalCount); // 요약문 데이터 총 갯수
-                        Integer ridx0 = reportMapper.savReport(paramVo);
+                        reportMapper.savReport(paramVo);
 
                         if(reportVO.getRfil0()==1){ // 전체 요약문
                             SummaryVO params = new SummaryVO();

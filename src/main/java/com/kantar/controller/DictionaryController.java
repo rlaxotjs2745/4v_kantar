@@ -7,7 +7,7 @@ import com.kantar.model.CommonResult;
 import com.kantar.service.DictionaryService;
 import com.kantar.service.FileService;
 import com.kantar.service.ResponseService;
-import com.kantar.util.Excel;
+import com.kantar.util.FileEncode;
 import com.kantar.vo.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
@@ -154,11 +154,16 @@ public class DictionaryController extends BaseController {
                     String ext = FilenameUtils.getExtension(fname);
                     String contentType = mf.getContentType();
                     if (!ext.equals("csv")) {
-                        return responseService.getFailResult("dictionary_create", ".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                        return responseService.getFailResult("dictionary_create", ".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
                     }
                     if (!contentType.equals("text/csv")) {
-                        return responseService.getFailResult("dictionary_create", ".csv 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                        return responseService.getFailResult("dictionary_create", ".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
                     }
+                    String _encode = FileEncode.findFileEncoding(mf);
+                    if(_encode!="UTF-8"){
+                        return responseService.getFailResult("dictionary_create", ".csv (UTF-8 형식) 포맷 파일이 맞는지 확인 후 다시 업로드를 시도해주세요.");
+                    }
+
                 }
                 String path = "/dictionary/" + paramVo.getTitle() + "/";
                 String fullpath = this.filepath + path;
@@ -415,7 +420,7 @@ public class DictionaryController extends BaseController {
                 }
             }
 
-            return fileService.getFileDown(_fpath);
+            return fileService.getFileDown(_fpath, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
         }

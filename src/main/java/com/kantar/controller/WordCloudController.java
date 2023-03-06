@@ -1,31 +1,18 @@
 package com.kantar.controller;
 
 import com.kantar.base.BaseController;
-import com.kantar.mapper.FilterMapper;
-import com.kantar.mapper.ProjectMapper;
-import com.kantar.mapper.ReportMapper;
 import com.kantar.mapper.WordCloudMapper;
 import com.kantar.model.CommonResult;
 import com.kantar.service.*;
 import com.kantar.util.TokenJWT;
 import com.kantar.vo.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.util.UriUtils;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

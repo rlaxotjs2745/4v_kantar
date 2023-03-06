@@ -121,4 +121,50 @@ public class FileService {
         }
         return null;
     }
+
+    public ResponseEntity<Object> getFileDown(String fileName, String _encode) throws Exception {
+        try {
+            File file = new File(fileName);
+            // Path fPath = Paths.get(file.getAbsolutePath());
+
+            if(!file.exists()) {
+                return null;
+            }
+
+            String _fileName = file.getName();
+            String outputFileName = null;
+            if(_encode.equals("UTF-8")){
+                outputFileName = UriUtils.encode(_fileName, StandardCharsets.UTF_8.toString());
+            }else{
+                outputFileName = UriUtils.encode(_fileName, _encode);
+            }
+            // String ext = _fileName.substring(_fileName.lastIndexOf(".") + 1);
+            HttpHeaders header = new HttpHeaders();
+
+            if(_encode.equals("UTF-8")){
+                header.add("Content-Disposition", "attachment;filename*=UTF-8''"+ outputFileName);
+            }else{
+                header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+outputFileName);
+            }
+            header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+            header.add("Pragma", "no-cache");
+            header.add("Expires", "0");
+            
+            InputStreamResource resource3 = null;
+            if(_encode.equals("UTF-8")){
+                resource3 = new InputStreamResource(new FileInputStream(file), StandardCharsets.UTF_8.toString());
+            }else{
+                resource3 = new InputStreamResource(new FileInputStream(file), _encode);
+            }
+
+            return ResponseEntity.ok()
+                    .headers(header)
+                    .contentLength(file.length())
+                    .contentType(MediaType.parseMediaType("application/octet-stream"))
+                    .body(resource3);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
